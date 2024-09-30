@@ -10,10 +10,26 @@ Windows - open a powershell and type in `python` to install the python interpret
 Windows Terminal (from the Microsoft Store)
 
 
+Windows:
 
+Create a virual environment with python:   python3 -m venv .pygame-ce-codemash25
 
-Create a virual environment with python:
+Activate the virtual environment:  source .\.pygame-ce-codemash25\Scripts\activate
 
-Activate the virtual environment:
+```
+.\.pygame-ce-codemash25\Scripts\activate : File C:\Users\Andrew\sbx\.pygame-ce-codemash25\Scripts\Activate.ps1 cannot
+be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies at
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:1
++ .\.pygame-ce-codemash25\Scripts\activate
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+```
 
-Windows - allow scripts:
+Windows - allow scripts for the current process:
+`Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process`
+
+`pip install pygame-ce`
+
+`python test.py`
