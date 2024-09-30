@@ -70,9 +70,13 @@ if(GAME_CLI_ARGUMENTS.double_buffer):
   print(f"Setting Double Buffering")
 
 pygame.display.set_caption("CodeMash 2025 Divez - So you want to be a video game developer?")
+
+# Create the screen object
 THE_SCREEN = pygame.display.set_mode((GAME_CONSTANTS['SCREEN_WIDTH'], GAME_CONSTANTS['SCREEN_HEIGHT']), GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'])
-print(f"{pygame.display.get_driver()}")
-print(f"{pygame.display.Info()}")
+
+
+print(f"PyGame Driver:  {pygame.display.get_driver()}")
+print(f"PyGame Display Info:\n{pygame.display.Info()}")
 
 
 #screen.fill((r,g,b))
@@ -81,7 +85,8 @@ print(f"{pygame.display.Info()}")
 # ESTABLISH THE GAME CLOCK
 #
 # The game clock and ELAPSED_MS will be used for most, if not all
-# our calculations for how all elements are to progress in the game.
+# our calculations for how all elements are to progress in the game,
+# for each frame.
 # At the end of our game loop, we have the game clock tick near 60fps
 # as best as the hardware we're running off of can go.
 ######################################################################
@@ -107,10 +112,16 @@ while GAME_STATE['RUNNING']:
     # HANDLE USER I/O
     ##################################################################
 
+    
 
 
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
+  #
+  # Tell the game to update what's on screen visually.
+  #
+  # Calculate how much time has elapsed so we can update our game
+  # on the next frame.
   ####################################################################
   if(GAME_CLI_ARGUMENTS.double_buffer):
     pygame.display.flip() #Updates the whole screen, with double buffering, we want to use flip
