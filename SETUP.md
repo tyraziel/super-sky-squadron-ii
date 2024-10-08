@@ -14,7 +14,7 @@ Windows:
 
 Create a virual environment with python:   python3 -m venv .pygame-ce-codemash25
 
-Activate the virtual environment:  source .\.pygame-ce-codemash25\Scripts\activate
+Activate the virtual environment:  .\.pygame-ce-codemash25\Scripts\activate
 
 ```
 .\.pygame-ce-codemash25\Scripts\activate : File C:\Users\Andrew\sbx\.pygame-ce-codemash25\Scripts\Activate.ps1 cannot
@@ -33,3 +33,14 @@ Windows - allow scripts for the current process:
 `pip install pygame-ce`
 
 `python test.py`
+
+
+To deactivate your venv: `deactivate` from the command prompt
+
+
+
+
+The Assets:
+
+Kenney Fonts:  https://kenney.nl/assets/kenney-fonts
+Kenney Space Shooter Redux:  https://kenney.nl/assets/space-shooter-redux

@@ -38,8 +38,8 @@ GAME_CLI_ARGUMENTS = argument_parser.parse_args()
 #These are 'indexed' by GAME_STATE['KEY']
 GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode,
-              'RUNNING': True, 'GAME_OVER': False,
-              } 
+              'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
+             } 
             #   'main_game': False, 'title_screen': False, 'mission_screen': False, 'high_score_screen': False,
             #   'transition_to_game_from_mission': False, 'transition_to_game_from_mission_ttl': TRANSITION_TO_GAME_TTL,
             #   'transition_to_mission_from_title': False, 'transition_to_mission_from_title_ttl': TRANSITION_TO_MISSION_TTL,
@@ -63,7 +63,6 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 # ***LESSON***
 TTL_DEFAULTS = {}
 
-
 ######################################################################
 # INITIALIZE PYGAME AND OTHER ELEMENTS FOR THE GAME
 ######################################################################
@@ -73,9 +72,12 @@ pygame.init()
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] Complete!")
 
-#We create a separate dictionary for the game keys so we can do stuff according to the state of the keys
-#'indexed' by game_keys['key']
-GAME_KEYS = {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False, 'w': False, 'a': False, 's': False, 'd': False, 'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False} #, 'space': False, 'advance': False, 'backspace': False}
+#We create a separate dictionary for the game controls so we can do stuff according to the state of the controls
+#'indexed' by GAME_CONTROLS['key']
+GAME_CONTROLS = {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False, 
+                 'w': False, 'a': False, 's': False, 'd': False, 
+                 'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False,
+                }
 
 GAME_FONTS = {}
 
@@ -195,30 +197,30 @@ while GAME_STATE['RUNNING']:
         GAME_STATE['RUNNING'] = False
 
       if the_event.key == K_UP:
-        GAME_KEYS['UP'] = True
-        GAME_KEYS['up_arrow'] = True
+        GAME_CONTROLS['UP'] = True
+        GAME_CONTROLS['up_arrow'] = True
       if the_event.key == K_LEFT:
-        GAME_KEYS['LEFT'] = True
-        GAME_KEYS['left_arrow'] = True
+        GAME_CONTROLS['LEFT'] = True
+        GAME_CONTROLS['left_arrow'] = True
       if the_event.key == K_DOWN:
-        GAME_KEYS['DOWN'] = True
-        GAME_KEYS['down_arrow'] = True
+        GAME_CONTROLS['DOWN'] = True
+        GAME_CONTROLS['down_arrow'] = True
       if the_event.key == K_RIGHT:
-        GAME_KEYS['RIGHT'] = True
-        GAME_KEYS['right_arrow'] = True
+        GAME_CONTROLS['RIGHT'] = True
+        GAME_CONTROLS['right_arrow'] = True
 
       if the_event.key == K_w:
-        GAME_KEYS['UP'] = True
-        GAME_KEYS['w'] = True
+        GAME_CONTROLS['UP'] = True
+        GAME_CONTROLS['w'] = True
       if the_event.key == K_a:
-        GAME_KEYS['LEFT'] = True
-        GAME_KEYS['a'] = True
+        GAME_CONTROLS['LEFT'] = True
+        GAME_CONTROLS['a'] = True
       if the_event.key == K_s:
-        GAME_KEYS['DOWN'] = True
-        GAME_KEYS['s'] = True
+        GAME_CONTROLS['DOWN'] = True
+        GAME_CONTROLS['s'] = True
       if the_event.key == K_d:
-        GAME_KEYS['RIGHT'] = True
-        GAME_KEYS['d'] = True
+        GAME_CONTROLS['RIGHT'] = True
+        GAME_CONTROLS['d'] = True
 
       #If we are in TEST_MODE a bunch of additional keys not generally available are now activated for us to manage the
       #game to test various things out.  Helpful if we need to test a level and we don't want to have to play through
@@ -259,30 +261,30 @@ while GAME_STATE['RUNNING']:
         print(f"[EVENT] [KEYBOARD] [KEYUP] {the_event.key}")
 
       if the_event.key == K_UP:
-        GAME_KEYS['UP'] = False
-        GAME_KEYS['up_arrow'] = False
+        GAME_CONTROLS['UP'] = False
+        GAME_CONTROLS['up_arrow'] = False
       if the_event.key == K_LEFT:
-        GAME_KEYS['LEFT'] = False
-        GAME_KEYS['left_arrow'] = False
+        GAME_CONTROLS['LEFT'] = False
+        GAME_CONTROLS['left_arrow'] = False
       if the_event.key == K_DOWN:
-        GAME_KEYS['DOWN'] = False
-        GAME_KEYS['down_arrow'] = False
+        GAME_CONTROLS['DOWN'] = False
+        GAME_CONTROLS['down_arrow'] = False
       if the_event.key == K_RIGHT:
-        GAME_KEYS['RIGHT'] = False
-        GAME_KEYS['right_arrow'] = False
+        GAME_CONTROLS['RIGHT'] = False
+        GAME_CONTROLS['right_arrow'] = False
 
       if the_event.key == K_w:
-        GAME_KEYS['UP'] = False
-        GAME_KEYS['w'] = False
+        GAME_CONTROLS['UP'] = False
+        GAME_CONTROLS['w'] = False
       if the_event.key == K_a:
-        GAME_KEYS['LEFT'] = False
-        GAME_KEYS['a'] = False
+        GAME_CONTROLS['LEFT'] = False
+        GAME_CONTROLS['a'] = False
       if the_event.key == K_s:
-        GAME_KEYS['DOWN'] = False
-        GAME_KEYS['s'] = False
+        GAME_CONTROLS['DOWN'] = False
+        GAME_CONTROLS['s'] = False
       if the_event.key == K_d:
-        GAME_KEYS['RIGHT'] = False
-        GAME_KEYS['d'] = False
+        GAME_CONTROLS['RIGHT'] = False
+        GAME_CONTROLS['d'] = False
 
     ##################################################################
     # HANDLE USER I/O (JOYSTICK)
@@ -349,8 +351,6 @@ while GAME_STATE['RUNNING']:
   ####################################################################
   if GAME_STATE['DEBUG']:
 
-
-
     # ***LESSON***
     #A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
     #https://www.pygame.org/docs/ref/font.html#pygame.font.Font.render
@@ -365,38 +365,38 @@ while GAME_STATE['RUNNING']:
     #Show input keys from keyboard
     wasd_debug_x_offset = 112 + 64
     wasd_debug_y_offset = 3
-    if GAME_KEYS['w']:
+    if GAME_CONTROLS['w']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
-    if GAME_KEYS['a']:
+    if GAME_CONTROLS['a']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    if GAME_KEYS['s']:
+    if GAME_CONTROLS['s']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    if GAME_KEYS['d']:
+    if GAME_CONTROLS['d']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
 
     arrow_debug_x_offset = 64
     arrow_debug_y_offset = 3
-    if GAME_KEYS['up_arrow']:
+    if GAME_CONTROLS['up_arrow']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
-    if GAME_KEYS['left_arrow']:
+    if GAME_CONTROLS['left_arrow']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    if GAME_KEYS['down_arrow']:
+    if GAME_CONTROLS['down_arrow']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    if GAME_KEYS['right_arrow']:
+    if GAME_CONTROLS['right_arrow']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
