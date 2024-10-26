@@ -14,7 +14,7 @@ from pygame.locals import (
 #Argument parsing to make running the game in different modes slightly easier
 argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to be a video game developer?")
 
-argument_parser.add_argument("--test", help="Enter Test/Dev Mode", action="store_true", dest="test_mode")
+argument_parser.add_argument("--test", "--test-mode", help="Enter Test/Dev Mode", action="store_true", dest="test_mode")
 argument_parser.add_argument("--debug", help="Enter Debug Mode", action="store_true", dest="debug")
 argument_parser.add_argument("--debug-to-console", help="Debug to Console only (does not need to be used in conjunction with --debug, does not debug events)", action="store_true", dest="debug_to_console")
 argument_parser.add_argument("--debug-events", help="Debug Events to Console (does not need --debug or --debug-to-console)", action="store_true", dest="debug_events")
@@ -40,11 +40,6 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_TO_CONSOLE': GAME_CLI_AR
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
              } 
-            #   'main_game': False, 'title_screen': False, 'mission_screen': False, 'high_score_screen': False,
-            #   'transition_to_game_from_mission': False, 'transition_to_game_from_mission_ttl': TRANSITION_TO_GAME_TTL,
-            #   'transition_to_mission_from_title': False, 'transition_to_mission_from_title_ttl': TRANSITION_TO_MISSION_TTL,
-            #   'transition_to_high_score_from_game': False, 'transition_to_high_score_from_game_ttl': TRANSITION_TO_HIGH_SCORE_TTL,
-            #   'transition_to_title_from_high_score': False, 'transition_to_title_from_high_score_ttl': TRANSITION_TO_TITLE_TTL,
 
 #Game Constants are generally held within this dictionary
 #These are 'indexed' by GAME_CONSTANTS['KEY']
@@ -122,6 +117,12 @@ GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'] = pygame.transfor
 GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 4*16, 16, 16)), (32, 32)) #31, 4
 GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 12*16, 16, 16)), (32, 32)) #31, 12
 
+GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #7, 13
+
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [IMAGES] Completed")
 
@@ -192,8 +193,8 @@ while GAME_STATE['RUNNING']:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [KEYBOARD] [KEYDOWN] {the_event.key}")
     
-      # The game wil exit / quit if someone hits the ESCAPE key
-      if the_event.key == K_ESCAPE:
+      # The game wil exit / quit if someone hits the SHFIT+ESCAPE key sequence
+      if the_event.key == K_ESCAPE  and (the_event.mod & KMOD_SHIFT):
         GAME_STATE['RUNNING'] = False
 
       if the_event.key == K_UP:
@@ -225,18 +226,20 @@ while GAME_STATE['RUNNING']:
       #If we are in TEST_MODE a bunch of additional keys not generally available are now activated for us to manage the
       #game to test various things out.  Helpful if we need to test a level and we don't want to have to play through
       #the game to get there (or even test out powerups / score / other things / and final boss battles!)
+      #
+      #Enter test mode by hitting the SHIFT+F12 key sequence
       if GAME_STATE['TEST_MODE']:
         if the_event.key == K_F9:
-          print(f"[TEST-MODE] [DEBUG-TO-CONSOLE] MODE TOGGLED")
+          print(f"[TEST-MODE] [DEBUG-TO-CONSOLE] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_TO_CONSOLE'])).upper()}")
           GAME_STATE['DEBUG_TO_CONSOLE'] = not GAME_STATE['DEBUG_TO_CONSOLE']
         if the_event.key == K_F10:
-          print(f"[TEST-MODE] [DEBUG-EVENTS] MODE TOGGLED")
+          print(f"[TEST-MODE] [DEBUG-EVENTS] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_EVENTS'])).upper()}")
           GAME_STATE['DEBUG_EVENTS'] = not GAME_STATE['DEBUG_EVENTS']
         if the_event.key == K_F11:
-          print(f"[TEST-MODE] [DEBUG-EVENTS-VERBOSE] MODE TOGGLED")
+          print(f"[TEST-MODE] [DEBUG-EVENTS-VERBOSE] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_EVENTS_VERBOSE'])).upper()}")
           GAME_STATE['DEBUG_EVENTS_VERBOSE'] = not GAME_STATE['DEBUG_EVENTS_VERBOSE']
         if the_event.key == K_F12 and not (the_event.mod & KMOD_SHIFT):
-          print(f"[TEST-MODE] [DEBUG] MODE TOGGLED")
+          print(f"[TEST-MODE] [DEBUG] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG'])).upper()}")
           GAME_STATE['DEBUG'] = not GAME_STATE['DEBUG']
         if the_event.key == K_F12 and (the_event.mod & KMOD_SHIFT):
           print(f"[TEST-MODE] DEACTIVATED")
@@ -261,29 +264,29 @@ while GAME_STATE['RUNNING']:
         print(f"[EVENT] [KEYBOARD] [KEYUP] {the_event.key}")
 
       if the_event.key == K_UP:
-        GAME_CONTROLS['UP'] = False
+        GAME_CONTROLS['UP'] = False or GAME_CONTROLS['w']
         GAME_CONTROLS['up_arrow'] = False
       if the_event.key == K_LEFT:
-        GAME_CONTROLS['LEFT'] = False
+        GAME_CONTROLS['LEFT'] = False or GAME_CONTROLS['a']
         GAME_CONTROLS['left_arrow'] = False
       if the_event.key == K_DOWN:
-        GAME_CONTROLS['DOWN'] = False
+        GAME_CONTROLS['DOWN'] = False or GAME_CONTROLS['s']
         GAME_CONTROLS['down_arrow'] = False
       if the_event.key == K_RIGHT:
-        GAME_CONTROLS['RIGHT'] = False
+        GAME_CONTROLS['RIGHT'] = False or GAME_CONTROLS['d']
         GAME_CONTROLS['right_arrow'] = False
 
       if the_event.key == K_w:
-        GAME_CONTROLS['UP'] = False
+        GAME_CONTROLS['UP'] = False or GAME_CONTROLS['up_arrow']
         GAME_CONTROLS['w'] = False
       if the_event.key == K_a:
-        GAME_CONTROLS['LEFT'] = False
+        GAME_CONTROLS['LEFT'] = False or GAME_CONTROLS['left_arrow']
         GAME_CONTROLS['a'] = False
       if the_event.key == K_s:
-        GAME_CONTROLS['DOWN'] = False
+        GAME_CONTROLS['DOWN'] = False or GAME_CONTROLS['down_arrow']
         GAME_CONTROLS['s'] = False
       if the_event.key == K_d:
-        GAME_CONTROLS['RIGHT'] = False
+        GAME_CONTROLS['RIGHT'] = False or GAME_CONTROLS['right_arrow']
         GAME_CONTROLS['d'] = False
 
     ##################################################################
@@ -400,6 +403,20 @@ while GAME_STATE['RUNNING']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+
+    direction_x_offset = 10
+    direction_y_offset = 10
+
+    THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    if GAME_CONTROLS['UP']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    if GAME_CONTROLS['LEFT']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    if GAME_CONTROLS['DOWN']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    if GAME_CONTROLS['RIGHT']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
   #
