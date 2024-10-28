@@ -1,6 +1,8 @@
 import pygame
 import argparse
 
+import xml.etree.ElementTree as element_tree
+
 #Import of Key Constants to make evaluation a bit easier
 from pygame.locals import (
     K_ESCAPE, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12,
@@ -89,58 +91,80 @@ JOYSTICKS = {}
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [FONTS] Loading")
 
-#Game fonts are held within this dictionary
-#These are 'indexed' by GAME_FONTS['KEY']
+######################################################################
+# LOAD IMAGES AND IMAGE SHEETS
+# Game fonts are held within this dictionary
+# These are 'indexed' by GAME_FONTS['KEY']
+######################################################################
+
 GAME_FONTS = {'KENNEY_MINI_16': pygame.font.Font('./fonts/Kenney Mini.ttf', 16)}
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [FONTS] Completed")
 
-#Load our images
+######################################################################
+# LOAD IMAGES AND IMAGE SHEETS AND CONVERT TO GAME SURFACES
+#
+# **** LESSON ****
+#
+######################################################################
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [IMAGES] Loading")
 
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET'] = {}
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'] = pygame.image.load("./sprites/input-prompts/pixel-16/tilemap_packed.png")
+GAME_SURFACES['INPUT_PROMPTS'] = {}
+GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'] = pygame.image.load("./sprites/input-prompts/pixel-16/tilemap_packed.png")
 
 # Here we are pulling out the parts of the spritesheet that we want and we're making them twice as large
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 2*16, 16, 16)), (32, 32)) #18,2
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 10*16, 16, 16)), (32, 32)) #18,10
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 3*16, 16, 16)), (32, 32)) #18,3
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 11*16, 16, 16)), (32, 32)) #18,11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 3*16, 16, 16)), (32, 32)) #19,3
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 11*16, 16, 16)), (32, 32)) #19,11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 3*16, 16, 16)), (32, 32)) #20,3
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 11*16, 16, 16)), (32, 32)) #20,11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(30*16, 4*16, 16, 16)), (32, 32)) #30, 4
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(30*16, 12*16, 16, 16)), (32, 32)) #30, 12
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(33*16, 4*16, 16, 16)), (32, 32)) #33, 4
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(33*16, 12*16, 16, 16)), (32, 32)) #33, 12
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(32*16, 4*16, 16, 16)), (32, 32)) #32, 4
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(32*16, 12*16, 16, 16)), (32, 32)) #32, 12
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 4*16, 16, 16)), (32, 32)) #31, 4
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 12*16, 16, 16)), (32, 32)) #31, 12
+GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 2*16, 16, 16)), (32, 32)) #18,2
+GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 10*16, 16, 16)), (32, 32)) #18,10
+GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 3*16, 16, 16)), (32, 32)) #18,3
+GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 11*16, 16, 16)), (32, 32)) #18,11
+GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 3*16, 16, 16)), (32, 32)) #19,3
+GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 11*16, 16, 16)), (32, 32)) #19,11
+GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 3*16, 16, 16)), (32, 32)) #20,3
+GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 11*16, 16, 16)), (32, 32)) #20,11
+GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(30*16, 4*16, 16, 16)), (32, 32)) #30, 4
+GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(30*16, 12*16, 16, 16)), (32, 32)) #30, 12
+GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(33*16, 4*16, 16, 16)), (32, 32)) #33, 4
+GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(33*16, 12*16, 16, 16)), (32, 32)) #33, 12
+GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(32*16, 4*16, 16, 16)), (32, 32)) #32, 4
+GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(32*16, 12*16, 16, 16)), (32, 32)) #32, 12
+GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 4*16, 16, 16)), (32, 32)) #31, 4
+GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 12*16, 16, 16)), (32, 32)) #31, 12
 
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
 
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(13*16, 1*16, 16, 16)), (32, 32)) #13, 1
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(14*16, 1*16, 16, 16)), (32, 32)) #14, 1
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(15*16, 1*16, 16, 16)), (32, 32)) #15, 1
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(16*16, 1*16, 16, 16)), (32, 32)) #16, 1
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(13*16, 1*16, 16, 16)), (32, 32)) #13, 1
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(14*16, 1*16, 16, 16)), (32, 32)) #14, 1
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(15*16, 1*16, 16, 16)), (32, 32)) #15, 1
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(16*16, 1*16, 16, 16)), (32, 32)) #16, 1
 
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(4*16, 0*16, 16, 16)), (32, 32)) #4, 0
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 0*16, 16, 16)), (32, 32)) #5, 0
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 0*16, 16, 16)), (32, 32)) #6, 0
-GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 0*16, 16, 16)), (32, 32)) #7, 0
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(4*16, 0*16, 16, 16)), (32, 32)) #4, 0
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 0*16, 16, 16)), (32, 32)) #5, 0
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 0*16, 16, 16)), (32, 32)) #6, 0
+GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 0*16, 16, 16)), (32, 32)) #7, 0
 
+GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
+GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
+
+space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shooter-redux/sheet.xml").getroot().findall("SubTexture")
+#print(space_shooter_redux_xml_subtextures)
+for subtexture in space_shooter_redux_xml_subtextures:
+  #print(subtexture)
+  subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
+  print(subsurface_name)
+  subsurface_x = int(subtexture.attrib['x'])
+  subsurface_y = int(subtexture.attrib['y'])
+  subsurface_width = int(subtexture.attrib['width'])
+  subsurface_height = int(subtexture.attrib['height'])
+  GAME_SURFACES['SPACE_SHOOTER_REDUX'][subsurface_name] = GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [IMAGES] Completed")
-
 
 ######################################################################
 # SETUP THE DISPLAY
@@ -415,73 +439,73 @@ while GAME_STATE['RUNNING']:
     wasd_debug_x_offset = 112 + 64
     wasd_debug_y_offset = 3
     if GAME_CONTROLS['w']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['W_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
     if GAME_CONTROLS['a']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     if GAME_CONTROLS['s']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['S_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     if GAME_CONTROLS['d']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['D_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
 
     arrow_debug_x_offset = 64
     arrow_debug_y_offset = 3
     if GAME_CONTROLS['up_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['UP_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
     if GAME_CONTROLS['left_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['LEFT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     if GAME_CONTROLS['down_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DOWN_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     if GAME_CONTROLS['right_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
 
     direction_x_offset = 10
     direction_y_offset = 10
 
-    THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
     if GAME_CONTROLS['UP']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_UP'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
     if GAME_CONTROLS['LEFT']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_LEFT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
     if GAME_CONTROLS['DOWN']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_DOWN'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
     if GAME_CONTROLS['RIGHT']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['DIRECTION_RIGHT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
 
     joystick_buttons_x_offset = 128
     joystick_buttons_y_offset = 75
 
     if GAME_CONTROLS['controller_a']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_COLOR'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     if GAME_CONTROLS['controller_b']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_COLOR'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     if GAME_CONTROLS['controller_x']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_COLOR'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     if GAME_CONTROLS['controller_y']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_COLOR'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
     else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS_SPRITE_SHEET']['BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
 
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
