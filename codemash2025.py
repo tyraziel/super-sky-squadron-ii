@@ -184,7 +184,7 @@ ELAPSED_S = ELAPSED_MS / 1000.0
 
 ######################################################################
 # MAIN GAME LOOP
-# ***LESSON***
+# ***LESSON*** ***GAME LOOP***
 ######################################################################
 while GAME_STATE['RUNNING']:
   # RESET THE SCREEN COLOR
@@ -400,9 +400,9 @@ while GAME_STATE['RUNNING']:
   ####################################################################
   if GAME_STATE['DEBUG']:
 
-    # ***LESSON***
-    #A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
-    #https://www.pygame.org/docs/ref/font.html#pygame.font.Font.render
+    #### ***LESSON***
+    #### A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
+    #### https://www.pygame.org/docs/ref/font.html#pygame.font.Font.render
     time_passed_ms_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"{ELAPSED_MS}ms", True, GAME_COLORS['GREEN'])
 
     #### ***LESSON*** Blit - What is blitting?  Blit stands for 
@@ -485,6 +485,8 @@ while GAME_STATE['RUNNING']:
 
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
+  #
+  # ***LESSON*** ***GAME LOOP***
   #
   # Tell the game to update what's on screen visually.
   #
