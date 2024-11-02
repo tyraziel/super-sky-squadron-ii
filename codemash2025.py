@@ -9,6 +9,7 @@ from pygame.locals import (
     K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_0, K_MINUS, K_PLUS,
     K_w, K_a, K_s, K_d,
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
+    K_SPACE,
     KMOD_SHIFT, KMOD_CTRL, KMOD_ALT,
     KEYDOWN, KEYUP, QUIT
 )
@@ -45,7 +46,7 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_TO_CONSOLE': GAME_CLI_AR
 
 #Game Constants are generally held within this dictionary
 #These are 'indexed' by GAME_CONSTANTS['KEY']
-GAME_CONSTANTS = {'SCREEN_WIDTH': 720, 'SCREEN_HEIGHT': 1280, 'SCREEN_FLAGS': 0}
+GAME_CONSTANTS = {'SCREEN_WIDTH': 1280, 'SCREEN_HEIGHT': 720, 'SCREEN_FLAGS': 0}
 
 #Primiative Colors are held within this dictionary
 #These are 'indexed' by GAME_COLORS['KEY']
@@ -72,10 +73,12 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 #We create a separate dictionary for the game controls so we can do stuff according to the state of the controls
 #'indexed' by GAME_CONTROLS['key']
 GAME_CONTROLS = {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
+                 'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False,
                  'w': False, 'a': False, 's': False, 'd': False,
                  'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False,
                  'hat_up': False, 'hat_left': False, 'hat_down': False, 'hat_right': False,
                  'axis_0': 0.0, 'axis_1': 0.0, 'axis_2': 0.0, 'axis_3': 0.0, 'axis_4': 0.0, 'axis_5': 0.0,
+                 'space_bar': False, 
                  'controller_a': False, 'controller_b': False, 'controller_x': False, 'controller_y': False,
                  'controller_lb': False, 'controller_rb': False, 'controller_back': False, 'controller_start': False,
                 }
@@ -132,11 +135,8 @@ GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'] = pygame.transform.scale(GAME_
 GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 4*16, 16, 16)), (32, 32)) #31, 4
 GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 12*16, 16, 16)), (32, 32)) #31, 12
 
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
+GAME_SURFACES['INPUT_PROMPTS']['SPACE_BAR_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 6*16, 48, 16)), (96, 32)) #31,6
+GAME_SURFACES['INPUT_PROMPTS']['SPACE_BAR_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(31*16, 14*16, 48, 16)), (96, 32)) #31, 14
 
 GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(13*16, 1*16, 16, 16)), (32, 32)) #13, 1
 GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(14*16, 1*16, 16, 16)), (32, 32)) #14, 1
@@ -148,6 +148,25 @@ GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'] = pygame.transform.scale(GAME_S
 GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 0*16, 16, 16)), (32, 32)) #6, 0
 GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 0*16, 16, 16)), (32, 32)) #7, 0
 
+GAME_SURFACES['INPUT_PROMPTS']['JOY_DIRECTIONAL'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 20*16, 16, 16)), (32, 32)) #0, 20
+GAME_SURFACES['INPUT_PROMPTS']['JOY_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 20*16, 16, 16)), (32, 32)) #28, 20
+GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 21*16, 16, 16)), (32, 32)) #28, 21
+
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
+GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
+
+GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 13*16, 16, 16)), (32, 32)) #5, 13
+GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 13*16, 16, 16)), (32, 32)) #6, 13
+GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 14*16, 16, 16)), (32, 32)) #5, 14
+GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 14*16, 16, 16)), (32, 32)) #6, 14
+GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 15*16, 16, 16)), (32, 32)) #5, 15
+GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 15*16, 16, 16)), (32, 32)) #6, 15
+GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 16*16, 16, 16)), (32, 32)) #5, 16
+GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 16*16, 16, 16)), (32, 32)) #6, 16
+
 GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
 GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
 
@@ -156,7 +175,7 @@ space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shoote
 for subtexture in space_shooter_redux_xml_subtextures:
   #print(subtexture)
   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
-  print(subsurface_name)
+  print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
   subsurface_x = int(subtexture.attrib['x'])
   subsurface_y = int(subtexture.attrib['y'])
   subsurface_width = int(subtexture.attrib['width'])
@@ -241,30 +260,25 @@ while GAME_STATE['RUNNING']:
         GAME_STATE['RUNNING'] = False
 
       if the_event.key == K_UP:
-        GAME_CONTROLS['UP'] = True
         GAME_CONTROLS['up_arrow'] = True
       if the_event.key == K_LEFT:
-        GAME_CONTROLS['LEFT'] = True
         GAME_CONTROLS['left_arrow'] = True
       if the_event.key == K_DOWN:
-        GAME_CONTROLS['DOWN'] = True
         GAME_CONTROLS['down_arrow'] = True
       if the_event.key == K_RIGHT:
-        GAME_CONTROLS['RIGHT'] = True
         GAME_CONTROLS['right_arrow'] = True
 
       if the_event.key == K_w:
-        GAME_CONTROLS['UP'] = True
         GAME_CONTROLS['w'] = True
       if the_event.key == K_a:
-        GAME_CONTROLS['LEFT'] = True
         GAME_CONTROLS['a'] = True
       if the_event.key == K_s:
-        GAME_CONTROLS['DOWN'] = True
         GAME_CONTROLS['s'] = True
       if the_event.key == K_d:
-        GAME_CONTROLS['RIGHT'] = True
         GAME_CONTROLS['d'] = True
+
+      if the_event.key == K_SPACE:
+        GAME_CONTROLS['space_bar'] = True
 
       #If we are in TEST_MODE a bunch of additional keys not generally available are now activated for us to manage the
       #game to test various things out.  Helpful if we need to test a level and we don't want to have to play through
@@ -307,35 +321,31 @@ while GAME_STATE['RUNNING']:
         print(f"[EVENT] [KEYBOARD] [KEYUP] {the_event.key}")
 
       if the_event.key == K_UP:
-        GAME_CONTROLS['UP'] = False or GAME_CONTROLS['w']
         GAME_CONTROLS['up_arrow'] = False
       if the_event.key == K_LEFT:
-        GAME_CONTROLS['LEFT'] = False or GAME_CONTROLS['a']
         GAME_CONTROLS['left_arrow'] = False
       if the_event.key == K_DOWN:
-        GAME_CONTROLS['DOWN'] = False or GAME_CONTROLS['s']
         GAME_CONTROLS['down_arrow'] = False
       if the_event.key == K_RIGHT:
-        GAME_CONTROLS['RIGHT'] = False or GAME_CONTROLS['d']
         GAME_CONTROLS['right_arrow'] = False
 
       if the_event.key == K_w:
-        GAME_CONTROLS['UP'] = False or GAME_CONTROLS['up_arrow']
         GAME_CONTROLS['w'] = False
       if the_event.key == K_a:
-        GAME_CONTROLS['LEFT'] = False or GAME_CONTROLS['left_arrow']
         GAME_CONTROLS['a'] = False
       if the_event.key == K_s:
-        GAME_CONTROLS['DOWN'] = False or GAME_CONTROLS['down_arrow']
         GAME_CONTROLS['s'] = False
       if the_event.key == K_d:
-        GAME_CONTROLS['RIGHT'] = False or GAME_CONTROLS['right_arrow']
         GAME_CONTROLS['d'] = False
+
+      if the_event.key == K_SPACE:
+        GAME_CONTROLS['space_bar'] = False
 
     ##################################################################
     # HANDLE USER I/O (JOYSTICK)
     # 
     # https://www.pygame.org/docs/ref/joystick.html
+    # Xbox 360 Controller - a =0, b=1, x=2, y=3, lb=4, rb=5, back=6, start=7, xbox=10, leftaxis-8, rightaxis-9
     ##################################################################
     
     # Handle hotplugging
@@ -355,6 +365,7 @@ while GAME_STATE['RUNNING']:
     if the_event.type == pygame.JOYBUTTONDOWN:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [BUTTONDOWN] {the_event.button}")
+
       if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller':
         if the_event.button == 0:
           GAME_CONTROLS['controller_a'] = True
@@ -364,11 +375,11 @@ while GAME_STATE['RUNNING']:
           GAME_CONTROLS['controller_x'] = True
         if the_event.button == 3:
           GAME_CONTROLS['controller_y'] = True
-        #a =0, b=1, x=2, y=3, lb=4, rb=5, back=6, start=7, xbox=10, leftaxis-8, rightaxis-9
 
     if the_event.type == pygame.JOYBUTTONUP:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [BUTTONUP] {the_event.button}")
+
       if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller':
         if the_event.button == 0:
           GAME_CONTROLS['controller_a'] = False
@@ -382,6 +393,7 @@ while GAME_STATE['RUNNING']:
     if the_event.type == pygame.JOYAXISMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [AXISMOTION] {the_event.axis} value {the_event.value}")
+      GAME_CONTROLS[f'axis_{the_event.axis}'] = the_event.value
       #xbox - 4 is left trigger, 5 is right trigger (-1 -> 1 [fully pressed])
       #0 - is left/right on the left axis, 1 is up/down on the left axis (minus is up and left, positive is down and right from 1.0 <-> -1.0)
       #2 - is left/right on the right axis, 3 is up/down on the right axis
@@ -389,11 +401,45 @@ while GAME_STATE['RUNNING']:
     if the_event.type == pygame.JOYHATMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [HATMOTION] ({the_event.value[0]}, {the_event.value[1]})")
+
+      if the_event.value[0] == 0:
+        GAME_CONTROLS['hat_left'] = False
+        GAME_CONTROLS['hat_right'] = False
+      elif the_event.value[0] == 1:
+        GAME_CONTROLS['hat_left'] = False
+        GAME_CONTROLS['hat_right'] = True
+      elif the_event.value[0] == -1:
+        GAME_CONTROLS['hat_left'] = True
+        GAME_CONTROLS['hat_right'] = False
+      if the_event.value[1] == 0:
+        GAME_CONTROLS['hat_up'] = False
+        GAME_CONTROLS['hat_down'] = False
+      elif the_event.value[1] == 1:
+        GAME_CONTROLS['hat_up'] = True
+        GAME_CONTROLS['hat_down'] = False
+      elif the_event.value[1] == -1:
+        GAME_CONTROLS['hat_up'] = False
+        GAME_CONTROLS['hat_down'] = True
       #(0,0) - center
       #(0,1) - up
       #(0,-1) - down
       #(1,0) - right
       #(-1,0) - left
+
+    ###################################
+    #
+    # Apply I/O to actual Game Controls
+    #
+    ###################################
+    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up']
+    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left']
+    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down']
+    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right']
+
+    GAME_CONTROLS['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
+    GAME_CONTROLS['RED'] = GAME_CONTROLS['controller_b']
+    GAME_CONTROLS['BLUE'] = GAME_CONTROLS['controller_x']
+    GAME_CONTROLS['YELLOW'] = GAME_CONTROLS['controller_y']
 
     ##################################################################
     # WINDOW FOCUS LOSS / GAIN
@@ -474,9 +520,11 @@ while GAME_STATE['RUNNING']:
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
 
+
+    #Show Game Control Inputs
+
     direction_x_offset = 10
     direction_y_offset = 10
-
     THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
     if GAME_CONTROLS['UP']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
@@ -487,25 +535,47 @@ while GAME_STATE['RUNNING']:
     if GAME_CONTROLS['RIGHT']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
 
-    joystick_buttons_x_offset = 128
-    joystick_buttons_y_offset = 75
+    game_buttons_x_offset = 48
+    game_buttons_y_offset = 8
+    if GAME_CONTROLS['GREEN']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    if GAME_CONTROLS['BLUE']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    if GAME_CONTROLS['RED']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    if GAME_CONTROLS['YELLOW']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
 
-    if GAME_CONTROLS['controller_a']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    if GAME_CONTROLS['controller_b']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    if GAME_CONTROLS['controller_x']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    if GAME_CONTROLS['controller_y']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+    #If we have a joystick plugged in, we will show the joystick controls
+
+    if len(JOYSTICKS) > 0:
+      joystick_buttons_x_offset = 128
+      joystick_buttons_y_offset = 75
+
+      if GAME_CONTROLS['controller_a']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      if GAME_CONTROLS['controller_b']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      if GAME_CONTROLS['controller_x']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      if GAME_CONTROLS['controller_y']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
 
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
