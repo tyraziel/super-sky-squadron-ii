@@ -1,3 +1,14 @@
+##### This powershell script sets up the resources that are downloadable from kenney.nl
+##### It relies on creating temporary directories and then creating directorys in the project_root
+##### as defined by the variable.
+#####
+##### UNDERSTAND WHAT THIS SCRIPT IS DOING BEFORE RUNNING IT.
+##### RUN SCRIPT AT YOUR OWN RISK.
+##### SCRIPT PROVIDED AS-IS.
+#####
+##### It's general best practice to understand any scripts that you're going to run on your computer.
+##### Run script at your own risk.  This script is provided AS-IS with no warrenties or assumed liability
+
 $project_root = ".."
 
 ### Create a temporary directory to do the work in
@@ -10,29 +21,57 @@ Write-Host "Created '$created_temp_directory'"
 Write-Host "Fetching Assets..."
 
 $the_assets = @(
-    @{the_file = "$created_temp_directory\kenney_kenney-fonts.zip"; the_url = "https://kenney.nl/media/pages/assets/kenney-fonts/1876150b34-1677661710/kenney_kenney-fonts.zip"; 
-      the_source = "$created_temp_directory\Fonts\*"; the_target = "$project_root\fonts\"},
-    @{the_file = "$created_temp_directory\kenney_input-prompts-pixel-16.zip"; the_url = "https://kenney.nl/media/pages/assets/input-prompts-pixel-16/a9d5de5009-1677495570/kenney_input-prompts-pixel-16.zip"; 
-      the_source = "$created_temp_directory\Tilemap\tilemap_packed.png"; the_target = "$project_root\sprites\input-prompts\pixel-16\"},
-    @{the_file = "$created_temp_directory\kenney_space-shooter-redux.zip"; the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
-      the_source = @("$created_temp_directory\Spritesheet\sheet.*", "$created_temp_directory\Bonus\*.ogg"); the_target = @("$project_root\sprites\space-shooter-redux\","$project_root\sfx\space-shooter-redux\")}
+    @{the_file = "$created_temp_directory\kenney_kenney-fonts.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/kenney-fonts/1876150b34-1677661710/kenney_kenney-fonts.zip"; 
+      the_source = "$created_temp_directory\kenney-fonts\Fonts\*"; 
+      the_target = "$project_root\fonts\";
+      the_temp = "kenney-fonts\"},
+    @{the_file = "$created_temp_directory\kenney_input-prompts-pixel-16.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/input-prompts-pixel-16/a9d5de5009-1677495570/kenney_input-prompts-pixel-16.zip"; 
+      the_source = "$created_temp_directory\input-prompts\Tilemap\tilemap_packed.png"; 
+      the_target = "$project_root\sprites\input-prompts\pixel-16\";
+      the_temp = "input-prompts\"},
+    @{the_file = "$created_temp_directory\kenney_space-shooter-redux.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
+      the_source = @("$created_temp_directory\space-shooter-redux\Spritesheet\sheet.*", "$created_temp_directory\space-shooter-redux\Bonus\*.ogg"); 
+      the_target = @("$project_root\sprites\space-shooter-redux\", "$project_root\sfx\space-shooter-redux\");
+      the_temp = "space-shooter-redux\"}
+    @{the_file = "$created_temp_directory\kenney_pixel-shmup.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip";
+      the_source = @("$created_temp_directory\pixel-shmup\Tilemap\*_packed.png"); 
+      the_target = @("$project_root\sprites\pixel-shmup\");
+      the_temp = "pixel-shmup\"}
 )
 
 #https://kenney.nl/media/pages/assets/simple-space/f694a6eca6-1677578143/kenney_simple-space.zip -- maybe for enemy hud stuff
 #https://kenney.nl/media/pages/assets/planets/b62f72bfc7-1677495391/kenney_planets.zip
+#https://kenney.nl/media/pages/assets/ranks-pack/dbfb992998-1677578852/kenney_ranks-pack.zip
+#https://kenney.nl/media/pages/assets/emotes-pack/a3823d6799-1677578798/kenney_emotes-pack.zip
+#https://kenney.nl/media/pages/assets/space-shooter-extension/57049efd94-1677693518/kenney_space-shooter-extension.zip
+#https://kenney.nl/media/pages/assets/smoke-particles/adfa60d27d-1677695171/kenney_smoke-particles.zip
+
+
+#https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip
+#https://kenney.nl/media/pages/assets/medals/68269b9e9e-1677668150/kenneymedals.zip
+
 
 foreach ($item in $the_assets){
     $the_url = $item.the_url
     $the_file = $item.the_file
     $the_source = $item.the_source
     $the_target = $item.the_target
+    $the_temp = $item.the_temp
+
+    Write-Host "Creating Temp Sub-Directory '$created_temp_directory\$the_temp'"
+    $created_temp_sub_directory = New-Item -Path "$created_temp_directory\$the_temp" -ItemType "directory" -Force
+    Write-Host "Created '$created_temp_sub_directory'"
 
     Write-Host "Getting $the_url and storing it as $the_file"
     Invoke-WebRequest $the_url -OutFile $the_file
     Write-Host "Successfully retrieved $the_url as $the_file"
 
-    Write-Host "Extracting $the_file to $created_temp_directory"
-    Expand-Archive $the_file -DestinationPath $created_temp_directory -Force
+    Write-Host "Extracting $the_file to $created_temp_sub_directory"
+    Expand-Archive $the_file -DestinationPath $created_temp_sub_directory -Force
     Write-Host "Extraction Completed"
 
     if($the_source -is [array] -and $the_target -is [array] ){
@@ -56,8 +95,4 @@ foreach ($item in $the_assets){
       Write-Host "Copying $the_source to $created_target_directory"
       Copy-Item -Path "$the_source" -Destination "$created_target_directory" -Recurse
     }
-
-    #Probably will leave this commented out
-    #Write-Host "Deleting $the_file"
-    #Remove-Item $the_file
 }
