@@ -9,6 +9,10 @@
 ##### It's general best practice to understand any scripts that you're going to run on your computer.
 ##### Run script at your own risk.  This script is provided AS-IS with no warrenties or assumed liability
 
+##### Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+##### CodeMash25\setup\setup.ps1 cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies at
+##### https:/go.microsoft.com/fwlink/?LinkID=135170.
+
 $project_root = ".."
 
 ### Create a temporary directory to do the work in
