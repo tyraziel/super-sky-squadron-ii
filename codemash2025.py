@@ -39,14 +39,29 @@ GAME_CLI_ARGUMENTS = argument_parser.parse_args()
 
 #Game State is generally held within this dictionary
 #These are 'indexed' by GAME_STATE['KEY']
-GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
+GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': False, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
              } 
 
 #Game Constants are generally held within this dictionary
 #These are 'indexed' by GAME_CONSTANTS['KEY']
-GAME_CONSTANTS = {'SCREEN_WIDTH': 1280, 'SCREEN_HEIGHT': 720, 'SCREEN_FLAGS': 0}
+GAME_CONSTANTS = {'SCREEN_WIDTH': 1280, 'SCREEN_HEIGHT': 720, 'SCREEN_FLAGS': 0, 'SQUARE_SIZE': 32}
+
+####### Generate the Debug Grid in a clever way
+GAME_CONSTANTS['DEBUG_GRID'] = []
+for width in range(0,int(GAME_CONSTANTS['SCREEN_WIDTH']/GAME_CONSTANTS['SQUARE_SIZE'])):
+  GAME_CONSTANTS['DEBUG_GRID'].append([width * GAME_CONSTANTS['SQUARE_SIZE'], 0])
+  GAME_CONSTANTS['DEBUG_GRID'].append([width * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([(width+1) * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([(width+1) * GAME_CONSTANTS['SQUARE_SIZE'], 0])
+  GAME_CONSTANTS['DEBUG_GRID'].append([(width+2) * GAME_CONSTANTS['SQUARE_SIZE'], 0])
+for height in range(0,int(GAME_CONSTANTS['SCREEN_HEIGHT']/GAME_CONSTANTS['SQUARE_SIZE'])):
+  GAME_CONSTANTS['DEBUG_GRID'].append([0, height * GAME_CONSTANTS['SQUARE_SIZE']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([GAME_CONSTANTS['SCREEN_WIDTH'], height * GAME_CONSTANTS['SQUARE_SIZE']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([GAME_CONSTANTS['SCREEN_WIDTH'], (height+1) * GAME_CONSTANTS['SQUARE_SIZE']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([0, (height+1) * GAME_CONSTANTS['SQUARE_SIZE']])
+  GAME_CONSTANTS['DEBUG_GRID'].append([0, (height+2) * GAME_CONSTANTS['SQUARE_SIZE']])
 
 #Primiative Colors are held within this dictionary
 #These are 'indexed' by GAME_COLORS['KEY']
@@ -112,8 +127,10 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 #
 ######################################################################
 if GAME_CLI_ARGUMENTS.debug_to_console:
-  print(f"[INIT] [IMAGES] Loading")
+  print(f"[INIT] [TEXTURE] Loading")
 
+if GAME_CLI_ARGUMENTS.debug_to_console:
+  print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: input-prompts-pixel-16")
 GAME_SURFACES['INPUT_PROMPTS'] = {}
 GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'] = pygame.image.load("./sprites/input-prompts/pixel-16/tilemap_packed.png")
 
@@ -167,6 +184,9 @@ GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'] = pygame.transform.scale(GAME_
 GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 16*16, 16, 16)), (32, 32)) #5, 16
 GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 16*16, 16, 16)), (32, 32)) #6, 16
 
+if GAME_CLI_ARGUMENTS.debug_to_console:
+  print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: space-shooter-redux")
+
 GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
 GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
 
@@ -175,7 +195,8 @@ space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shoote
 for subtexture in space_shooter_redux_xml_subtextures:
   #print(subtexture)
   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
-  print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
   subsurface_x = int(subtexture.attrib['x'])
   subsurface_y = int(subtexture.attrib['y'])
   subsurface_width = int(subtexture.attrib['width'])
@@ -183,7 +204,17 @@ for subtexture in space_shooter_redux_xml_subtextures:
   GAME_SURFACES['SPACE_SHOOTER_REDUX'][subsurface_name] = GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
-  print(f"[INIT] [IMAGES] Completed")
+  print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-tiles")
+GAME_SURFACES['PIXEL_SHMUP_TILES'] = {}
+GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/tiles_packed.png") #192x160
+
+if GAME_CLI_ARGUMENTS.debug_to_console:
+  print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-ships")
+GAME_SURFACES['PIXEL_SHMUP_SHIPS'] = {}
+GAME_SURFACES['PIXEL_SHMUP_SHIPS']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/ships_packed.png") #128x192
+
+if GAME_CLI_ARGUMENTS.debug_to_console:
+  print(f"[INIT] [TEXTURE] Completed")
 
 ######################################################################
 # SETUP THE DISPLAY
@@ -286,6 +317,9 @@ while GAME_STATE['RUNNING']:
       #
       #Enter test mode by hitting the SHIFT+F12 key sequence
       if GAME_STATE['TEST_MODE']:
+        if the_event.key == K_F8:
+          print(f"[TEST-MODE] [DEBUG-GRID] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_GRID'])).upper()}")
+          GAME_STATE['DEBUG_GRID'] = not GAME_STATE['DEBUG_GRID']
         if the_event.key == K_F9:
           print(f"[TEST-MODE] [DEBUG-TO-CONSOLE] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_TO_CONSOLE'])).upper()}")
           GAME_STATE['DEBUG_TO_CONSOLE'] = not GAME_STATE['DEBUG_TO_CONSOLE']
@@ -301,11 +335,13 @@ while GAME_STATE['RUNNING']:
         if the_event.key == K_F12 and (the_event.mod & KMOD_SHIFT):
           print(f"[TEST-MODE] DEACTIVATED")
           print(f"[TEST-MODE] [DEBUG] DEACTIVATED")
+          print(f"[TEST-MODE] [DEBUG-GRID] DEACTIVATED")
           print(f"[TEST-MODE] [DEBUG-TO-CONSOLE] DEACTIVATED")
           print(f"[TEST-MODE] [DEBUG-EVENTS] DEACTIVATED")
           print(f"[TEST-MODE] [DEBUG-EVENTS-VERBOSE] DEACTIVATED")
           GAME_STATE['TEST_MODE'] = False
           GAME_STATE['DEBUG'] = False
+          GAME_STATE['DEBUG_GRID'] = False
           GAME_STATE['DEBUG_TO_CONSOLE'] = False
           GAME_STATE['DEBUG_EVENTS'] = False
           GAME_STATE['DEBUG_EVENTS_VERBOSE'] = False
@@ -313,8 +349,10 @@ while GAME_STATE['RUNNING']:
         if the_event.key == K_F12 and (the_event.mod & KMOD_SHIFT):
           print(f"[TEST-MODE] ACTIVATED")
           print(f"[TEST-MODE] [DEBUG] ACTIVATED")
+          print(f"[TEST-MODE] [DEBUG-GRID] ACTIVATED")
           GAME_STATE['TEST_MODE'] = True
           GAME_STATE['DEBUG'] = True
+          GAME_STATE['DEBUG_GRID'] = True
 
     if the_event.type == KEYUP:
       if GAME_STATE['DEBUG_EVENTS']:
@@ -577,6 +615,8 @@ while GAME_STATE['RUNNING']:
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
 
+    if GAME_STATE['DEBUG_GRID']:
+      pygame.draw.lines(THE_SCREEN, GAME_COLORS['GREEN'], False, GAME_CONSTANTS['DEBUG_GRID'], width=1)
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
   #
