@@ -96,3 +96,5 @@ foreach ($item in $the_assets){
       Copy-Item -Path "$the_source" -Destination "$created_target_directory" -Recurse
     }
 }
+
+###Copy etc assets into the proper locations
