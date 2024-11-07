@@ -191,9 +191,7 @@ GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
 GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
 
 space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shooter-redux/sheet.xml").getroot().findall("SubTexture")
-#print(space_shooter_redux_xml_subtextures)
 for subtexture in space_shooter_redux_xml_subtextures:
-  #print(subtexture)
   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
   if GAME_CLI_ARGUMENTS.debug_to_console:
     print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
@@ -208,10 +206,33 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 GAME_SURFACES['PIXEL_SHMUP_TILES'] = {}
 GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/tiles_packed.png") #192x160
 
+##### CONSIDER REFACTORING THIS INTO A METHOD/FUNCTION IN A SEPARATE FILE
+pixel_shmup_tiles_xml_subtextures = element_tree.parse("./sprites/pixel-shmup/tiles_sheet.xml").getroot().findall("SubTexture")
+for subtexture in pixel_shmup_tiles_xml_subtextures:
+  subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
+  subsurface_x = int(subtexture.attrib['x'])
+  subsurface_y = int(subtexture.attrib['y'])
+  subsurface_width = int(subtexture.attrib['width'])
+  subsurface_height = int(subtexture.attrib['height'])
+  GAME_SURFACES['PIXEL_SHMUP_TILES'][subsurface_name] = GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
+
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-ships")
 GAME_SURFACES['PIXEL_SHMUP_SHIPS'] = {}
 GAME_SURFACES['PIXEL_SHMUP_SHIPS']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/ships_packed.png") #128x192
+
+pixel_shmup_ships_xml_subtextures = element_tree.parse("./sprites/pixel-shmup/ships_sheet.xml").getroot().findall("SubTexture")
+for subtexture in pixel_shmup_ships_xml_subtextures:
+  subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
+  subsurface_x = int(subtexture.attrib['x'])
+  subsurface_y = int(subtexture.attrib['y'])
+  subsurface_width = int(subtexture.attrib['width'])
+  subsurface_height = int(subtexture.attrib['height'])
+  GAME_SURFACES['PIXEL_SHMUP_SHIPS'][subsurface_name] = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Completed")
