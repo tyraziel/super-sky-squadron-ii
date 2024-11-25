@@ -92,6 +92,7 @@ GAME_CONTROLS = {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
                  'w': False, 'a': False, 's': False, 'd': False,
                  'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False,
                  'hat_up': False, 'hat_left': False, 'hat_down': False, 'hat_right': False,
+                 'dpad_up': False, 'dpad_left': False, 'dpad_down': False, 'dpad_right': False,
                  'axis_0': 0.0, 'axis_1': 0.0, 'axis_2': 0.0, 'axis_3': 0.0, 'axis_4': 0.0, 'axis_5': 0.0,
                  'space_bar': False, 
                  'controller_a': False, 'controller_b': False, 'controller_x': False, 'controller_y': False,
@@ -370,7 +371,7 @@ while GAME_STATE['RUNNING']:
           print(f"[TEST-MODE] [DEBUG-EVENTS-VERBOSE] DEACTIVATED")
           GAME_STATE['TEST_MODE'] = False
           GAME_STATE['DEBUG'] = False
-          GAME_STATE['DEBUG_GRID'] = False
+          #GAME_STATE['DEBUG_GRID'] = False
           GAME_STATE['DEBUG_TO_CONSOLE'] = False
           GAME_STATE['DEBUG_EVENTS'] = False
           GAME_STATE['DEBUG_EVENTS_VERBOSE'] = False
@@ -381,7 +382,7 @@ while GAME_STATE['RUNNING']:
           print(f"[TEST-MODE] [DEBUG-GRID] ACTIVATED")
           GAME_STATE['TEST_MODE'] = True
           GAME_STATE['DEBUG'] = True
-          GAME_STATE['DEBUG_GRID'] = True
+          #GAME_STATE['DEBUG_GRID'] = True
 
     if the_event.type == KEYUP:
       if GAME_STATE['DEBUG_EVENTS']:
@@ -412,7 +413,15 @@ while GAME_STATE['RUNNING']:
     # HANDLE USER I/O (JOYSTICK)
     # 
     # https://www.pygame.org/docs/ref/joystick.html
-    # Xbox 360 Controller - a =0, b=1, x=2, y=3, lb=4, rb=5, back=6, start=7, xbox=10, leftaxis-8, rightaxis-9
+    # Xbox 360 Controller - a =0, b=1, x=2, y=3, lb=4, rb=5, back=6, start=7, xbox=10, leftaxis=8, rightaxis=9
+    #                xbox - axis-4 is left trigger, axis-5 is right trigger (-1 -> 1 [fully pressed])
+    #                       0 - is left/right on the left axis, 1 is up/down on the left axis (minus is up and left, positive is down and right from 1.0 <-> -1.0)
+    #                       2 - is left/right on the right axis, 3 is up/down on the right axis
+    # PowerA NSW Wired Controller - a=0 , b=1 , x=2 , y=3 , dpad-up=11, dpad-down=12, dpad-left=13, dpad-right=14, 
+    #                               square/circle=15, home=5, minus=4, plus=6, L=9, R=10, leftaxis=7, rightaxis=8 
+    #                             - ZL=Axis-4, ZR=Axis-5, leftaxis-up/down=1, leftaxis-left/right=0, rightaxis-up/down=3, rightaxis-left/right=2
+    #                             - up=negative1, down=positive1, left=negative1, right=positive1
+    #                             - ZL=pressed=-1.0,released=0.9999969482421875
     ##################################################################
     
     # Handle hotplugging
@@ -433,7 +442,7 @@ while GAME_STATE['RUNNING']:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [BUTTONDOWN] {the_event.button}")
 
-      if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller':
+      if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller' or JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
         if the_event.button == 0:
           GAME_CONTROLS['controller_a'] = True
         if the_event.button == 1:
@@ -442,12 +451,21 @@ while GAME_STATE['RUNNING']:
           GAME_CONTROLS['controller_x'] = True
         if the_event.button == 3:
           GAME_CONTROLS['controller_y'] = True
+      if JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
+        if the_event.button == 11:
+          GAME_CONTROLS['dpad_up'] = True
+        if the_event.button == 12:
+          GAME_CONTROLS['dpad_down'] = True
+        if the_event.button == 13:
+          GAME_CONTROLS['dpad_left'] = True
+        if the_event.button == 14:
+          GAME_CONTROLS['dpad_right'] = True
 
     if the_event.type == pygame.JOYBUTTONUP:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [BUTTONUP] {the_event.button}")
 
-      if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller':
+      if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller' or JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
         if the_event.button == 0:
           GAME_CONTROLS['controller_a'] = False
         if the_event.button == 1:
@@ -457,13 +475,20 @@ while GAME_STATE['RUNNING']:
         if the_event.button == 3:
           GAME_CONTROLS['controller_y'] = False
 
+      if JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
+        if the_event.button == 11:
+          GAME_CONTROLS['dpad_up'] = False
+        if the_event.button == 12:
+          GAME_CONTROLS['dpad_down'] = False
+        if the_event.button == 13:
+          GAME_CONTROLS['dpad_left'] = False
+        if the_event.button == 14:
+          GAME_CONTROLS['dpad_right'] = False
+
     if the_event.type == pygame.JOYAXISMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
         print(f"[EVENT] [JOYSTICK] [AXISMOTION] {the_event.axis} value {the_event.value}")
       GAME_CONTROLS[f'axis_{the_event.axis}'] = the_event.value
-      #xbox - 4 is left trigger, 5 is right trigger (-1 -> 1 [fully pressed])
-      #0 - is left/right on the left axis, 1 is up/down on the left axis (minus is up and left, positive is down and right from 1.0 <-> -1.0)
-      #2 - is left/right on the right axis, 3 is up/down on the right axis
 
     if the_event.type == pygame.JOYHATMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
@@ -495,13 +520,13 @@ while GAME_STATE['RUNNING']:
 
     ###################################
     #
-    # Apply I/O to actual Game Controls
+    # Apply I/O to actual Game Controls - outside of the I/O event loop
     #
     ###################################
-    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up']
-    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left']
-    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down']
-    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right']
+    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up']
+    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left']
+    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down']
+    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right']
 
     GAME_CONTROLS['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
     GAME_CONTROLS['RED'] = GAME_CONTROLS['controller_b']
@@ -628,19 +653,19 @@ while GAME_STATE['RUNNING']:
       joystick_buttons_y_offset = 75
 
       if GAME_CONTROLS['controller_a']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       if GAME_CONTROLS['controller_b']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       if GAME_CONTROLS['controller_x']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       if GAME_CONTROLS['controller_y']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_COLOR'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_COLOR'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
 
