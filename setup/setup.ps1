@@ -102,3 +102,6 @@ foreach ($item in $the_assets){
 }
 
 ###Copy etc assets into the proper locations
+Copy-Item -Path "../ships_sheet.xml" -Destination "../sprites/pixel-shmup/ships_sheet.xml"
+Copy-Item -Path "../tilemap_sheet.xml" -Destination "../sprites/input-prompts/pixel-16/tilemap_sheet.xml"
+Copy-Item -Path "../tiles_sheet.xml" -Destination "../sprites/pixel-shmup/tiles_sheet.xml"
