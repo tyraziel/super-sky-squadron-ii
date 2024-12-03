@@ -1,3 +1,9 @@
+############################################################################################################################################
+# https://kenney.itch.io/ship-mixer
+#
+# Transporter-5
+# MDowOjAvMTA6MDowLzM6MDowLzk6MDowLzA6MDowL3wwOjEzLzE6MTMvMjoxMy8zOjAvNDo1LzU6LTEv
+#############################################################################################################################################
 import pygame
 import argparse
 
@@ -154,6 +160,14 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 # GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 0*16, 16, 16)), (32, 32)) #5, 0
 # GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 0*16, 16, 16)), (32, 32)) #6, 0
 # GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 0*16, 16, 16)), (32, 32)) #7, 0
+# GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 20*16, 16, 16)), (32, 32)) #0, 20
+# GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 20*16, 16, 16)), (32, 32)) #28, 20
+# GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 21*16, 16, 16)), (32, 32)) #28, 21
+# GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
+# GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
+# GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
+# GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
+# GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
 ######################################################################
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Loading")
@@ -174,25 +188,6 @@ for subtexture in input_prompts_pixel_16_xml_subtextures:
   subsurface_height = int(subtexture.attrib['height'])
   # Here we are pulling out the parts of the spritesheet that we want and we're making them twice as large
   GAME_SURFACES['INPUT_PROMPTS'][subsurface_name] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height)), (subsurface_width*2, subsurface_height*2))
-
-GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 20*16, 16, 16)), (32, 32)) #0, 20
-GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 20*16, 16, 16)), (32, 32)) #28, 20
-GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 21*16, 16, 16)), (32, 32)) #28, 21
-
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 13*16, 16, 16)), (32, 32)) #7, 13
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 11*16, 16, 16)), (32, 32)) #0, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(3*16, 11*16, 16, 16)), (32, 32)) #3, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(2*16, 11*16, 16, 16)), (32, 32)) #2, 11
-GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(1*16, 11*16, 16, 16)), (32, 32)) #1, 11
-
-GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 13*16, 16, 16)), (32, 32)) #5, 13
-GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 13*16, 16, 16)), (32, 32)) #6, 13
-GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 14*16, 16, 16)), (32, 32)) #5, 14
-GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 14*16, 16, 16)), (32, 32)) #6, 14
-GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 15*16, 16, 16)), (32, 32)) #5, 15
-GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 15*16, 16, 16)), (32, 32)) #6, 15
-GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 16*16, 16, 16)), (32, 32)) #5, 16
-GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 16*16, 16, 16)), (32, 32)) #6, 16
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: space-shooter-redux")
@@ -420,7 +415,7 @@ while GAME_STATE['RUNNING']:
     #                hat  - (0,0) - center, (0,1) - up, (0,-1) - down, (1,0) - right, (-1,0) - left
     # PowerA NSW Wired Controller - a=0 , b=1 , x=2 , y=3 , dpad-up=11, dpad-down=12, dpad-left=13, dpad-right=14, 
     #                               square/circle=15, home=5, minus=4, plus=6, L=9, R=10, leftaxis=7, rightaxis=8 
-    #                             - ZL=Axis-4, ZR=Axis-5, leftaxis-up/down=1, leftaxis-left/right=0, rightaxis-up/down=3, rightaxis-left/right=2
+    #                             - ZL=Axis-4, ZR=Axis-5, leftaxis-left/right=0, leftaxis-up/down=1, rightaxis-left/right=2, rightaxis-up/down=3
     #                             - up=negative1, down=positive1, left=negative1, right=positive1
     #                             - ZL=pressed=-1.0,released=0.9999969482421875
     ##################################################################
@@ -452,6 +447,7 @@ while GAME_STATE['RUNNING']:
           GAME_CONTROLS['controller_x'] = True
         if the_event.button == 3:
           GAME_CONTROLS['controller_y'] = True
+
       if JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
         if the_event.button == 11:
           GAME_CONTROLS['dpad_up'] = True
@@ -520,10 +516,12 @@ while GAME_STATE['RUNNING']:
     # Not sure why this won't work when it's pulled out of the i/o loop
     #
     ###################################
-    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up']
-    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left']
-    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down']
-    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right']
+    directional_axis_tolleration = 0.50
+
+    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up'] or GAME_CONTROLS['axis_1'] < -directional_axis_tolleration or GAME_CONTROLS['axis_3'] < -directional_axis_tolleration
+    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left'] or GAME_CONTROLS['axis_0'] < -directional_axis_tolleration or GAME_CONTROLS['axis_2'] < -directional_axis_tolleration
+    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down'] or GAME_CONTROLS['axis_1'] > directional_axis_tolleration or GAME_CONTROLS['axis_3'] > directional_axis_tolleration
+    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right'] or GAME_CONTROLS['axis_0'] > directional_axis_tolleration or GAME_CONTROLS['axis_2'] > directional_axis_tolleration
 
     GAME_CONTROLS['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
     GAME_CONTROLS['RED'] = GAME_CONTROLS['controller_b']
