@@ -188,17 +188,17 @@
 	<SubTexture name=".png" x="80" y="80" width="16" height="16"/>
 	<SubTexture name=".png" x="96" y="80" width="16" height="16"/>
 	<SubTexture name=".png" x="112" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="128" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="144" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="160" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="176" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="192" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="208" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="224" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="240" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="256" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="272" y="80" width="16" height="16"/>
-	<SubTexture name=".png" x="288" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray.png" x="128" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_up.png" x="144" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_right.png" x="160" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_down.png" x="176" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_left.png" x="192" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_right_left.png" x="208" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_up_down.png" x="224" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_all.png" x="240" y="80" width="16" height="16"/>
+	<SubTexture name="hat_gray_push.png" x="256" y="80" width="16" height="16"/>
+	<SubTexture name="alt_left_white.png" x="272" y="80" width="16" height="16"/>
+	<SubTexture name="alt_right_white.png" x="288" y="80" width="16" height="16"/>
 	<SubTexture name=".png" x="304" y="80" width="16" height="16"/>
 	<SubTexture name=".png" x="320" y="80" width="16" height="16"/>
 	<SubTexture name=".png" x="336" y="80" width="16" height="16"/>
@@ -396,14 +396,14 @@
 	<SubTexture name="enter_2_gray.png" x="528" y="160" width="16" height="16"/>
 
 	<!-- Row 12 -->
-	<SubTexture name="direction_up.png" x="0" y="176" width="16" height="16"/>
-	<SubTexture name="direction_right.png" x="16" y="176" width="16" height="16"/>
-	<SubTexture name="direction_down.png" x="32" y="176" width="16" height="16"/>
-	<SubTexture name="direction_left.png" x="48" y="176" width="16" height="16"/>
-	<SubTexture name=".png" x="64" y="176" width="16" height="16"/>
-	<SubTexture name=".png" x="80" y="176" width="16" height="16"/>
-	<SubTexture name=".png" x="96" y="176" width="16" height="16"/>
-	<SubTexture name=".png" x="112" y="176" width="16" height="16"/>
+	<SubTexture name="direction_up_white.png" x="0" y="176" width="16" height="16"/>
+	<SubTexture name="direction_right_white.png" x="16" y="176" width="16" height="16"/>
+	<SubTexture name="direction_down_white.png" x="32" y="176" width="16" height="16"/>
+	<SubTexture name="direction_left_white.png" x="48" y="176" width="16" height="16"/>
+	<SubTexture name="direction_up_white_yellow.png" x="64" y="176" width="16" height="16"/>
+	<SubTexture name="direction_right_white_yellow.png" x="80" y="176" width="16" height="16"/>
+	<SubTexture name="direction_down_white_yellow.png" x="96" y="176" width="16" height="16"/>
+	<SubTexture name="direction_left_white_yellow.png" x="112" y="176" width="16" height="16"/>
 	<SubTexture name=".png" x="128" y="176" width="16" height="16"/>
 	<SubTexture name=".png" x="144" y="176" width="16" height="16"/>
 	<SubTexture name=".png" x="160" y="176" width="16" height="16"/>
@@ -485,8 +485,8 @@
 	<SubTexture name=".png" x="224" y="208" width="16" height="16"/>
 	<SubTexture name=".png" x="240" y="208" width="16" height="16"/>
 	<SubTexture name=".png" x="256" y="208" width="16" height="16"/>
-	<SubTexture name=".png" x="272" y="208" width="16" height="16"/>
-	<SubTexture name=".png" x="288" y="208" width="16" height="16"/>
+	<SubTexture name="alt_left_gray.png" x="272" y="208" width="16" height="16"/>
+	<SubTexture name="alt_right_gray.png" x="288" y="208" width="16" height="16"/>
 	<SubTexture name=".png" x="304" y="208" width="16" height="16"/>
 	<SubTexture name=".png" x="320" y="208" width="16" height="16"/>
 	<SubTexture name=".png" x="336" y="208" width="16" height="16"/>
@@ -720,7 +720,7 @@
 	<SubTexture name=".png" x="528" y="304" width="16" height="16"/>
 
 	<!-- Row 21 -->
-	<SubTexture name="joy_axis_directional.png" x="0" y="320" width="16" height="16"/>
+	<SubTexture name="joy_axis_directional_white.png" x="0" y="320" width="16" height="16"/>
 	<SubTexture name=".png" x="16" y="320" width="16" height="16"/>
 	<SubTexture name=".png" x="32" y="320" width="16" height="16"/>
 	<SubTexture name=".png" x="48" y="320" width="16" height="16"/>
@@ -756,7 +756,7 @@
 	<SubTexture name=".png" x="528" y="320" width="16" height="16"/>
 
 	<!-- Row 22 -->
-	<SubTexture name=".png" x="0" y="336" width="16" height="16"/>
+	<SubTexture name="joy_axis_directional_gray.png" x="0" y="336" width="16" height="16"/>
 	<SubTexture name=".png" x="16" y="336" width="16" height="16"/>
 	<SubTexture name=".png" x="32" y="336" width="16" height="16"/>
 	<SubTexture name=".png" x="48" y="336" width="16" height="16"/>
@@ -868,6 +868,9 @@
 	<SubTexture name="enter_white.png" x="512" y="32" width="32" height="32"/>
 	<SubTexture name="backspace_gray.png" x="512" y="16" width="32" height="16"/>
 	<SubTexture name="enter_gray.png" x="512" y="32" width="32" height="32"/>
+	<SubTexture name="alt_white.png" x="272" y="80" width="32" height="16"/>
+	<SubTexture name="alt_gray.png" x="272" y="208" width="32" height="16"/>
 	<SubTexture name="spacebar_white.png" x="496" y="96" width="48" height="16"/>
 	<SubTexture name="spacebar_gray.png" x="496" y="224" width="48" height="16"/>
+		
 </TextureAtlas>
