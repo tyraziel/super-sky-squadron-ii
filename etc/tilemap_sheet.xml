@@ -872,5 +872,8 @@
 	<SubTexture name="alt_gray.png" x="272" y="208" width="32" height="16"/>
 	<SubTexture name="spacebar_white.png" x="496" y="96" width="48" height="16"/>
 	<SubTexture name="spacebar_gray.png" x="496" y="224" width="48" height="16"/>
-		
+	<SubTexture name="left_arrow_gold.png" x="528" y="272" width="8" height="16"/>
+	<SubTexture name="right_arrow_gold.png" x="536" y="272" width="8" height="16"/>
+	<SubTexture name="up_arrow_gold.png" x="528" y="288" width="16" height="8"/>
+	<SubTexture name="down_arrow_gold.png" x="528" y="296" width="16" height="8"/>
 </TextureAtlas>
