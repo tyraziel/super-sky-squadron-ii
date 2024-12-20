@@ -274,7 +274,13 @@ ELAPSED_S = ELAPSED_MS / 1000.0
 # ***LESSON*** ***GAME LOOP***
 ######################################################################
 while GAME_STATE['RUNNING']:
+  ####################################################################
   # RESET THE SCREEN COLOR
+  #
+  # ***LESSON***
+  # For the screen to be "wiped clean" so we can start fresh.  This
+  # fill operation needs to take place.
+  ####################################################################
   THE_SCREEN.fill(GAME_COLORS['DEEP_PURPLE'])
 
   ####################################################################
