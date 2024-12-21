@@ -194,28 +194,26 @@ for subtexture in input_prompts_pixel_16_xml_subtextures:
   # Here we are pulling out the parts of the spritesheet that we want and we're making them twice as large
   GAME_SURFACES['INPUT_PROMPTS'][subsurface_name] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height)), (subsurface_width*2, subsurface_height*2))
 
-if GAME_CLI_ARGUMENTS.debug_to_console:
-  print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: space-shooter-redux")
+# if GAME_CLI_ARGUMENTS.debug_to_console:
+#   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: space-shooter-redux")
+# GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
+# GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
+# space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shooter-redux/sheet.xml").getroot().findall("SubTexture")
+# for subtexture in space_shooter_redux_xml_subtextures:
+#   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
+#   if GAME_CLI_ARGUMENTS.debug_to_console:
+#     print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
+#   subsurface_x = int(subtexture.attrib['x'])
+#   subsurface_y = int(subtexture.attrib['y'])
+#   subsurface_width = int(subtexture.attrib['width'])
+#   subsurface_height = int(subtexture.attrib['height'])
+#   GAME_SURFACES['SPACE_SHOOTER_REDUX'][subsurface_name] = GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
 
-GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
-GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
-
-space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shooter-redux/sheet.xml").getroot().findall("SubTexture")
-for subtexture in space_shooter_redux_xml_subtextures:
-  subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
-  if GAME_CLI_ARGUMENTS.debug_to_console:
-    print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
-  subsurface_x = int(subtexture.attrib['x'])
-  subsurface_y = int(subtexture.attrib['y'])
-  subsurface_width = int(subtexture.attrib['width'])
-  subsurface_height = int(subtexture.attrib['height'])
-  GAME_SURFACES['SPACE_SHOOTER_REDUX'][subsurface_name] = GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
+##### CONSIDER REFACTORING THIS INTO A METHOD/FUNCTION IN A SEPARATE FILE
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-tiles")
 GAME_SURFACES['PIXEL_SHMUP_TILES'] = {}
 GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/tiles_packed.png") #192x160
-
-##### CONSIDER REFACTORING THIS INTO A METHOD/FUNCTION IN A SEPARATE FILE
 pixel_shmup_tiles_xml_subtextures = element_tree.parse("./sprites/pixel-shmup/tiles_sheet.xml").getroot().findall("SubTexture")
 for subtexture in pixel_shmup_tiles_xml_subtextures:
   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
@@ -231,7 +229,6 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-ships")
 GAME_SURFACES['PIXEL_SHMUP_SHIPS'] = {}
 GAME_SURFACES['PIXEL_SHMUP_SHIPS']['FULL_SHEET'] = pygame.image.load("./sprites/pixel-shmup/ships_packed.png") #128x192
-
 pixel_shmup_ships_xml_subtextures = element_tree.parse("./sprites/pixel-shmup/ships_sheet.xml").getroot().findall("SubTexture")
 for subtexture in pixel_shmup_ships_xml_subtextures:
   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
