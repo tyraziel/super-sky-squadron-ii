@@ -470,16 +470,16 @@ while GAME_STATE['RUNNING']:
       joystick = pygame.joystick.Joystick(the_event.device_index)
       JOYSTICKS[joystick.get_instance_id()] = joystick
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()}")
+        print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()}")
 
     if not GAME_CLI_ARGUMENTS.disable_joystick and the_event.type == pygame.JOYDEVICEREMOVED:
       del JOYSTICKS[the_event.instance_id]
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [DISCONNECT] ID:{the_event.instance_id}")
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [DISCONNECT] ID:{the_event.instance_id}")
 
     if the_event.type == pygame.JOYBUTTONDOWN:
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [BUTTONDOWN] {the_event.button}")
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [BUTTONDOWN] {the_event.button}")
 
       if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller' or JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
         if the_event.button == 0:
@@ -503,7 +503,7 @@ while GAME_STATE['RUNNING']:
 
     if the_event.type == pygame.JOYBUTTONUP:
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [BUTTONUP] {the_event.button}")
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [BUTTONUP] {the_event.button}")
 
       if JOYSTICKS[the_event.instance_id].get_name() == 'Xbox 360 Controller' or JOYSTICKS[the_event.instance_id].get_name() == 'PowerA NSW Wired controller':
         if the_event.button == 0:
@@ -527,12 +527,12 @@ while GAME_STATE['RUNNING']:
 
     if the_event.type == pygame.JOYAXISMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [AXISMOTION] {the_event.axis} value {the_event.value}")
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [AXISMOTION] {the_event.axis} value {the_event.value}")
       GAME_CONTROLS[f'axis_{the_event.axis}'] = the_event.value
 
     if the_event.type == pygame.JOYHATMOTION:
       if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK] [HATMOTION] ({the_event.value[0]}, {the_event.value[1]})")
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [HATMOTION] ({the_event.value[0]}, {the_event.value[1]})")
 
       if the_event.value[0] == 0:
         GAME_CONTROLS['hat_left'] = False
@@ -561,15 +561,19 @@ while GAME_STATE['RUNNING']:
     ###################################
     directional_axis_tolleration = 0.50
 
-    GAME_CONTROLS['PLAYER_1']['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up'] or GAME_CONTROLS['axis_1'] < -directional_axis_tolleration or GAME_CONTROLS['axis_3'] < -directional_axis_tolleration
-    GAME_CONTROLS['PLAYER_1']['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left'] or GAME_CONTROLS['axis_0'] < -directional_axis_tolleration or GAME_CONTROLS['axis_2'] < -directional_axis_tolleration
-    GAME_CONTROLS['PLAYER_1']['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down'] or GAME_CONTROLS['axis_1'] > directional_axis_tolleration or GAME_CONTROLS['axis_3'] > directional_axis_tolleration
-    GAME_CONTROLS['PLAYER_1']['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right'] or GAME_CONTROLS['axis_0'] > directional_axis_tolleration or GAME_CONTROLS['axis_2'] > directional_axis_tolleration
+    if not GAME_STATE['MULTIPLAYER']:
+      GAME_CONTROLS['PLAYER_1']['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up'] or GAME_CONTROLS['axis_1'] < -directional_axis_tolleration or GAME_CONTROLS['axis_3'] < -directional_axis_tolleration
+      GAME_CONTROLS['PLAYER_1']['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left'] or GAME_CONTROLS['axis_0'] < -directional_axis_tolleration or GAME_CONTROLS['axis_2'] < -directional_axis_tolleration
+      GAME_CONTROLS['PLAYER_1']['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down'] or GAME_CONTROLS['axis_1'] > directional_axis_tolleration or GAME_CONTROLS['axis_3'] > directional_axis_tolleration
+      GAME_CONTROLS['PLAYER_1']['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right'] or GAME_CONTROLS['axis_0'] > directional_axis_tolleration or GAME_CONTROLS['axis_2'] > directional_axis_tolleration
 
-    GAME_CONTROLS['PLAYER_1']['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
-    GAME_CONTROLS['PLAYER_1']['RED'] = GAME_CONTROLS['left_alt'] or GAME_CONTROLS['right_alt'] or GAME_CONTROLS['controller_b']
-    GAME_CONTROLS['PLAYER_1']['BLUE'] = GAME_CONTROLS['controller_x']
-    GAME_CONTROLS['PLAYER_1']['YELLOW'] = GAME_CONTROLS['controller_y']
+      GAME_CONTROLS['PLAYER_1']['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
+      GAME_CONTROLS['PLAYER_1']['RED'] = GAME_CONTROLS['left_alt'] or GAME_CONTROLS['right_alt'] or GAME_CONTROLS['controller_b']
+      GAME_CONTROLS['PLAYER_1']['BLUE'] = GAME_CONTROLS['controller_x']
+      GAME_CONTROLS['PLAYER_1']['YELLOW'] = GAME_CONTROLS['controller_y']
+    else:
+      a = 1
+
 
     ##################################################################
     # WINDOW FOCUS LOSS / GAIN
@@ -636,194 +640,237 @@ while GAME_STATE['RUNNING']:
     #### Copies the contents of one surface to another.
     #### In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
     #### Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
-    THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     #Show other "Game Information" that we care about
+    #Game State
+    game_state_running_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"RUNNING", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['RUNNING']:
+      game_state_running_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"RUNNING", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_running_text_surface, game_state_running_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_state_game_over_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['GAME_OVER']:
+      game_state_game_over_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_game_over_text_surface, game_state_game_over_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_state_paused_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"PAUSED", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['PAUSED']:
+      game_state_paused_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"PAUSED", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_paused_text_surface, game_state_paused_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 288 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_state_multiplayer_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MULTIPLAYER", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['MULTIPLAYER']:
+      game_state_multiplayer_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MULTIPLAYER", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_multiplayer_text_surface, game_state_multiplayer_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 192 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_state_title_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"TITLE SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['TITLE_SCREEN']:
+      game_state_title_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"TITLE SCREEN", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_title_screen_text_surface, game_state_running_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+
+    game_state_game_mode_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME MODE SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['GAME_MODE_SCREEN']:
+      game_state_game_mode_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME MODE SCREEN", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_game_mode_text_surface, game_state_game_mode_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 384 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+
+    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['DOG_FIGHT']:
+      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 192 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+
+    #MISSION
+    game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['MISSION']:
+      game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_mission_text_surface, game_state_mission_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 96 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+
     #Game Layers
     game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_1']:
       game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_2']:
       game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_3']:
       game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_4']:
       game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_5']:
       game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
     #Camera
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA X: {CAMERA['X']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 560 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 496 - debug_y_offset)))
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA Y: {CAMERA['Y']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 542 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 478 - debug_y_offset)))
 
-    #Show input keys from keyboard
-    wasd_debug_x_offset = 152 + debug_x_offset
-    wasd_debug_y_offset = 3 + debug_y_offset
-    if GAME_CONTROLS['w']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
-    if GAME_CONTROLS['a']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    if GAME_CONTROLS['s']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    if GAME_CONTROLS['d']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
-
-    arrow_debug_x_offset = 48 + debug_x_offset
-    arrow_debug_y_offset = 3 + debug_y_offset
-    if GAME_CONTROLS['up_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
-    if GAME_CONTROLS['left_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    if GAME_CONTROLS['down_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    if GAME_CONTROLS['right_arrow']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
-
-    left_alt_debug_x_offset = 170 + debug_x_offset
-    left_alt_debug_y_offset = 96 + debug_y_offset
-    if GAME_CONTROLS['left_alt']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - left_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - left_alt_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - left_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - left_alt_debug_y_offset)))
-
-    spacebar_debug_x_offset = 94 + debug_x_offset
-    spacebar_debug_y_offset = 96 + debug_y_offset
-    if GAME_CONTROLS['space_bar']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - spacebar_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - spacebar_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - spacebar_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - spacebar_debug_y_offset)))
-
-    right_alt_debug_x_offset = 32 + debug_x_offset
-    right_alt_debug_y_offset = 96 + debug_y_offset
-    if GAME_CONTROLS['right_alt']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - right_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - right_alt_debug_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - right_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - right_alt_debug_y_offset)))
-
-
-    #If we have a joystick plugged in, we will show the joystick controls
-    if len(JOYSTICKS) > 0:
-      joystick_buttons_x_offset = 176 + debug_x_offset
-      joystick_buttons_y_offset = 128 + debug_y_offset
-
-      if GAME_CONTROLS['controller_a']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+    if not GAME_STATE['MULTIPLAYER']:
+      #Show input keys from keyboard
+      wasd_debug_x_offset = 152 + debug_x_offset
+      wasd_debug_y_offset = 3 + debug_y_offset
+      if GAME_CONTROLS['w']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
       else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-      if GAME_CONTROLS['controller_b']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - wasd_debug_y_offset)))
+      if GAME_CONTROLS['a']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
       else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-      if GAME_CONTROLS['controller_x']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      if GAME_CONTROLS['s']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
       else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
-      if GAME_CONTROLS['controller_y']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
+      if GAME_CONTROLS['d']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
       else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - wasd_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - wasd_debug_y_offset)))
 
-      #Left Axis
-      joystick_axis_x_offset = 256 + debug_x_offset
-      joystick_axis_y_offset = 3 + debug_y_offset
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset)))
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'].get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset - 15 + GAME_CONTROLS['axis_0'] * 8, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset - 16 + GAME_CONTROLS['axis_1'] * 8)))
+      arrow_debug_x_offset = 48 + debug_x_offset
+      arrow_debug_y_offset = 3 + debug_y_offset
+      if GAME_CONTROLS['up_arrow']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 30 - arrow_debug_y_offset)))
+      if GAME_CONTROLS['left_arrow']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 56 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      if GAME_CONTROLS['down_arrow']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 28 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      if GAME_CONTROLS['right_arrow']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 0 - arrow_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 0 - arrow_debug_y_offset)))
 
-      #Right Axis
-      joystick_axis_x_offset = 0 + debug_x_offset
-      joystick_axis_y_offset = 3 + debug_y_offset
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset)))
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'].get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset - 15 + GAME_CONTROLS['axis_2'] * 8, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset - 16 + GAME_CONTROLS['axis_3'] * 8)))
+      left_alt_debug_x_offset = 170 + debug_x_offset
+      left_alt_debug_y_offset = 96 + debug_y_offset
+      if GAME_CONTROLS['left_alt']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - left_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - left_alt_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - left_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - left_alt_debug_y_offset)))
 
-      joystick_dpad_x_offset = 128 + debug_x_offset
-      joystick_dpad_y_offset = 48 + debug_y_offset
-      
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-      for joystick_to_debug in JOYSTICKS:
-        #Xbox Hat
-        if JOYSTICKS[joystick_to_debug].get_name() == 'Xbox 360 Controller':
-          if GAME_CONTROLS['hat_up']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset - 16)))
-          if GAME_CONTROLS['hat_down']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-          if GAME_CONTROLS['hat_left']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset - 16, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-          if GAME_CONTROLS['hat_right']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-        #PowerA D-Pad
-        if JOYSTICKS[joystick_to_debug].get_name() == 'PowerA NSW Wired controller':
-          if GAME_CONTROLS['dpad_up']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset - 16)))
-          if GAME_CONTROLS['dpad_down']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-          if GAME_CONTROLS['dpad_left']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset - 16, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
-          if GAME_CONTROLS['dpad_right']:
-            THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+      spacebar_debug_x_offset = 94 + debug_x_offset
+      spacebar_debug_y_offset = 96 + debug_y_offset
+      if GAME_CONTROLS['space_bar']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - spacebar_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - spacebar_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['SPACEBAR_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - spacebar_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - spacebar_debug_y_offset)))
 
-    #Show Actual Game Control Inputs
-    direction_x_offset = 10 + debug_x_offset
-    direction_y_offset = 10 + debug_y_offset
-    THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['UP']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['LEFT']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['DOWN']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['RIGHT']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      right_alt_debug_x_offset = 32 + debug_x_offset
+      right_alt_debug_y_offset = 96 + debug_y_offset
+      if GAME_CONTROLS['right_alt']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['ALT_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - right_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - right_alt_debug_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['ALT_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - right_alt_debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - right_alt_debug_y_offset)))
 
-    game_buttons_x_offset = 48 + debug_x_offset
-    game_buttons_y_offset = 8 + debug_y_offset
-    if GAME_CONTROLS['PLAYER_1']['GREEN']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['RED']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    if GAME_CONTROLS['PLAYER_1']['BLUE']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
 
-    if GAME_CONTROLS['PLAYER_1']['YELLOW']:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    else:
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      #If we have a joystick plugged in, we will show the joystick controls
+      if len(JOYSTICKS) > 0:
+        joystick_buttons_x_offset = 176 + debug_x_offset
+        joystick_buttons_y_offset = 128 + debug_y_offset
+
+        if GAME_CONTROLS['controller_a']:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GREEN_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        else:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        if GAME_CONTROLS['controller_b']:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_RED_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        else:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        if GAME_CONTROLS['controller_x']:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_BLUE_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        else:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        if GAME_CONTROLS['controller_y']:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_YELLOW_WHITE'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+        else:
+          THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_buttons_y_offset)))
+
+        #Left Axis
+        joystick_axis_x_offset = 256 + debug_x_offset
+        joystick_axis_y_offset = 3 + debug_y_offset
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'].get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset - 15 + GAME_CONTROLS['axis_0'] * 8, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset - 16 + GAME_CONTROLS['axis_1'] * 8)))
+
+        #Right Axis
+        joystick_axis_x_offset = 0 + debug_x_offset
+        joystick_axis_y_offset = 3 + debug_y_offset
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL_WHITE'].get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_axis_x_offset - 15 + GAME_CONTROLS['axis_2'] * 8, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_axis_y_offset - 16 + GAME_CONTROLS['axis_3'] * 8)))
+
+        joystick_dpad_x_offset = 128 + debug_x_offset
+        joystick_dpad_y_offset = 48 + debug_y_offset
+        
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE_GRAY'], GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE_GRAY'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+        for joystick_to_debug in JOYSTICKS:
+          #Xbox Hat
+          if JOYSTICKS[joystick_to_debug].get_name() == 'Xbox 360 Controller':
+            if GAME_CONTROLS['hat_up']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset - 16)))
+            if GAME_CONTROLS['hat_down']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+            if GAME_CONTROLS['hat_left']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset - 16, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+            if GAME_CONTROLS['hat_right']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+          #PowerA D-Pad
+          if JOYSTICKS[joystick_to_debug].get_name() == 'PowerA NSW Wired controller':
+            if GAME_CONTROLS['dpad_up']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['UP_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset - 16)))
+            if GAME_CONTROLS['dpad_down']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['DOWN_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+            if GAME_CONTROLS['dpad_left']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset - 16, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+            if GAME_CONTROLS['dpad_right']:
+              THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+
+      #Show Actual Game Control Inputs
+      direction_x_offset = 10 + debug_x_offset
+      direction_y_offset = 10 + debug_y_offset
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['UP']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['LEFT']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['DOWN']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+
+      game_buttons_x_offset = 48 + debug_x_offset
+      game_buttons_y_offset = 8 + debug_y_offset
+      if GAME_CONTROLS['PLAYER_1']['GREEN']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['RED']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      if GAME_CONTROLS['PLAYER_1']['BLUE']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+
+      if GAME_CONTROLS['PLAYER_1']['YELLOW']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
 
     if GAME_STATE['DEBUG_GRID']:
       pygame.draw.lines(THE_SCREEN, GAME_COLORS['GREEN'], False, GAME_CONSTANTS['DEBUG_GRID'], width=1)
