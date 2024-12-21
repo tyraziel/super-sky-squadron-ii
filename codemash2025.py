@@ -50,7 +50,7 @@ GAME_CLI_ARGUMENTS = argument_parser.parse_args()
 #These are 'indexed' by GAME_STATE['KEY']
 GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
-              'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True,
+              'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False, 
              } 
 
@@ -104,8 +104,10 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 
 #We create a separate dictionary for the game controls so we can do stuff according to the state of the controls
 #'indexed' by GAME_CONTROLS['key']
-GAME_CONTROLS = {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
-                 'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False,
+GAME_CONTROLS = {'PLAYER_1': {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
+                              'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False},
+                 'PLAYER_2': {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
+                              'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False},
                  'w': False, 'a': False, 's': False, 'd': False,
                  'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False,
                  'hat_up': False, 'hat_left': False, 'hat_down': False, 'hat_right': False,
@@ -366,6 +368,8 @@ while GAME_STATE['RUNNING']:
           GAME_STATE['LAYER_3'] = not GAME_STATE['LAYER_3']
         if the_event.key == K_4 and (the_event.mod & KMOD_SHIFT):
           GAME_STATE['LAYER_4'] = not GAME_STATE['LAYER_4']
+        if the_event.key == K_5 and (the_event.mod & KMOD_SHIFT):
+          GAME_STATE['LAYER_5'] = not GAME_STATE['LAYER_5']
 
         if the_event.key == K_F8:
           print(f"[TEST-MODE] [DEBUG-GRID] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_GRID'])).upper()}")
@@ -401,6 +405,7 @@ while GAME_STATE['RUNNING']:
           GAME_STATE['LAYER_2'] = True
           GAME_STATE['LAYER_3'] = True
           GAME_STATE['LAYER_4'] = True
+          GAME_STATE['LAYER_5'] = True
       else:
         if the_event.key == K_F12 and (the_event.mod & KMOD_SHIFT):
           print(f"[TEST-MODE] ACTIVATED")
@@ -555,15 +560,15 @@ while GAME_STATE['RUNNING']:
     ###################################
     directional_axis_tolleration = 0.50
 
-    GAME_CONTROLS['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up'] or GAME_CONTROLS['axis_1'] < -directional_axis_tolleration or GAME_CONTROLS['axis_3'] < -directional_axis_tolleration
-    GAME_CONTROLS['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left'] or GAME_CONTROLS['axis_0'] < -directional_axis_tolleration or GAME_CONTROLS['axis_2'] < -directional_axis_tolleration
-    GAME_CONTROLS['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down'] or GAME_CONTROLS['axis_1'] > directional_axis_tolleration or GAME_CONTROLS['axis_3'] > directional_axis_tolleration
-    GAME_CONTROLS['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right'] or GAME_CONTROLS['axis_0'] > directional_axis_tolleration or GAME_CONTROLS['axis_2'] > directional_axis_tolleration
+    GAME_CONTROLS['PLAYER_1']['UP'] = GAME_CONTROLS['w'] or GAME_CONTROLS['up_arrow'] or GAME_CONTROLS['hat_up'] or GAME_CONTROLS['dpad_up'] or GAME_CONTROLS['axis_1'] < -directional_axis_tolleration or GAME_CONTROLS['axis_3'] < -directional_axis_tolleration
+    GAME_CONTROLS['PLAYER_1']['LEFT'] = GAME_CONTROLS['a'] or GAME_CONTROLS['left_arrow'] or GAME_CONTROLS['hat_left'] or GAME_CONTROLS['dpad_left'] or GAME_CONTROLS['axis_0'] < -directional_axis_tolleration or GAME_CONTROLS['axis_2'] < -directional_axis_tolleration
+    GAME_CONTROLS['PLAYER_1']['DOWN'] = GAME_CONTROLS['s'] or GAME_CONTROLS['down_arrow'] or GAME_CONTROLS['hat_down'] or GAME_CONTROLS['dpad_down'] or GAME_CONTROLS['axis_1'] > directional_axis_tolleration or GAME_CONTROLS['axis_3'] > directional_axis_tolleration
+    GAME_CONTROLS['PLAYER_1']['RIGHT'] = GAME_CONTROLS['d'] or GAME_CONTROLS['right_arrow'] or GAME_CONTROLS['hat_right'] or GAME_CONTROLS['dpad_right'] or GAME_CONTROLS['axis_0'] > directional_axis_tolleration or GAME_CONTROLS['axis_2'] > directional_axis_tolleration
 
-    GAME_CONTROLS['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
-    GAME_CONTROLS['RED'] = GAME_CONTROLS['left_alt'] or GAME_CONTROLS['right_alt'] or GAME_CONTROLS['controller_b']
-    GAME_CONTROLS['BLUE'] = GAME_CONTROLS['controller_x']
-    GAME_CONTROLS['YELLOW'] = GAME_CONTROLS['controller_y']
+    GAME_CONTROLS['PLAYER_1']['GREEN'] = GAME_CONTROLS['space_bar'] or GAME_CONTROLS['controller_a']
+    GAME_CONTROLS['PLAYER_1']['RED'] = GAME_CONTROLS['left_alt'] or GAME_CONTROLS['right_alt'] or GAME_CONTROLS['controller_b']
+    GAME_CONTROLS['PLAYER_1']['BLUE'] = GAME_CONTROLS['controller_x']
+    GAME_CONTROLS['PLAYER_1']['YELLOW'] = GAME_CONTROLS['controller_y']
 
     ##################################################################
     # WINDOW FOCUS LOSS / GAIN
@@ -594,20 +599,20 @@ while GAME_STATE['RUNNING']:
   # screen.  This is here because we want this on top of everything
   # else from the game.
   ####################################################################
+  if GAME_STATE['LAYER_5']:
+    #Top HUD
+    pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,0,1280,32))
 
-  #Top HUD
-  pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,0,1280,32))
-
-  #Mini Map HUD
+    #Mini Map HUD
 
 
-  #Bottom HUD
-  pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
-  bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-  THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
+    #Bottom HUD
+    pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
+    bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
 
-  bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-  THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
+    bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
 
 
   ####################################################################
@@ -637,22 +642,27 @@ while GAME_STATE['RUNNING']:
     game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_1']:
       game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_2']:
       game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_3']:
       game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_4']:
       game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 32 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['LAYER_5']:
+      game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 32 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     #Camera
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA X: {CAMERA['X']}", True, GAME_COLORS['GREEN'])
@@ -785,31 +795,31 @@ while GAME_STATE['RUNNING']:
     direction_x_offset = 10 + debug_x_offset
     direction_y_offset = 10 + debug_y_offset
     THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['UP']:
+    if GAME_CONTROLS['PLAYER_1']['UP']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['LEFT']:
+    if GAME_CONTROLS['PLAYER_1']['LEFT']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['DOWN']:
+    if GAME_CONTROLS['PLAYER_1']['DOWN']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-    if GAME_CONTROLS['RIGHT']:
+    if GAME_CONTROLS['PLAYER_1']['RIGHT']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
 
     game_buttons_x_offset = 48 + debug_x_offset
     game_buttons_y_offset = 8 + debug_y_offset
-    if GAME_CONTROLS['GREEN']:
+    if GAME_CONTROLS['PLAYER_1']['GREEN']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    if GAME_CONTROLS['RED']:
+    if GAME_CONTROLS['PLAYER_1']['RED']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-    if GAME_CONTROLS['BLUE']:
+    if GAME_CONTROLS['PLAYER_1']['BLUE']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
 
-    if GAME_CONTROLS['YELLOW']:
+    if GAME_CONTROLS['PLAYER_1']['YELLOW']:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
     else:
       THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
