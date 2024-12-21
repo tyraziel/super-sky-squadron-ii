@@ -99,9 +99,9 @@ TTL_DEFAULTS = {}
 ######################################################################
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] Initializing Pygame")
-pygame.init()
+(init_pass, init_fail) = pygame.init()
 if GAME_CLI_ARGUMENTS.debug_to_console:
-  print(f"[INIT] Complete!")
+  print(f"[INIT] Complete!  (P: {init_pass} // F: {init_fail})")
 
 #We create a separate dictionary for the game controls so we can do stuff according to the state of the controls
 #'indexed' by GAME_CONTROLS['key']
