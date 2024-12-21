@@ -84,6 +84,9 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
                'RED': (255, 0, 0),
                'GREEN': (0, 255, 0),
                'BLUE': (0, 0, 255),
+               'ALMOST_BLACK': (29, 25, 35),
+               'STEEL_BLUE': (94, 129, 161),
+               'SHMUP_BLUE': (51, 153, 218)
                }
 
 #Time to live defaults are within this dictionary
@@ -126,7 +129,16 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 # These are 'indexed' by GAME_FONTS['KEY']
 ######################################################################
 
-GAME_FONTS = {'KENNEY_MINI_16': pygame.font.Font('./fonts/Kenney Mini.ttf', 16)}
+GAME_FONTS = {'KENNEY_MINI_16': pygame.font.Font('./fonts/Kenney Mini.ttf', 16),
+              'KENNEY_MINI_32': pygame.font.Font('./fonts/Kenney Mini.ttf', 32),
+              'KENNEY_MINI_SQUARE_16': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 16),
+              'KENNEY_MINI_SQUARE_32': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 32),
+              'KENNEY_PIXEL_16': pygame.font.Font('./fonts/Kenney Pixel.ttf', 16),
+              'KENNEY_PIXEL_SQUARE_16': pygame.font.Font('./fonts/Kenney Pixel Square.ttf', 16),
+              'KENNEY_BLOCKS_16': pygame.font.Font('./fonts/Kenney Blocks.ttf', 16),
+              'KENNEY_FUTURE_16': pygame.font.Font('./fonts/Kenney Future.ttf', 16),
+              'KENNEY_FUTURE_NARROW_16': pygame.font.Font('./fonts/Kenney Future Narrow.ttf', 16)
+             }
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [FONTS] Completed")
@@ -583,6 +595,21 @@ while GAME_STATE['RUNNING']:
   # else from the game.
   ####################################################################
 
+  #Top HUD
+  pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,0,1280,32))
+
+  #Mini Map HUD
+
+
+  #Bottom HUD
+  pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
+  bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+  THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
+
+  bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+  THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
+
+
   ####################################################################
   # Draw the DEBUG
   #
@@ -592,7 +619,7 @@ while GAME_STATE['RUNNING']:
   if GAME_STATE['DEBUG']:
 
     debug_x_offset = 0
-    debug_y_offset = 48
+    debug_y_offset = 80
 
     #### ***LESSON***
     #### A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
@@ -610,28 +637,28 @@ while GAME_STATE['RUNNING']:
     game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_1']:
       game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 654 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_2']:
       game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 654 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_3']:
       game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 654 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_4']:
       game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 32 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 654 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 32 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     #Camera
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA X: {CAMERA['X']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 64 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 624 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 64 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 560 - debug_y_offset)))
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA Y: {CAMERA['Y']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 64 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 608 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 64 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 542 - debug_y_offset)))
 
     #Show input keys from keyboard
     wasd_debug_x_offset = 152 + debug_x_offset
