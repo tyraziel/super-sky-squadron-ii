@@ -870,6 +870,10 @@
 	<SubTexture name="enter_gray.png" x="512" y="32" width="32" height="32"/>
 	<SubTexture name="alt_white.png" x="272" y="80" width="32" height="16"/>
 	<SubTexture name="alt_gray.png" x="272" y="208" width="32" height="16"/>
+	<SubTexture name="ctrl_white.png" x="272" y="96" width="32" height="16"/>
+	<SubTexture name="ctrl_gray.png" x="272" y="224" width="32" height="16"/>
+	<SubTexture name="shift_white.png" x="272" y="112" width="32" height="16"/>
+	<SubTexture name="shift_gray.png" x="272" y="240" width="32" height="16"/>
 	<SubTexture name="spacebar_white.png" x="496" y="96" width="48" height="16"/>
 	<SubTexture name="spacebar_gray.png" x="496" y="224" width="48" height="16"/>
 	<SubTexture name="left_arrow_gold.png" x="528" y="272" width="8" height="16"/>
