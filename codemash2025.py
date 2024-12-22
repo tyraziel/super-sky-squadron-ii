@@ -51,7 +51,7 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
-              'MULTIPLAYER': False,
+              'MULTIPLAYER': True,
               'TITLE_SCREEN': True, 'GAME_MODE_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
              } 
 
@@ -580,7 +580,9 @@ while GAME_STATE['RUNNING']:
     #
     # Apply I/O to actual Game Controls
     # Not sure why this won't work when it's pulled out of the i/o loop
-    #
+    # 
+    # ***LESSON***
+    # Note here that we have slightly different controls for single player mode and multiplayer mode.
     ###################################
     directional_axis_tolleration = 0.50
 
@@ -614,7 +616,6 @@ while GAME_STATE['RUNNING']:
       GAME_CONTROLS['PLAYER_2']['RED'] = GAME_CONTROLS['right_ctrl'] or GAME_CONTROLS['JOYSTICK_1']['controller_b']
       GAME_CONTROLS['PLAYER_2']['BLUE'] = GAME_CONTROLS['right_alt'] or GAME_CONTROLS['JOYSTICK_1']['controller_x']
       GAME_CONTROLS['PLAYER_2']['YELLOW'] = GAME_CONTROLS['JOYSTICK_1']['controller_y']
-
 
     ##################################################################
     # WINDOW FOCUS LOSS / GAIN
@@ -908,39 +909,79 @@ while GAME_STATE['RUNNING']:
               THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['LEFT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset - 16, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
             if GAME_CONTROLS['JOYSTICK_0']['dpad_right'] or GAME_CONTROLS['JOYSTICK_1']['dpad_right']:
               THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'], GAME_SURFACES['INPUT_PROMPTS']['RIGHT_ARROW_GOLD'].get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - joystick_dpad_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - joystick_dpad_y_offset)))
+    
+    else: #We are in MULTIPLAYER
+      a = 1
 
-      #Show Actual Game Control Inputs
-      direction_x_offset = 10 + debug_x_offset
-      direction_y_offset = 10 + debug_y_offset
-      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['UP']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['LEFT']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['DOWN']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['RIGHT']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - direction_y_offset)))
+    #Show Actual Game Control Inputs for Player 1
+    player_one_direction_x_offset = 10 + debug_x_offset
+    player_one_direction_y_offset = 10 + debug_y_offset
+    THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (player_one_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_direction_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['UP']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (player_one_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_direction_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['LEFT']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (player_one_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_direction_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['DOWN']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (player_one_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_direction_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (player_one_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_direction_y_offset)))
 
-      game_buttons_x_offset = 48 + debug_x_offset
-      game_buttons_y_offset = 8 + debug_y_offset
-      if GAME_CONTROLS['PLAYER_1']['GREEN']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-      else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['RED']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-      else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-      if GAME_CONTROLS['PLAYER_1']['BLUE']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
-      else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    player_one_game_buttons_x_offset = 48 + debug_x_offset
+    player_one_game_buttons_y_offset = 8 + debug_y_offset
+    if GAME_CONTROLS['PLAYER_1']['GREEN']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (player_one_game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (player_one_game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['RED']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['BLUE']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
 
-      if GAME_CONTROLS['PLAYER_1']['YELLOW']:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+    if GAME_CONTROLS['PLAYER_1']['YELLOW']:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+    else:
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (player_one_game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_one_game_buttons_y_offset)))
+
+    #If we are in multiplayer mode show actual game control inputs for Player 2
+    if GAME_STATE['MULTIPLAYER']:
+      player_two_direction_x_offset = 1098 + debug_x_offset
+      player_two_direction_y_offset = 10 + debug_y_offset
+      THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_BASE'].get_rect(bottomleft = (player_two_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['UP']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_UP_WHITE'].get_rect(bottomleft = (player_two_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['LEFT']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_LEFT_WHITE'].get_rect(bottomleft = (player_two_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['DOWN']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_DOWN_WHITE'].get_rect(bottomleft = (player_two_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_direction_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['RIGHT']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'], GAME_SURFACES['INPUT_PROMPTS']['DIRECTION_RIGHT_WHITE'].get_rect(bottomleft = (player_two_direction_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_direction_y_offset)))
+
+      player_two_game_buttons_x_offset = 1136 + debug_x_offset
+      player_two_game_buttons_y_offset = 8 + debug_y_offset
+      if GAME_CONTROLS['PLAYER_2']['GREEN']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_DOWN'].get_rect(bottomleft = (player_two_game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
       else:
-        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - game_buttons_y_offset)))
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['GREEN_BUTTON_UP'].get_rect(bottomleft = (player_two_game_buttons_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['RED']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_DOWN'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['RED_BUTTON_UP'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 32, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+      if GAME_CONTROLS['PLAYER_2']['BLUE']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_DOWN'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['BLUE_BUTTON_UP'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 64, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+
+      if GAME_CONTROLS['PLAYER_2']['YELLOW']:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_DOWN'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+      else:
+        THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
+
+
+
 
     if GAME_STATE['DEBUG_GRID']:
       pygame.draw.lines(THE_SCREEN, GAME_COLORS['GREEN'], False, GAME_CONSTANTS['DEBUG_GRID'], width=1)
