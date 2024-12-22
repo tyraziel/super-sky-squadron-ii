@@ -254,6 +254,12 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Completed")
 
 ######################################################################
+# TRANSLATE THE MAP INTO INDEXABLE ELEMETS FOR EASIER "MAPPING"
+######################################################################
+
+
+
+######################################################################
 # SETUP THE DISPLAY
 ######################################################################
 GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] = 0 #|pygame.NOFRAME|pygame.RESIZABLE
@@ -673,19 +679,28 @@ while GAME_STATE['RUNNING']:
     debug_x_offset = 0
     debug_y_offset = 80
 
-    #### ***LESSON***
-    #### A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
-    #### https://www.pygame.org/docs/ref/font.html#pygame.font.Font.render
+    ######################################################################
+    # Show "Game Information" that we care about
+    #
+    # Milliseconds elapsed between each frame
+    #
+    # ***LESSON***
+    # A surface is created when the render method is called from our Font object.  Render takes in text, Anti-aliasing, color.
+    # https://www.pygame.org/docs/ref/font.html#pygame.font.Font.render
+    #
+    # ***LESSON*** Blit - What is blitting?  Blit stands for 
+    # Copies the contents of one surface to another.
+    # In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
+    # Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
+    ######################################################################
     time_passed_ms_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"{ELAPSED_MS}ms", True, GAME_COLORS['GREEN'])
-
-    #### ***LESSON*** Blit - What is blitting?  Blit stands for 
-    #### Copies the contents of one surface to another.
-    #### In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
-    #### Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
     THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
-    #Show other "Game Information" that we care about
-    #Game State
+    ######################################################################
+    # Show "Game Information" that we care about
+    #
+    # Game State Information, Visible Layers
+    ######################################################################
     game_state_running_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"RUNNING", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['RUNNING']:
       game_state_running_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"RUNNING", True, GAME_COLORS['GREEN'])
@@ -721,13 +736,11 @@ while GAME_STATE['RUNNING']:
       game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 192 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    #MISSION
     game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['MISSION']:
       game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_mission_text_surface, game_state_mission_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 96 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    #Game Layers
     game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_1']:
       game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['GREEN'])
@@ -753,7 +766,12 @@ while GAME_STATE['RUNNING']:
       game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
 
-    #Camera
+    ######################################################################
+    # Show "Game Information" that we care about
+    #
+    # Camera details
+    # *** LESSON ***
+    ######################################################################
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA X: {CAMERA['X']}", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 496 - debug_y_offset)))
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA Y: {CAMERA['Y']}", True, GAME_COLORS['GREEN'])
@@ -980,11 +998,12 @@ while GAME_STATE['RUNNING']:
       else:
         THE_SCREEN.blit(GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'], GAME_SURFACES['INPUT_PROMPTS']['YELLOW_BUTTON_UP'].get_rect(bottomleft = (player_two_game_buttons_x_offset + 96, GAME_CONSTANTS['SCREEN_HEIGHT'] - player_two_game_buttons_y_offset)))
 
-
-
-
+    ####################################################################
+    # Debug Grid, useful for lining things up
+    ####################################################################
     if GAME_STATE['DEBUG_GRID']:
       pygame.draw.lines(THE_SCREEN, GAME_COLORS['GREEN'], False, GAME_CONSTANTS['DEBUG_GRID'], width=1)
+
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
   #
