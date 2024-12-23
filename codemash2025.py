@@ -132,6 +132,7 @@ GAME_CONTROLS = {'PLAYER_1': {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT
 
 #For joystick controllers
 JOYSTICKS = {}
+JOYSTICK_MAPPER = {}
 
 #Load our Fonts
 if GAME_CLI_ARGUMENTS.debug_to_console:
@@ -503,18 +504,48 @@ while GAME_STATE['RUNNING']:
     ##################################################################
     
     # Handle hotplugging
+    # This event will be generated when the program starts for every
+    # joystick, filling up the list without needing to create them manually.
     if not GAME_CLI_ARGUMENTS.disable_joystick and the_event.type == pygame.JOYDEVICEADDED:
-      # This event will be generated when the program starts for every
-      # joystick, filling up the list without needing to create them manually.
-      joystick = pygame.joystick.Joystick(the_event.device_index)
-      JOYSTICKS[joystick.get_instance_id()] = joystick
-      if GAME_STATE['DEBUG_EVENTS']:
+      if GAME_STATE['DEBUG_EVENTS'] or True:
         print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()}")
 
+      #Get the joystick that caused this event  
+      joystick = pygame.joystick.Joystick(the_event.device_index)
+      joystick_instance_id = joystick.get_instance_id()
+      JOYSTICK_MAPPER[joystick_instance_id] = {'JOYSTICK': joystick, 'PLAYER': 0}
+
+      if len(JOYSTICKS) < GAME_CONSTANTS['MAX_CONNECTED_JOYSTICKS']:
+        if GAME_STATE['DEBUG_EVENTS'] or True:
+          print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - Patching into JOYSTICK")
+        #Check if we have player 1's Joystick attached, if not, add the connected joystick for that player
+        #if not 0 in JOYSTICKS.keys():
+        if JOYSTICKS.get(0) == None:
+          JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] = 1
+          if GAME_STATE['DEBUG_EVENTS'] or True:
+            print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PLAYER 1 JOYSTICK CONNECTED")
+        #Check if we have player 1's Joystick attached, if not, add the connected joystick for that player
+        #elif not 1 in JOYSTICKS.keys():
+        elif JOYSTICKS.get(1) == None:
+          JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] = 2
+          if GAME_STATE['DEBUG_EVENTS'] or True:
+            print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PLAYER 2 JOYSTICK CONNECTED")
+        #Patch the joystick into the old code
+        JOYSTICKS[JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] - 1] = joystick
+        if GAME_STATE['DEBUG_EVENTS'] or True:
+          print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PATCHED AS {JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] - 1}")
+
     if not GAME_CLI_ARGUMENTS.disable_joystick and the_event.type == pygame.JOYDEVICEREMOVED:
-      del JOYSTICKS[the_event.instance_id]
-      if GAME_STATE['DEBUG_EVENTS']:
-        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [DISCONNECT] ID:{the_event.instance_id}")
+      if GAME_STATE['DEBUG_EVENTS'] or True:
+        print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [DISCONNECT] ID:{the_event.instance_id} FOR PLAYER {JOYSTICK_MAPPER[joystick_instance_id]['PLAYER']}")
+      
+      joystick_instance_id = the_event.instance_id
+
+      if JOYSTICK_MAPPER.get(joystick_instance_id) != None:
+        del JOYSTICKS[JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] - 1]
+        del JOYSTICK_MAPPER[joystick_instance_id]
+
+      #Check if we need to do any kind of remapping for additional controllers that may have been attached (Maybe? - or we just force it to the next one added, which may already happen)
 
     if the_event.type == pygame.JOYBUTTONDOWN and the_event.instance_id < GAME_CONSTANTS['MAX_CONNECTED_JOYSTICKS']:
       if GAME_STATE['DEBUG_EVENTS']:
