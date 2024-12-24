@@ -1,4 +1,11 @@
 ############################################################################################################################################
+# Flying Ace Follies (generated from ChatGPT - what's a good name for a shmup for kidzmash that features world war 2 style biplanes)
+# Ace Aviators: Sky Dash // Flying Sky Dash Follies
+# Super Sky Squadron // Super Sky Squadron II
+# Sky Ace Squadron vs Jetstream Jumpers
+# 
+# Super Sky Squadron II - The Flying Ace Follies
+#
 # https://kenney.itch.io/ship-mixer
 #
 # Transporter-5
