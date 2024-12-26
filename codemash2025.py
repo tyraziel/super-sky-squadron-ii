@@ -1,10 +1,14 @@
 ############################################################################################################################################
-# Flying Ace Follies (generated from ChatGPT - what's a good name for a shmup for kidzmash that features world war 2 style biplanes)
-# Ace Aviators: Sky Dash // Flying Sky Dash Follies
-# Super Sky Squadron // Super Sky Squadron II
-# Sky Ace Squadron vs Jetstream Jumpers
-# 
+# Game Title:
 # Super Sky Squadron II - The Flying Ace Follies
+# 
+# High Scores (missions):
+# Ace Aviators - for the "high scores" screen from missions?
+#
+# For the missions - Aerial Ace Adventures
+# For the pvp - Biplane Battle Royale
+# For the pvp - Sky Saviors: The Biplane Brawl
+# For the pvp - Dogfight Dash
 #
 # https://kenney.itch.io/ship-mixer
 #
@@ -29,7 +33,7 @@ from pygame.locals import (
 )
 
 #Argument parsing to make running the game in different modes slightly easier
-argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to be a video game developer?")
+argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to be a video game developer? - Super Sky Squadron II: The Flying Ace Follies")
 
 argument_parser.add_argument("--test", "--test-mode", help="Enter Test/Dev Mode (Also turned on with any debug flag)", action="store_true", dest="test_mode")
 argument_parser.add_argument("--debug", help="Enter Debug Mode", action="store_true", dest="debug")
@@ -60,7 +64,8 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
               'MULTIPLAYER': False,
-              'TITLE_SCREEN': True, 'GAME_MODE_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
+              'TITLE_SCREEN': True, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
+              'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_GAME': False, 
              } 
 
 #Game Constants are generally held within this dictionary
@@ -285,7 +290,7 @@ if GAME_CLI_ARGUMENTS.double_buffer:
   GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] = GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] | pygame.DOUBLEBUF
   print(f"[CLI] Setting Double Buffering")
 
-pygame.display.set_caption("CodeMash 2025 Divez - So you want to be a video game developer?")
+pygame.display.set_caption("CodeMash 2025 Divez - So you want to be a video game developer? - Super Sky Squadron II: The Flying Ace Follies")
 
 # Create the main screen object
 THE_SCREEN = pygame.display.set_mode((GAME_CONSTANTS['SCREEN_WIDTH'], GAME_CONSTANTS['SCREEN_HEIGHT']), GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'])
@@ -696,6 +701,20 @@ while GAME_STATE['RUNNING']:
         print(f"[EVENT] [WINDOW] [FOCUSGAINED]")
 
   ####################################################################
+  # *** LESSON ***
+  # 
+  # Out of the I/O section of the game loop, now we're going to see
+  # where we are at in terms of game state to figure out what to do
+  #
+  #
+  #
+  #
+  #
+  ####################################################################
+
+  #if GAME_STATE[]:
+
+  ####################################################################
   # Draw Layer One (The Map Tiles)
   #
   #
@@ -714,6 +733,29 @@ while GAME_STATE['RUNNING']:
   if GAME_STATE['LAYER_5']:
     #Top HUD
     pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,0,1280,32))
+
+    top_hud_player_one = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 1", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(top_hud_player_one, top_hud_player_one.get_rect(topleft = (16, -6)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (160, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (192, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (224, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (256, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (288, 0)))
+
+    top_hud_player_two = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 2", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(top_hud_player_two, top_hud_player_two.get_rect(topleft = (912, -6)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1056+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1088+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1120+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1152+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1184+16, 0)))
+    
+
+    top_hud_high_score_text = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"HI-SCORE:", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(top_hud_high_score_text, top_hud_high_score_text.get_rect(topleft = (480, -6)))
+
+    top_hud_high_score = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"000000000", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(top_hud_high_score, top_hud_high_score.get_rect(topleft = (640, -6)))
 
     #Mini Map HUD
 
