@@ -1,0 +1,147 @@
+---
+- name: Setup Game Assets
+  hosts: localhost
+  gather_facts: false
+  become: false
+
+  tasks:
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ./tmp
+      state: directory
+      mode: '0755'
+
+  - name: Download file
+    ansible.builtin.get_url:
+      url: https://kenney.nl/media/pages/assets/kenney-fonts/1876150b34-1677661710/kenney_kenney-fonts.zip
+      dest: ./tmp/kenney_kenney-fonts.zip
+      checksum: sha256:4e69a86eef3cd47e9d8207413868cd08bcddeb2dae4047dbd10362e2a7a16bac
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ./tmp/kenney-fonts/
+      state: directory
+      mode: '0755'
+
+  - name: Unarchive a file 
+    ansible.builtin.unarchive:
+      src: ./tmp/kenney_kenney-fonts.zip
+      dest: ./tmp/kenney-fonts/
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ../fonts/
+      state: directory
+      mode: '0755'
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "{{ item }}"
+      dest: ../fonts/
+    with_fileglob:
+      - "./tmp/kenney-fonts/Fonts/*"
+
+  - name: Download file
+    ansible.builtin.get_url:
+      url: https://kenney.nl/media/pages/assets/input-prompts-pixel-16/a9d5de5009-1677495570/kenney_input-prompts-pixel-16.zip
+      dest: ./tmp/kenney_input-prompts-pixel-16.zip
+      checksum: sha256:b0b41fc4d2681698a6002914daabf2a1a69050fde87d2bf96de7f43b025b7df6
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ./tmp/input-prompts/
+      state: directory
+      mode: '0755'
+
+  - name: Unarchive a file 
+    ansible.builtin.unarchive:
+      src: ./tmp/kenney_input-prompts-pixel-16.zip
+      dest: ./tmp/input-prompts/
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ../sprites/input-prompts/pixel-16/
+      state: directory
+      mode: '0755'
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "./tmp/input-prompts/Tilemap/tilemap_packed.png"
+      dest: ../sprites/input-prompts/pixel-16/
+
+  - name: Download file
+    ansible.builtin.get_url:
+      url: https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip
+      dest: ./tmp/kenney_pixel-shmup.zip
+      checksum: sha256:e33fd626b799de343f18c81ebaa6f3bc161772fdd717acf3f223589ce74cf952
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ./tmp/pixel-shmup/
+      state: directory
+      mode: '0755'
+
+  - name: Unarchive a file 
+    ansible.builtin.unarchive:
+      src: ./tmp/kenney_pixel-shmup.zip
+      dest: ./tmp/pixel-shmup/
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ../sprites/pixel-shmup/
+      state: directory
+      mode: '0755'
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "{{ item }}"
+      dest: ../sprites/pixel-shmup/
+    with_fileglob:
+      - "./tmp/pixel-shmup/Tilemap/*_packed.png"
+
+# $the_assets = @(
+#     @{the_file = "$temp_dir/kenney_space-shooter-redux.zip"; 
+#       the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
+#       the_source = @("$temp_dir/space-shooter-redux/Spritesheet/sheet.*", "$temp_dir/space-shooter-redux/Bonus/*.ogg"); 
+#       the_target = @("$project_root/sprites/space-shooter-redux/", "$project_root/sfx/space-shooter-redux/");
+#       the_temp = "space-shooter-redux/"}
+#     @{the_file = "$temp_dir/kenney_pixel-shmup.zip"; 
+#       the_url = "";
+#       the_source = @("$temp_dir/pixel-shmup/Tilemap/*_packed.png"); 
+#       the_target = @("$project_root/sprites/pixel-shmup/");
+#       the_temp = "pixel-shmup/"}
+# )
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ../sprites/pixel-shmup/
+      state: directory
+      mode: '0755'
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: ../sprites/input-prompts/pixel-16/
+      state: directory
+      mode: '0755'
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "../etc/ships_sheet.xml"
+      dest: "../sprites/pixel-shmup/ships_sheet.xml"
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "../etc/tilemap_sheet.xml"
+      dest: "../sprites/input-prompts/pixel-16/tilemap_sheet.xml"
+
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      remote_src: true
+      src: "../etc/tiles_sheet.xml"
+      dest: "../sprites/pixel-shmup/tiles_sheet.xml"
