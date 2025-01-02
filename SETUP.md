@@ -32,10 +32,17 @@ Windows - allow scripts for the current process:
 
 `pip install pygame-ce`
 
-`python test.py`
+`run setup`
+
+`python codemash2025.py`
 
 
 To deactivate your venv: `deactivate` from the command prompt
+
+Linux Based:
+
+create venv, activate, install pip reqs and install ansible-core.
+If not present install unzip/zip
 
 
 
@@ -62,6 +69,16 @@ Download vscode for your Chromebook's architecture, click show downloads and cli
 apt install python3.11-venv
 create venv and activate, install pip reqs, install ansible-core
 
+
+Windows based systems:  
+execute 
+`cd setup`
+`setup.ps1`
+
+Linux based systems (Including Chromebook Linux Development Environment and Windows WSL):
+after activating the python virtual environment execute:
+`cd setup`
+`ansible-playbook setup.yaml`
 
 
 
