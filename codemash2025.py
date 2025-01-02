@@ -33,7 +33,7 @@ from pygame.locals import (
 )
 
 #Argument parsing to make running the game in different modes slightly easier
-argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to be a video game developer? - Super Sky Squadron II: The Flying Ace Follies")
+argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to make video games? - Super Sky Squadron II: The Flying Ace Follies")
 
 argument_parser.add_argument("--test", "--test-mode", help="Enter Test/Dev Mode (Also turned on with any debug flag)", action="store_true", dest="test_mode")
 argument_parser.add_argument("--debug", help="Enter Debug Mode", action="store_true", dest="debug")
@@ -290,7 +290,7 @@ if GAME_CLI_ARGUMENTS.double_buffer:
   GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] = GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] | pygame.DOUBLEBUF
   print(f"[CLI] Setting Double Buffering")
 
-pygame.display.set_caption("CodeMash 2025 Divez - So you want to be a video game developer? - Super Sky Squadron II: The Flying Ace Follies")
+pygame.display.set_caption("CodeMash 2025 Divez - So you want to make video games? - Super Sky Squadron II: The Flying Ace Follies")
 
 # Create the main screen object
 THE_SCREEN = pygame.display.set_mode((GAME_CONSTANTS['SCREEN_WIDTH'], GAME_CONSTANTS['SCREEN_HEIGHT']), GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'])
