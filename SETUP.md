@@ -12,7 +12,7 @@ Windows Terminal (from the Microsoft Store)
 
 Windows:
 
-Create a virual environment with python:   python3 -m venv .pygame-ce-codemash25
+Create a virual environment with python:  python3 -m venv .pygame-ce-codemash25
 
 Activate the virtual environment:  .\.pygame-ce-codemash25\Scripts\activate
 
@@ -47,6 +47,8 @@ If not present install unzip/zip
 
 
 Chromebook: (tested on amd64 architecture)
+
+(https://code.visualstudio.com/blogs/2020/12/03/chromebook-get-started)
 
 Settings - search for linux in the top search bar.
 
