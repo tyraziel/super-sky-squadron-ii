@@ -32,7 +32,13 @@ from pygame.locals import (
     KEYDOWN, KEYUP, QUIT
 )
 
-#Argument parsing to make running the game in different modes slightly easier
+######################################################################
+# ***LESSON 0 - Argument Parsing***
+#
+# Argument parsing to make running the game in different modes 
+# slightly easier
+######################################################################
+
 argument_parser = argparse.ArgumentParser(description="CodeMash 2025 Divez - So you want to make video games? - Super Sky Squadron II: The Flying Ace Follies")
 
 argument_parser.add_argument("--test", "--test-mode", help="Enter Test/Dev Mode (Also turned on with any debug flag)", action="store_true", dest="test_mode")
@@ -54,7 +60,7 @@ GAME_CLI_ARGUMENTS = argument_parser.parse_args()
 
 ######################################################################
 # SET GAME DEFAULTS
-# ***LESSON*** - State Machine
+# ***LESSON 4*** - State Machine
 ######################################################################
 
 #Game State is generally held within this dictionary
@@ -66,12 +72,12 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'MULTIPLAYER': False,
               'TITLE_SCREEN': True, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
               'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_GAME': False, 
-             } 
+             }
 
 #Game Constants are generally held within this dictionary
 #These are 'indexed' by GAME_CONSTANTS['KEY']
 ######################################################################
-# ***LESSON*** - SCREEN COORDINATES
+# ***LESSON 3*** - SCREEN COORDINATES
 ######################################################################
 GAME_CONSTANTS = {'SCREEN_WIDTH': 1280, 'SCREEN_HEIGHT': 720, 'SCREEN_FLAGS': 0, 'SQUARE_SIZE': 32,
                   'MAX_CONNECTED_JOYSTICKS': 2}
@@ -118,11 +124,13 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] Complete!  (P: {init_pass} // F: {init_fail})")
 
 #We create a separate dictionary for the game controls so we can do stuff according to the state of the controls
+# ***LESSON***
 #'indexed' by GAME_CONTROLS['key']
 GAME_CONTROLS = {'PLAYER_1': {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
                               'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False},
                  'PLAYER_2': {'UP': False, 'LEFT': False, 'DOWN' : False, 'RIGHT': False,
                               'GREEN': False, 'BLUE': False, 'RED': False, 'YELLOW': False},
+
                  'w': False, 'a': False, 's': False, 'd': False,
                  'up_arrow': False, 'left_arrow': False, 'down_arrow': False, 'right_arrow': False,
                  'space_bar': False, 'left_alt': False, 'right_alt': False, 
@@ -302,8 +310,31 @@ print(f"PyGame Display Info:\n{pygame.display.Info()}")
 
 CAMERA = {'X': 0, 'Y': 0}
 
+# LESSON - Initialize other game elements
+
+MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ]
+
 ######################################################################
-# ***LESSON*** ESTABLISH THE GAME CLOCK
+# ***LESSON 2*** ESTABLISH THE GAME CLOCK
 #
 # The game clock and ELAPSED_MS will be used for most, if not all
 # our calculations for how all elements are to progress in the game,
@@ -317,13 +348,13 @@ ELAPSED_S = ELAPSED_MS / 1000.0
 
 ######################################################################
 # MAIN GAME LOOP
-# ***LESSON*** ***GAME LOOP***
+# ***LESSON 1*** ***GAME LOOP***
 ######################################################################
 while GAME_STATE['RUNNING']:
   ####################################################################
   # RESET THE SCREEN COLOR
   #
-  # ***LESSON***
+  # ***LESSON 6***
   # For the screen to be "wiped clean" so we can start fresh.  This
   # fill operation needs to take place.
   ####################################################################
@@ -332,7 +363,7 @@ while GAME_STATE['RUNNING']:
   ####################################################################
   # HANDLE EVENTS
   #
-  # ***LESSON***
+  # ***LESSON 5***
   # We need to handle user I/O as that's the main way the player
   # interacts with the game.  Every button press, key press or 
   # direction movement that we care about needs to be evaluated for
@@ -500,7 +531,7 @@ while GAME_STATE['RUNNING']:
     ##################################################################
     # HANDLE USER I/O (JOYSTICK)
     # 
-    # ***LESSON*** 
+    # ***LESSON 5a*** 
     #
     # https://www.pygame.org/docs/ref/joystick.html
     # Xbox 360 Controller - a =0, b=1, x=2, y=3, lb=4, rb=5, back=6, start=7, xbox=10, leftaxis=8, rightaxis=9
@@ -651,7 +682,7 @@ while GAME_STATE['RUNNING']:
     # Apply I/O to actual Game Controls
     # Not sure why this won't work when it's pulled out of the i/o loop
     # 
-    # ***LESSON***
+    # ***LESSON 5b***
     # Note here that we have slightly different controls for single player mode and multiplayer mode.
     ###################################
     directional_axis_tolleration = 0.50
@@ -1267,7 +1298,7 @@ while GAME_STATE['RUNNING']:
   ####################################################################
   # FINAL UPDATES FOR OUR GAME LOOP
   #
-  # ***LESSON*** ***GAME LOOP***
+  # ***LESSON 1*** ***GAME LOOP***
   #
   # Tell the game to update what's on screen visually.
   #
