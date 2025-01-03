@@ -501,7 +501,7 @@ initialize_title_screen()
 GAME_CLOCK = pygame.time.Clock()
 ELAPSED_MS = GAME_CLOCK.tick()
 ELAPSED_S = ELAPSED_MS / 1000.0
-FRAME_COUNTER = 0
+#FRAME_COUNTER = 0
 
 ######################################################################
 # MAIN GAME LOOP
@@ -1502,6 +1502,6 @@ while GAME_STATE['RUNNING']:
   
   ELAPSED_MS = GAME_CLOCK.tick(60)
   ELAPSED_S = ELAPSED_MS / 1000.0
-  FRAME_COUNTER = FRAME_COUNTER + 1
+  #FRAME_COUNTER = FRAME_COUNTER + 1
 
 pygame.quit()
