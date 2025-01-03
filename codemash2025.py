@@ -33,6 +33,143 @@ from pygame.locals import (
 )
 
 ######################################################################
+# Classes Created to support game objects
+######################################################################
+class Plane(pygame.sprite.Sprite):
+  PLANE_DEATH_TTL = 1000
+
+  def __init__(self, x, y, rotation, style):
+    super().__init__()
+    self.x = x
+    self.y = y
+    self.speed_x = 0
+    self.speed_y = 0
+    self.health = 0
+    self.rotation = rotation
+    self.style = style
+
+  def set_location(self, x, y):
+    self.x = x
+    self.y = y
+
+  def set_location_delta(self, x, y):
+    self.set_location(self.x + x, self.y + y)
+
+  def set_rotation(self, rotation):
+    self.rotation = rotation
+    if self.rotation < 0:
+      self.rotation = 0
+    if self.rotation > 360:
+      self.rotation = 360
+  
+  def set_rotation_delta(self, rotation):
+    self.set_rotation(self.rotation + rotation)
+
+  def copy(self):
+    plane = Plane(self.x, self.y, self.rotation, self.style)
+    return plane
+
+######################################################################
+# Rotate from Center 
+# https://stackoverflow.com/questions/4183208/how-do-i-rotate-an-image-around-its-center-using-pygame
+######################################################################
+def blitRotate(surf, image, pos, originPos, angle):
+
+    # offset from pivot to center
+    image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+    offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
+    
+    # roatated offset from pivot to center
+    rotated_offset = offset_center_to_pivot.rotate(-angle)
+
+    # roatetd image center
+    rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
+
+    # get a rotated image
+    rotated_image = pygame.transform.rotate(image, angle)
+    rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
+
+    # rotate and blit the image
+    surf.blit(rotated_image, rotated_image_rect)
+  
+    # draw rectangle around the image
+    # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
+
+######################################################################
+# Functions Created to support game initialization and transitions
+######################################################################
+def reset_game_state():
+  global GAME_STATE
+  GAME_STATE['LAYER_1'] = True 
+  GAME_STATE['LAYER_2'] = True 
+  GAME_STATE['LAYER_3'] = True 
+  GAME_STATE['LAYER_4'] = True 
+  GAME_STATE['LAYER_5'] = True 
+  GAME_STATE['RUNNING'] = True 
+  GAME_STATE['GAME_OVER'] = False
+  GAME_STATE['PAUSED'] = False
+  GAME_STATE['MULTIPLAYER'] = False
+
+def reset_screens():
+  global GAME_STATE
+  GAME_STATE['TITLE_SCREEN'] = False
+  GAME_STATE['GAME_MODE_SCREEN'] = False
+  GAME_STATE['INSTRUCTIONS_SCREEN'] = False
+  GAME_STATE['DOG_FIGHT'] = False
+  GAME_STATE['MISSION'] = False
+
+def reset_transitions():
+  global GAME_STATE
+  GAME_STATE['TRANSITION_TO_TITLE_SCREEN'] = False
+  GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN'] = False
+  GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = False
+  GAME_STATE['TRANSITION_TO_DOGFIGHT_MODE'] = False
+  GAME_STATE['TRANSITION_TO_MISSION_MODE'] = False
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN']
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN']
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN']
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_DOGFIGHT_MODE'] = TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE']
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_MISSION_MODE'] = TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE']
+
+def stop_all_sounds():
+  return
+
+def destroy_dogfight_objects():
+  return
+
+def destroy_mission_objects():
+  return
+
+def destroy_mission_level_objects():
+  return
+
+def destroy_all():
+  return
+
+def reset_players():
+  return
+
+def reset_for_game_state_transition():
+  destroy_all()
+  reset_screens()
+  reset_transitions()
+  stop_all_sounds()
+
+def initialize_title_screen():
+  global GAME_STATE
+  global press_start_color
+  global press_start_blink_ttl
+
+  press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
+  press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
+
+  reset_for_game_state_transition()
+  reset_players()
+  
+  GAME_STATE['TITLE_SCREEN'] = True
+
+
+######################################################################
 # ***LESSON 0 - Argument Parsing***
 #
 # Argument parsing to make running the game in different modes 
@@ -57,22 +194,6 @@ argument_parser.add_argument("--disable-joystick", help="Disable Joystick Activi
 # PARSE GAME CLI ARGUMENTS
 ######################################################################
 GAME_CLI_ARGUMENTS = argument_parser.parse_args()
-
-######################################################################
-# SET GAME DEFAULTS
-# ***LESSON 4*** - State Machine
-######################################################################
-
-#Game State is generally held within this dictionary
-#These are 'indexed' by GAME_STATE['KEY']
-GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
-              'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
-              'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
-              'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
-              'MULTIPLAYER': False,
-              'TITLE_SCREEN': True, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
-              'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_GAME': False, 
-             }
 
 #Game Constants are generally held within this dictionary
 #These are 'indexed' by GAME_CONSTANTS['KEY']
@@ -107,12 +228,36 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
                'BLUE': (0, 0, 255),
                'ALMOST_BLACK': (29, 25, 35),
                'STEEL_BLUE': (94, 129, 161),
-               'SHMUP_BLUE': (51, 153, 218)
+               'SHMUP_BLUE': (51, 153, 218),
+               'SHMUP_RED': (218, 52, 72),
+               'SHMUP_ORANGE': (218, 116, 52),
+               'SHMUP_YELLOW': (218, 199, 52),
+               'SHMUP_ROYAL_PURPLE': (75, 52, 218),
+               'SHMUP_PURPLE': (51, 153, 218),
+               'SHMUP_BLACK': (51, 51, 51)
                }
 
 #Time to live defaults are within this dictionary
 # ***LESSON***
-TTL_DEFAULTS = {}
+TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 1000, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000,
+                'PRESS_START_BLINK': 750}
+
+######################################################################
+# SET GAME DEFAULTS
+# ***LESSON 4*** - State Machine
+######################################################################
+#Game State is generally held within this dictionary
+#These are 'indexed' by GAME_STATE['KEY']
+GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
+              'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
+              'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
+              'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
+              'MULTIPLAYER': False,
+              'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
+              'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False,
+             }
+
+GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE']}
 
 ######################################################################
 # INITIALIZE PYGAME AND OTHER ELEMENTS FOR THE GAME
@@ -168,6 +313,10 @@ GAME_FONTS = {'KENNEY_MINI_16': pygame.font.Font('./fonts/Kenney Mini.ttf', 16),
               'KENNEY_MINI_32': pygame.font.Font('./fonts/Kenney Mini.ttf', 32),
               'KENNEY_MINI_SQUARE_16': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 16),
               'KENNEY_MINI_SQUARE_32': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 32),
+              'KENNEY_MINI_SQUARE_48': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 48),
+              'KENNEY_MINI_SQUARE_64': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 64),
+              'KENNEY_MINI_SQUARE_80': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 80),
+              'KENNEY_MINI_SQUARE_96': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 96),
               'KENNEY_PIXEL_16': pygame.font.Font('./fonts/Kenney Pixel.ttf', 16),
               'KENNEY_PIXEL_SQUARE_16': pygame.font.Font('./fonts/Kenney Pixel Square.ttf', 16),
               'KENNEY_BLOCKS_16': pygame.font.Font('./fonts/Kenney Blocks.ttf', 16),
@@ -308,9 +457,8 @@ pygame.display.update()
 print(f"PyGame Driver:  {pygame.display.get_driver()}")
 print(f"PyGame Display Info:\n{pygame.display.Info()}")
 
-CAMERA = {'X': 0, 'Y': 0}
-
 # LESSON - Initialize other game elements
+CAMERA = {'X': 0, 'Y': 0}
 
 MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -333,6 +481,14 @@ MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       ]
 
+press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
+press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
+
+# Initialize Players
+
+# Set to Title Screen
+initialize_title_screen()
+
 ######################################################################
 # ***LESSON 2*** ESTABLISH THE GAME CLOCK
 #
@@ -345,6 +501,7 @@ MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 GAME_CLOCK = pygame.time.Clock()
 ELAPSED_MS = GAME_CLOCK.tick()
 ELAPSED_S = ELAPSED_MS / 1000.0
+FRAME_COUNTER = 0
 
 ######################################################################
 # MAIN GAME LOOP
@@ -743,7 +900,39 @@ while GAME_STATE['RUNNING']:
   #
   ####################################################################
 
-  #if GAME_STATE[]:
+  if GAME_STATE['TITLE_SCREEN']:
+    
+    press_start_blink_ttl = press_start_blink_ttl - ELAPSED_MS
+    if press_start_blink_ttl < 1:
+      press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
+      if press_start_color == GAME_COLORS['SHMUP_ROYAL_PURPLE']:
+        press_start_color = GAME_COLORS['ALMOST_BLACK']
+      else:
+        press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
+
+    potozniak_electronics = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"POTOZNIAK ELECTRONICS", True, GAME_COLORS['SHMUP_BLUE'])
+    THE_SCREEN.blit(potozniak_electronics, potozniak_electronics.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8)))
+    presents = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"PRESENTS", True, GAME_COLORS['SHMUP_BLUE'])
+    THE_SCREEN.blit(presents, presents.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, (GAME_CONSTANTS['SCREEN_HEIGHT'] / 8) + (GAME_CONSTANTS['SQUARE_SIZE'] * 2))))
+
+    game_title = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"Super Sky Squadron II:", True, GAME_COLORS['SHMUP_RED'])
+    THE_SCREEN.blit(game_title, game_title.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 3)))
+    game_title_2 = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"The Flying Ace Follies", True, GAME_COLORS['SHMUP_ORANGE'])
+    THE_SCREEN.blit(game_title_2, game_title_2.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, (GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 3) + (GAME_CONSTANTS['SQUARE_SIZE'] * 2))))
+
+    blitRotate(THE_SCREEN, 
+               pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], (64, 64)), 
+               (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
+               (32, 32), 
+               270)
+    blitRotate(THE_SCREEN,
+               pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], (64, 64)), 
+               (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 - GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
+               (32, 32), 
+               90)
+
+    press_start = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"PRESS START", True, press_start_color)
+    THE_SCREEN.blit(press_start, press_start.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 - GAME_CONSTANTS['SQUARE_SIZE'] / 2)))
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
@@ -767,19 +956,19 @@ while GAME_STATE['RUNNING']:
 
     top_hud_player_one = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 1", True, GAME_COLORS['ALMOST_BLACK'])
     THE_SCREEN.blit(top_hud_player_one, top_hud_player_one.get_rect(topleft = (16, -6)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (160, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (192, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (224, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (256, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (288, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'].get_rect(topleft = (160, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'].get_rect(topleft = (192, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (224, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (256, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (288, 0)))
 
     top_hud_player_two = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 2", True, GAME_COLORS['ALMOST_BLACK'])
     THE_SCREEN.blit(top_hud_player_two, top_hud_player_two.get_rect(topleft = (912, -6)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1056+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1088+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1120+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1152+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (1184+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'].get_rect(topleft = (1056+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'].get_rect(topleft = (1088+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1120+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1152+16, 0)))
+    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1184+16, 0)))
     
 
     top_hud_high_score_text = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"HI-SCORE:", True, GAME_COLORS['ALMOST_BLACK'])
@@ -793,11 +982,12 @@ while GAME_STATE['RUNNING']:
 
     #Bottom HUD
     pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
-    bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-    THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
 
-    bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-    THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
+    # bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+    # THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
+
+    # bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
+    # THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
 
 
   ####################################################################
@@ -1312,5 +1502,6 @@ while GAME_STATE['RUNNING']:
   
   ELAPSED_MS = GAME_CLOCK.tick(60)
   ELAPSED_S = ELAPSED_MS / 1000.0
+  FRAME_COUNTER = FRAME_COUNTER + 1
 
 pygame.quit()
