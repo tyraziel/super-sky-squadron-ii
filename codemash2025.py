@@ -25,7 +25,9 @@ from pygame.locals import (
     K_ESCAPE, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12,
     K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_0, K_MINUS, K_PLUS,
     K_w, K_a, K_s, K_d,
-    K_m,
+    K_t, K_y, K_u, K_i, K_o, K_p,
+    K_g, K_h, K_j, K_k, K_l,
+    K_b, K_n, K_m,
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
     K_SPACE, K_LALT, K_RALT, K_LCTRL, K_RCTRL, K_LSHIFT, K_RSHIFT,
     KMOD_SHIFT, KMOD_CTRL, KMOD_ALT,
@@ -69,32 +71,6 @@ class Plane(pygame.sprite.Sprite):
     plane = Plane(self.x, self.y, self.rotation, self.style)
     return plane
 
-# ######################################################################
-# # Rotate from Center 
-# # https://stackoverflow.com/questions/4183208/how-do-i-rotate-an-image-around-its-center-using-pygame
-# ######################################################################
-# def blitRotate(surf, image, pos, originPos, angle):
-
-#     # offset from pivot to center
-#     image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
-#     offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
-    
-#     # roatated offset from pivot to center
-#     rotated_offset = offset_center_to_pivot.rotate(-angle)
-
-#     # roatetd image center
-#     rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
-
-#     # get a rotated image
-#     rotated_image = pygame.transform.rotate(image, angle)
-#     rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
-
-#     # rotate and blit the image
-#     surf.blit(rotated_image, rotated_image_rect)
-  
-#     # draw rectangle around the image
-#     # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
-
 ######################################################################
 # Functions Created to support game initialization and transitions
 ######################################################################
@@ -115,8 +91,9 @@ def reset_screens():
   GAME_STATE['TITLE_SCREEN'] = False
   GAME_STATE['GAME_MODE_SCREEN'] = False
   GAME_STATE['INSTRUCTIONS_SCREEN'] = False
-  GAME_STATE['DOG_FIGHT'] = False
-  GAME_STATE['MISSION'] = False
+  GAME_STATE['DOG_FIGHT_MODE'] = False
+  GAME_STATE['MISSION_MODE'] = False
+  GAME_STATE['GAME_OVER_SCREEN'] = False
 
 def reset_transitions():
   global GAME_STATE
@@ -125,11 +102,13 @@ def reset_transitions():
   GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = False
   GAME_STATE['TRANSITION_TO_DOGFIGHT_MODE'] = False
   GAME_STATE['TRANSITION_TO_MISSION_MODE'] = False
+  GAME_STATE['TRANSITION_TO_GAME_OVER_SCREEN'] = False
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN']
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN']
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN']
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_DOGFIGHT_MODE'] = TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE']
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_MISSION_MODE'] = TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE']
+  GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_OVER_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']
 
 def stop_all_sounds():
   return
@@ -154,6 +133,52 @@ def reset_for_game_state_transition():
   reset_screens()
   reset_transitions()
   stop_all_sounds()
+  destroy_alert()
+
+def create_alert(color, font, txt_1, txt_2, ttl, fadeout, fadeout_ttl):
+  global alert_ttl 
+  global alert_txt_1
+  global alert_txt_2
+  global alert_color
+  global alert_active
+  global alert_fadeout
+  global alert_fadeout_ttl
+  global alert_font
+
+  alert_txt_1 = txt_1
+  alert_txt_2 = txt_2
+
+  alert_color = color
+  if color == "":
+    alert_color = GAME_COLORS['SHMUP_RED']
+
+  alert_font = font
+  if font == "":
+    alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
+  alert_fadeout = fadeout
+  alert_fadeout_ttl = fadeout_ttl
+
+  alert_ttl = ttl
+  if ttl < 1:
+    alert_ttl = TTL_DEFAULTS['ALERT']
+  
+  alert_active = True
+
+def destroy_alert():
+  global alert_active
+  global alert_txt_1
+  global alert_txt_2
+  global alert_fadeout
+  global alert_font
+
+  alert_active = False
+  alert_ttl = 0
+  alert_txt_1 = ""
+  alert_txt_2 = ""
+  alert_fadeout = False
+  alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
+  alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
+
 
 def initialize_title_screen():
   global GAME_STATE
@@ -168,6 +193,12 @@ def initialize_title_screen():
   
   GAME_STATE['TITLE_SCREEN'] = True
 
+def initialize_game_mode_screen():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['GAME_MODE_SCREEN'] = True
 
 ######################################################################
 # ***LESSON 0 - Argument Parsing***
@@ -240,8 +271,8 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 
 #Time to live defaults are within this dictionary
 # ***LESSON***
-TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 1000, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000,
-                'PRESS_START_BLINK': 750}
+TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 250, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
+                'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000}
 
 ######################################################################
 # SET GAME DEFAULTS
@@ -254,11 +285,11 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
               'MULTIPLAYER': False,
-              'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT': False, 'MISSION': False, 
-              'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False,
+              'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT_MODE': False, 'MISSION_MODE': False, 'GAME_OVER_SCREEN': False,
+              'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False, 'TRANSITION_TO_GAME_OVER_SCREEN': False,
              }
 
-GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE']}
+GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE'], 'TRANSITION_TO_GAME_OVER_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']}
 
 ######################################################################
 # INITIALIZE PYGAME AND OTHER ELEMENTS FOR THE GAME
@@ -485,6 +516,15 @@ MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
 press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
 
+alert_ttl = TTL_DEFAULTS['ALERT']
+alert_txt_1 = ""
+alert_txt_2 = ""
+alert_color = GAME_COLORS['SHMUP_RED']
+alert_active = False
+alert_fadeout = False
+alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
+alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
+
 # Initialize Players
 
 # Set to Title Screen
@@ -601,8 +641,25 @@ while GAME_STATE['RUNNING']:
           print(f"[TEST-MODE] [LAYER_5] MODE TOGGLED TO {(str(not GAME_STATE['LAYER_5'])).upper()}")
           GAME_STATE['LAYER_5'] = not GAME_STATE['LAYER_5']
 
+        #t,g,b over for additional testing keystrokes
         if the_event.key == K_m and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
           GAME_STATE['MULTIPLAYER'] = not GAME_STATE['MULTIPLAYER']
+
+        #Alert testing
+        #def create_alert(color, font, txt_1, txt_2, ttl, fadeout, fadeout_ttl):
+        if the_event.key == K_p and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
+          destroy_alert()
+        if the_event.key == K_t and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
+          create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "SINGLE LINE TEST", "", 0, False, 0)          
+        if the_event.key == K_y and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
+          create_alert(GAME_COLORS['SHMUP_YELLOW'], "", "SINGLE LINE TEST FADEOUT", "", 2500, True, 1500)
+        if the_event.key == K_u and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
+          create_alert(GAME_COLORS['SHMUP_YELLOW'], "", "MULTIPLE LINE", "ALERT TESTING", 2500, True, 1500)
+
+        if the_event.key == K_F1:
+          initialize_title_screen()
+        if the_event.key == K_F2:
+          initialize_game_mode_screen()
 
         if the_event.key == K_F8:
           print(f"[TEST-MODE] [DEBUG-GRID] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_GRID'])).upper()}")
@@ -929,14 +986,6 @@ while GAME_STATE['RUNNING']:
     game_title_2 = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"The Flying Ace Follies", True, GAME_COLORS['SHMUP_ORANGE'])
     THE_SCREEN.blit(game_title_2, game_title_2.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, (GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 3) + (GAME_CONSTANTS['SQUARE_SIZE'] * 2))))
 
-    #From my friend and pygame-ce contributor - Mzivic from the pygame-ce community
-    # pos = (x, y)
-    # # angle is in degrees
-    # # img is input image
-    # rotated_img = pygame.transform.rotozoom(img, angle, 1)
-    # rotated_img_rect = rotated_img.get_rect(center=pos)
-    # # surface.blit(rotated_img, rotated_img_rect)
-
     red_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], 0, 2)
     THE_SCREEN.blit(red_plane, red_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
 
@@ -949,19 +998,16 @@ while GAME_STATE['RUNNING']:
     yellow_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 90, 2)
     THE_SCREEN.blit(yellow_plane, yellow_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 + 3.5 * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
 
-    # blitRotate(THE_SCREEN, 
-    #            pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], (64, 64)), 
-    #            (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
-    #            (32, 32), 
-    #            270)
-    # blitRotate(THE_SCREEN,
-    #            pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], (64, 64)), 
-    #            (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 - GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
-    #            (32, 32), 
-    #            90)
-
     press_start = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"PRESS START", True, press_start_color)
     THE_SCREEN.blit(press_start, press_start.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 - GAME_CONSTANTS['SQUARE_SIZE'] / 2)))
+
+    #Evaluate pressing start and then transitioning to the next state of the game after TTL expires
+    if not GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN'] and (GAME_CONTROLS['PLAYER_1']['GREEN'] or GAME_CONTROLS['PLAYER_1']['RED'] or GAME_CONTROLS['PLAYER_1']['BLUE'] or GAME_CONTROLS['PLAYER_1']['YELLOW'] or GAME_CONTROLS['PLAYER_2']['GREEN'] or GAME_CONTROLS['PLAYER_2']['RED'] or GAME_CONTROLS['PLAYER_2']['BLUE'] or GAME_CONTROLS['PLAYER_2']['YELLOW']):
+      GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN'] = True
+    if GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN']:
+      GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] - ELAPSED_MS
+      if GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] <= 0:
+        initialize_game_mode_screen()
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
@@ -1020,6 +1066,28 @@ while GAME_STATE['RUNNING']:
 
 
   ####################################################################
+  # Draw ALERTS
+  #
+  # We want this on top of everything except for the debug
+  ####################################################################
+  if alert_active:
+    if alert_ttl > 0:
+      alert_ttl = alert_ttl - ELAPSED_MS
+      alert_text_surface_1 = alert_font.render(f"{alert_txt_1}", True, alert_color)  
+      alert_text_surface_2 = alert_font.render(f"{alert_txt_2}", True, alert_color)
+      if alert_fadeout:
+        alert_text_surface_1.set_alpha(int((alert_ttl / alert_fadeout_ttl) * 255))
+        alert_text_surface_2.set_alpha(int((alert_ttl / alert_fadeout_ttl) * 255))
+
+      if alert_txt_2 == "":
+        THE_SCREEN.blit(alert_text_surface_1, alert_text_surface_1.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SQUARE_SIZE'] * 7)))
+      else:
+        THE_SCREEN.blit(alert_text_surface_1, alert_text_surface_1.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SQUARE_SIZE'] * 6)))
+        THE_SCREEN.blit(alert_text_surface_2, alert_text_surface_2.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SQUARE_SIZE'] * 8)))
+    else:
+      destroy_alert()
+
+  ####################################################################
   # Draw the DEBUG
   #
   # This is last, becasue we want all of this on top of everything
@@ -1044,22 +1112,23 @@ while GAME_STATE['RUNNING']:
     # In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
     # Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
 
-#From my friend and pygame-ce maintainer - Andrew from the pygame-ce community
-#It’s actually called “bit blit”, and it means “bit block transfer (bit blt)”. It’s a generic term for combining multiple bitmaps into one output bitmap using some set of bool operations.
-#Graphics however, has generally taken the name and replaced that definition with some form of mathematical operation, usually with some form of alpha compositing
-#I’d just call it block transfer. It’s not bit-wise, and alpha is complicated
-#it’s just easier to say blit than blt lol
-#Basic form: copies and pastes pixels and does no math (or rather, math is just pixel_out = pixel_in)
-#More advanced form: applies alphas from source and destination and blends the two together to create a composite image
+    #From my friend and pygame-ce maintainer - Andrew from the pygame-ce community
+    #It’s actually called “bit blit”, and it means “bit block transfer (bit blt)”. It’s a generic term for combining multiple bitmaps into one output bitmap using some set of bool operations.
+    #Graphics however, has generally taken the name and replaced that definition with some form of mathematical operation, usually with some form of alpha compositing
+    #I’d just call it block transfer. It’s not bit-wise, and alpha is complicated
+    #it’s just easier to say blit than blt lol
+    #Basic form: copies and pastes pixels and does no math (or rather, math is just pixel_out = pixel_in)
+    #More advanced form: applies alphas from source and destination and blends the two together to create a composite image
 
     ######################################################################
     time_passed_ms_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"{ELAPSED_MS}ms", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     ######################################################################
     # Show "Game Information" that we care about
     #
-    # Game State Information, Visible Layers
+    # Camera details
+    # *** LESSON ***
     ######################################################################
     game_state_running_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"RUNNING", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['RUNNING']:
@@ -1084,58 +1153,67 @@ while GAME_STATE['RUNNING']:
     game_state_title_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"TITLE SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['TITLE_SCREEN']:
       game_state_title_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"TITLE SCREEN", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_state_title_screen_text_surface, game_state_running_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+    THE_SCREEN.blit(game_state_title_screen_text_surface, game_state_running_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 672 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
     game_state_game_mode_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME MODE SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['GAME_MODE_SCREEN']:
       game_state_game_mode_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME MODE SCREEN", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_state_game_mode_text_surface, game_state_game_mode_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 384 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+    THE_SCREEN.blit(game_state_game_mode_text_surface, game_state_game_mode_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 544 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT", True, GAME_COLORS['NOT_QUITE_BLACK'])
-    if GAME_STATE['DOG_FIGHT']:
-      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 192 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+    game_state_game_instructions_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"INSTRUCTIONS SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['INSTRUCTIONS_SCREEN']:
+      game_state_game_instructions_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"INSTRUCTIONS SCREEN", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_game_instructions_text_surface, game_state_game_instructions_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 352 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['NOT_QUITE_BLACK'])
-    if GAME_STATE['MISSION']:
-      game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_state_mission_text_surface, game_state_mission_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 96 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+    game_state_game_over_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['GAME_OVER_SCREEN']:
+      game_state_game_over_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER SCREEN", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_game_over_screen_text_surface, game_state_game_over_screen_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 160 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
+
+    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['DOG_FIGHT_MODE']:
+      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT MODE", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 288 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 558 - debug_y_offset)))
+
+    game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['MISSION_MODE']:
+      game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION MODE", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_mission_text_surface, game_state_mission_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 558 - debug_y_offset)))
+
+    alert_active_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"ALERT", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if alert_active:
+      alert_active_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"ALERT", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(alert_active_surface, alert_active_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 608 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_1']:
       game_layer_1_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 1", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_1_text_surface, game_layer_1_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 512 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_2']:
       game_layer_2_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 2", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_2_text_surface, game_layer_2_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 416 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_3']:
       game_layer_3_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 3", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_3_text_surface, game_layer_3_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 320 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_4']:
       game_layer_4_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 4", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_4_text_surface, game_layer_4_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 224 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
     game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['LAYER_5']:
       game_layer_5_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LAYER 5", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
+    THE_SCREEN.blit(game_layer_5_text_surface, game_layer_5_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
 
-    ######################################################################
-    # Show "Game Information" that we care about
-    #
-    # Camera details
-    # *** LESSON ***
-    ######################################################################
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA X: {CAMERA['X']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 496 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 464 - debug_y_offset)))
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA Y: {CAMERA['Y']}", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 478 - debug_y_offset)))
+    THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 446 - debug_y_offset)))
 
     ######################################################################
     # Show the Player Controls Debug
