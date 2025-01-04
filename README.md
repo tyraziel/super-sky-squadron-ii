@@ -3,35 +3,6 @@ Code for CodeMash 2025 Divez Session - So you want to make video games? - Super 
 
 In order to get the most out of the session, it is strongly advisable that the pre-requisites are completed prior to the session starting.  It is even more advisable to complete the pre-requisites before coming to CodeMash as you and every other attendee will be fighting for bandwidth and some setups (chromebook) might take a long time for downloads.
 
-## Credits
-
-All visual assets and sound effects have been provided by [kenney.nl](https://www.kenney.nl)
-
-## Python Code License - CC0 1.0
-
-The python code in this project is licensed under a Creative Commons CC0 1.0 Universal Public Domain Dedication [https://creativecommons.org/publicdomain/zero/1.0/](https://creativecommons.org/publicdomain/zero/1.0/)
-
-## All other asset licenses
-
-Please review the licenses for the other assets.
-
-## Attribution
-
-Since this has been released to the Public Domain under Creative Commons CC0 1.0 Universal Public Domain Dedication, attribution is not needed, but it would be a nice gesture.
-
-## Special Thanks
-
-- My Family
-
-- CodeMash and KidzMash (codemash.org)[https://codemash.org/]
-
-- Pygame-CE - [https://github.com/pygame-community/pygame-ce](https://github.com/pygame-community/pygame-ce)
-- Pygame-CE Mantainer - Andrew (oddbookworm)[https://github.com/oddbookworm]
-- Pygame-CE Contributor - Mzivic (mzivic7)[https://github.com/mzivic7]
-- The Pygame-CE Community - [discord.com/invite/pygame](discord.com/invite/pygame)
-
-- Those that attend "So you want to make video games?"
-
 ## Pre-Requisites
 
 - A laptop capable of running python3 with pygame-ce and installing various pip packages, and running some type of editor and unzip capabilities.
@@ -78,3 +49,32 @@ python3 codemash2025.py
 ```
 
 For more detailed instructions look at [SETUP.md](SETUP.md)
+
+## Credits
+
+All visual assets and sound effects have been provided by [kenney.nl](https://www.kenney.nl)
+
+## Python Code License - CC0 1.0
+
+The python code in this project is licensed under a Creative Commons CC0 1.0 Universal Public Domain Dedication [https://creativecommons.org/publicdomain/zero/1.0/](https://creativecommons.org/publicdomain/zero/1.0/)
+
+## All other asset licenses
+
+Please review the licenses for the other assets.
+
+## Attribution
+
+Since this has been released to the Public Domain under Creative Commons CC0 1.0 Universal Public Domain Dedication, attribution is not needed, but it would be a nice gesture.
+
+## Special Thanks
+
+- My Family
+
+- CodeMash and KidzMash (codemash.org)[https://codemash.org/]
+
+- Pygame-CE - [https://github.com/pygame-community/pygame-ce](https://github.com/pygame-community/pygame-ce)
+- Pygame-CE Mantainer - Andrew (oddbookworm)[https://github.com/oddbookworm]
+- Pygame-CE Contributor - Mzivic (mzivic7)[https://github.com/mzivic7]
+- The Pygame-CE Community - [discord.com/invite/pygame](discord.com/invite/pygame)
+
+- Those that attend "So you want to make video games?"
