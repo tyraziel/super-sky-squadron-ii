@@ -69,31 +69,31 @@ class Plane(pygame.sprite.Sprite):
     plane = Plane(self.x, self.y, self.rotation, self.style)
     return plane
 
-######################################################################
-# Rotate from Center 
-# https://stackoverflow.com/questions/4183208/how-do-i-rotate-an-image-around-its-center-using-pygame
-######################################################################
-def blitRotate(surf, image, pos, originPos, angle):
+# ######################################################################
+# # Rotate from Center 
+# # https://stackoverflow.com/questions/4183208/how-do-i-rotate-an-image-around-its-center-using-pygame
+# ######################################################################
+# def blitRotate(surf, image, pos, originPos, angle):
 
-    # offset from pivot to center
-    image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
-    offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
+#     # offset from pivot to center
+#     image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+#     offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
     
-    # roatated offset from pivot to center
-    rotated_offset = offset_center_to_pivot.rotate(-angle)
+#     # roatated offset from pivot to center
+#     rotated_offset = offset_center_to_pivot.rotate(-angle)
 
-    # roatetd image center
-    rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
+#     # roatetd image center
+#     rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
 
-    # get a rotated image
-    rotated_image = pygame.transform.rotate(image, angle)
-    rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
+#     # get a rotated image
+#     rotated_image = pygame.transform.rotate(image, angle)
+#     rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
 
-    # rotate and blit the image
-    surf.blit(rotated_image, rotated_image_rect)
+#     # rotate and blit the image
+#     surf.blit(rotated_image, rotated_image_rect)
   
-    # draw rectangle around the image
-    # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
+#     # draw rectangle around the image
+#     # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
 
 ######################################################################
 # Functions Created to support game initialization and transitions
@@ -183,6 +183,7 @@ argument_parser.add_argument("--debug", help="Enter Debug Mode", action="store_t
 argument_parser.add_argument("--debug-grid", help="Show Debug Grid", action="store_true", dest="debug_grid")
 argument_parser.add_argument("--debug-to-console", help="Debug to Console only (does not need to be used in conjunction with --debug, does not debug events)", action="store_true", dest="debug_to_console")
 argument_parser.add_argument("--debug-events", help="Debug Events to Console (does not need --debug or --debug-to-console)", action="store_true", dest="debug_events")
+argument_parser.add_argument("--debug-joystick-events", help="Debug Events to Console (does not need --debug or --debug-to-console or --debug-events)", action="store_true", dest="debug_joystick_events")
 argument_parser.add_argument("--debug-events-verbose", help="Debug All Events with its Data to Console (does not need --debug or --debug-to-console or --debug-events)", action="store_true", dest="debug_events_verbose")
 argument_parser.add_argument("--mute-audio", help="Mute all Sounds", action="store_true", dest="mute_audio")
 argument_parser.add_argument("--no-frame", help="Remove any windowing system framing", action="store_true", dest="no_frame")
@@ -248,7 +249,7 @@ TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCR
 ######################################################################
 #Game State is generally held within this dictionary
 #These are 'indexed' by GAME_STATE['KEY']
-GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
+GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_JOYSTICK_EVENTS': GAME_CLI_ARGUMENTS.debug_joystick_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
@@ -501,7 +502,7 @@ initialize_title_screen()
 GAME_CLOCK = pygame.time.Clock()
 ELAPSED_MS = GAME_CLOCK.tick()
 ELAPSED_S = ELAPSED_MS / 1000.0
-#FRAME_COUNTER = 0
+FRAME_COUNTER = 0
 
 ######################################################################
 # MAIN GAME LOOP
@@ -701,13 +702,21 @@ while GAME_STATE['RUNNING']:
     #                             - ZL=Axis-4, ZR=Axis-5, leftaxis-left/right=0, leftaxis-up/down=1, rightaxis-left/right=2, rightaxis-up/down=3
     #                             - up=negative1, down=positive1, left=negative1, right=positive1
     #                             - ZL=pressed=-1.0,released=0.9999969482421875
+    #
+    # We have other joysticks that we haven't programmed for yet
+    #
+    #
+    #
+    #
+    #
+    #
     ##################################################################
     
     # Handle hotplugging
     # This event will be generated when the program starts for every
     # joystick, filling up the list without needing to create them manually.
     if not GAME_CLI_ARGUMENTS.disable_joystick and the_event.type == pygame.JOYDEVICEADDED:
-      if GAME_STATE['DEBUG_EVENTS'] or True:
+      if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
         print(f"[EVENT] [JOYSTICK-{the_event.device_index}] [CONNECT] ID:{the_event.device_index}")
 
       #Get the joystick that caused this event  
@@ -716,27 +725,27 @@ while GAME_STATE['RUNNING']:
       JOYSTICK_MAPPER[joystick_instance_id] = {'JOYSTICK': joystick, 'PLAYER': 0}
 
       if len(JOYSTICKS) < GAME_CONSTANTS['MAX_CONNECTED_JOYSTICKS']:
-        if GAME_STATE['DEBUG_EVENTS'] or True:
+        if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
           print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - Patching into JOYSTICK")
         #Check if we have player 1's Joystick attached, if not, add the connected joystick for that player
         if JOYSTICKS.get(1) == None:
           JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] = 1
-          if GAME_STATE['DEBUG_EVENTS'] or True:
+          if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
             print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PLAYER 1 JOYSTICK CONNECTED")
         #Check if we have player 2's Joystick attached, if not, add the connected joystick for that player
         elif JOYSTICKS.get(2) == None:
           JOYSTICK_MAPPER[joystick_instance_id]['PLAYER'] = 2
-          if GAME_STATE['DEBUG_EVENTS'] or True:
+          if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
             print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PLAYER 2 JOYSTICK CONNECTED")
 
         #Patch the joystick into the old code
         JOYSTICKS[JOYSTICK_MAPPER[joystick_instance_id]['PLAYER']] = joystick
 
-        if GAME_STATE['DEBUG_EVENTS'] or True:
+        if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
           print(f"[EVENT] [JOYSTICK-{joystick.get_instance_id()}] [CONNECT] ID:{joystick.get_instance_id()} - {joystick} - {joystick.get_name()} - PATCHED AS {JOYSTICK_MAPPER[joystick_instance_id]['PLAYER']}")
 
     if not GAME_CLI_ARGUMENTS.disable_joystick and the_event.type == pygame.JOYDEVICEREMOVED:
-      if GAME_STATE['DEBUG_EVENTS'] or True:
+      if GAME_STATE['DEBUG_EVENTS'] or GAME_STATE['DEBUG_JOYSTICK_EVENTS']:
         print(f"[EVENT] [JOYSTICK-{the_event.instance_id}] [DISCONNECT] ID:{the_event.instance_id} FOR PLAYER {JOYSTICK_MAPPER[the_event.instance_id]['PLAYER']}")
       
       joystick_instance_id = the_event.instance_id
@@ -920,16 +929,36 @@ while GAME_STATE['RUNNING']:
     game_title_2 = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"The Flying Ace Follies", True, GAME_COLORS['SHMUP_ORANGE'])
     THE_SCREEN.blit(game_title_2, game_title_2.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, (GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 3) + (GAME_CONSTANTS['SQUARE_SIZE'] * 2))))
 
-    blitRotate(THE_SCREEN, 
-               pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], (64, 64)), 
-               (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
-               (32, 32), 
-               270)
-    blitRotate(THE_SCREEN,
-               pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], (64, 64)), 
-               (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 - GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
-               (32, 32), 
-               90)
+    #From my friend and pygame-ce contributor - Mzivic from the pygame-ce community
+    # pos = (x, y)
+    # # angle is in degrees
+    # # img is input image
+    # rotated_img = pygame.transform.rotozoom(img, angle, 1)
+    # rotated_img_rect = rotated_img.get_rect(center=pos)
+    # # surface.blit(rotated_img, rotated_img_rect)
+
+    red_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], 0, 2)
+    THE_SCREEN.blit(red_plane, red_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
+
+    green_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['GREEN_A_FIGHTER'], 270, 2)
+    THE_SCREEN.blit(green_plane, green_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 - 3.5 * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
+
+    blue_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], 0, 2)
+    THE_SCREEN.blit(blue_plane, blue_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 - GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
+
+    yellow_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 90, 2)
+    THE_SCREEN.blit(yellow_plane, yellow_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 + 3.5 * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
+
+    # blitRotate(THE_SCREEN, 
+    #            pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], (64, 64)), 
+    #            (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 + GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
+    #            (32, 32), 
+    #            270)
+    # blitRotate(THE_SCREEN,
+    #            pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], (64, 64)), 
+    #            (GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 - GAME_CONSTANTS['SQUARE_SIZE'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE']), 
+    #            (32, 32), 
+    #            90)
 
     press_start = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"PRESS START", True, press_start_color)
     THE_SCREEN.blit(press_start, press_start.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 - GAME_CONSTANTS['SQUARE_SIZE'] / 2)))
@@ -1014,6 +1043,15 @@ while GAME_STATE['RUNNING']:
     # Copies the contents of one surface to another.
     # In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
     # Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
+
+#From my friend and pygame-ce maintainer - Andrew from the pygame-ce community
+#It’s actually called “bit blit”, and it means “bit block transfer (bit blt)”. It’s a generic term for combining multiple bitmaps into one output bitmap using some set of bool operations.
+#Graphics however, has generally taken the name and replaced that definition with some form of mathematical operation, usually with some form of alpha compositing
+#I’d just call it block transfer. It’s not bit-wise, and alpha is complicated
+#it’s just easier to say blit than blt lol
+#Basic form: copies and pastes pixels and does no math (or rather, math is just pixel_out = pixel_in)
+#More advanced form: applies alphas from source and destination and blends the two together to create a composite image
+
     ######################################################################
     time_passed_ms_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"{ELAPSED_MS}ms", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 526 - debug_y_offset)))
@@ -1502,6 +1540,6 @@ while GAME_STATE['RUNNING']:
   
   ELAPSED_MS = GAME_CLOCK.tick(60)
   ELAPSED_S = ELAPSED_MS / 1000.0
-  #FRAME_COUNTER = FRAME_COUNTER + 1
+  FRAME_COUNTER = FRAME_COUNTER + 1
 
 pygame.quit()
