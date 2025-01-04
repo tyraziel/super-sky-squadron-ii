@@ -1,20 +1,27 @@
-Pre-Requisits:
+# Pre-Requisits:
 
-Git for windows:  https://git-scm.com/downloads
+- Git: via a packaging manager or https://git-scm.com/downloads / (windows) https://git-scm.com/downloads/win
+- vscode: https://code.visualstudio.com/download
+- python 3
+- - Windows - open a powershell and type in `python` to install the python interpreter from the microsoft store.
+- Windows Terminal (from the Microsoft Store)
 
-vscode: https://code.visualstudio.com/download
+## Windows:
 
-python 3
-Windows - open a powershell and type in `python` to install the python interpreter from the microsoft store.
+Create a virual environment with python in a directory that you have write permissions in.  
+Open a terminal window in powershell (it should open in your "users" directory) and execute the following:
 
-Windows Terminal (from the Microsoft Store)
+```shell
+python3 -m venv .pygame-ce-codemash25
+```
 
+Activate the virtual environment by executing the following:  
 
-Windows:
+```shell
+.\.pygame-ce-codemash25\Scripts\activate
+```
 
-Create a virual environment with python:  python3 -m venv .pygame-ce-codemash25
-
-Activate the virtual environment:  .\.pygame-ce-codemash25\Scripts\activate
+If you see an error similar to the following, then you need to enable script executions (you will also need this for the setup.ps1 script you will execute later):
 
 ```
 .\.pygame-ce-codemash25\Scripts\activate : File C:\Users\Andrew\sbx\.pygame-ce-codemash25\Scripts\Activate.ps1 cannot
@@ -27,8 +34,26 @@ At line:1 char:1
     + FullyQualifiedErrorId : UnauthorizedAccess
 ```
 
-Windows - allow scripts for the current process:
-`Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process`
+To enable script executions and have it apply to only the current process (i.e. the powershell prompt you're currently at) execute the following:
+
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+
+and then try executing the following again:
+
+```shell
+.\.pygame-ce-codemash25\Scripts\activate
+```
+
+If all is successful then you should see something similar to the following:
+
+```
+(.pygame-ce-codemash25) PS C:\Users\Andrew> 
+```
+
+Notice that the name of your virtual environment is in the beginning of the command prompt.
+
 
 `pip install pygame-ce`
 
@@ -37,7 +62,12 @@ Windows - allow scripts for the current process:
 `python codemash2025.py`
 
 
-To deactivate your venv: `deactivate` from the command prompt
+To leave or deactivate your venv execute 
+```
+deactivate
+``` 
+
+And you should see the command prompt return to normal (the virutal environment is no longer prefixed at the prompt)
 
 Linux Based:
 
