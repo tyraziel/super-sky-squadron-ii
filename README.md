@@ -21,10 +21,16 @@ Since this has been released to the Public Domain under Creative Commons CC0 1.0
 
 ## Special Thanks
 
+My Family
+
+CodeMash and KidzMash
+
 Pygame-CE - [https://github.com/pygame-community/pygame-ce](https://github.com/pygame-community/pygame-ce)
 Pygame-CE Mantainer - Andrew (oddbookworm)[https://github.com/oddbookworm]
 Pygame-CE Contributor - Mzivic
 The Pygame-CE Community - [discord.com/invite/pygame](discord.com/invite/pygame)
+
+Those that attend "So you want to make video games?"
 
 ## Pre-Requisites
 
