@@ -202,6 +202,45 @@ def initialize_game_mode_screen():
   reset_for_game_state_transition()
 
   GAME_STATE['GAME_MODE_SCREEN'] = True
+  GAME_MODE_OPTIONS['PLAYERS'] = True
+  GAME_MODE_OPTIONS['GAME_MODE'] = False
+  GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+  GAME_MODE_OPTIONS['START_GAME'] = False
+
+def initialize_instructions_screen():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['INSTRUCTIONS_SCREEN'] = True
+
+def initialize_dog_fight_mode():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['DOG_FIGHT_MODE'] = True
+
+def initialize_mission_mode():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['MISSION_MODE'] = True
+
+def initialize_arena_mode():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['ARENA_MODE'] = True
+
+def initialize_game_over_screen():
+  global GAME_STATE
+
+  reset_for_game_state_transition()
+
+  GAME_STATE['GAME_OVER_SCREEN'] = True
 
 ######################################################################
 # ***LESSON 0 - Argument Parsing***
@@ -277,7 +316,7 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 
 #Time to live defaults are within this dictionary
 # ***LESSON***
-TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
+TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000}
 
 ######################################################################
@@ -295,7 +334,10 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False, 'TRANSITION_TO_ARENA_MODE': False, 'TRANSITION_TO_GAME_OVER_SCREEN': False,
              }
 
-#GAME_MODE_OPTIONS = {'MULTIPLAYER': False, }
+GAME_MODE_OPTIONS = {'PLAYERS': True, 'GAME_MODE': False, 'STARTING_LIVES': False, 'START_GAME': False,
+                     'ONE_PLAYER': True, 'TWO_PLAYERS': False, 
+                     'MISSION': True, 'ARENA': False, 'DOG_FIGHT': False,
+                     'LIVES_COUNT': 3}
 
 GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE'], 'TRANSITION_TO_ARENA_MODE': TTL_DEFAULTS['TRANSITION_TO_ARENA_MODE'], 'TRANSITION_TO_GAME_OVER_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']}
 
@@ -668,6 +710,16 @@ while GAME_STATE['RUNNING']:
           initialize_title_screen()
         if the_event.key == K_F2:
           initialize_game_mode_screen()
+        if the_event.key == K_F3:
+          initialize_instructions_screen()
+        if the_event.key == K_F4:
+          initialize_dog_fight_mode()
+        if the_event.key == K_F5:
+          initialize_mission_mode()
+        if the_event.key == K_F6:
+          initialize_arena_mode()
+        if the_event.key == K_F7:
+          initialize_game_over_screen()
 
         if the_event.key == K_F8:
           print(f"[TEST-MODE] [DEBUG-GRID] MODE TOGGLED TO {(str(not GAME_STATE['DEBUG_GRID'])).upper()}")
@@ -1025,45 +1077,219 @@ while GAME_STATE['RUNNING']:
         initialize_game_mode_screen()
 
   if GAME_STATE['GAME_MODE_SCREEN']:
-    players = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"PLAYERS:", True, GAME_COLORS['SHMUP_ORANGE'])
+    if not GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN']:
+      ## UPDATE THE GAME MODE BASED ON CONTROLS
+      if GAME_CONTROLS['PLAYER_1']['DOWN']:
+        GAME_CONTROLS['PLAYER_1']['DOWN'] = False
+        if GAME_MODE_OPTIONS['PLAYERS']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          GAME_MODE_OPTIONS['GAME_MODE'] = True
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = False
+        elif GAME_MODE_OPTIONS['GAME_MODE']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          GAME_MODE_OPTIONS['GAME_MODE'] = False
+          if GAME_MODE_OPTIONS['DOG_FIGHT']:
+            GAME_MODE_OPTIONS['STARTING_LIVES'] = True
+            GAME_MODE_OPTIONS['START_GAME'] = False
+          else:
+            GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+            GAME_MODE_OPTIONS['START_GAME'] = True
+        elif GAME_MODE_OPTIONS['STARTING_LIVES']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          GAME_MODE_OPTIONS['GAME_MODE'] = False
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = True
+        elif GAME_MODE_OPTIONS['START_GAME']:
+          GAME_MODE_OPTIONS['PLAYERS'] = True
+          GAME_MODE_OPTIONS['GAME_MODE'] = False
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = False
+
+      if GAME_CONTROLS['PLAYER_1']['UP']:
+        GAME_CONTROLS['PLAYER_1']['UP'] = False
+        if GAME_MODE_OPTIONS['PLAYERS']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          GAME_MODE_OPTIONS['GAME_MODE'] = False
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = True
+        elif GAME_MODE_OPTIONS['GAME_MODE']:
+          GAME_MODE_OPTIONS['PLAYERS'] = True
+          GAME_MODE_OPTIONS['GAME_MODE'] = False
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = False
+        elif GAME_MODE_OPTIONS['STARTING_LIVES']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          GAME_MODE_OPTIONS['GAME_MODE'] = True
+          GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = False
+        elif GAME_MODE_OPTIONS['START_GAME']:
+          GAME_MODE_OPTIONS['PLAYERS'] = False
+          if GAME_MODE_OPTIONS['DOG_FIGHT']:
+            GAME_MODE_OPTIONS['GAME_MODE'] = False
+            GAME_MODE_OPTIONS['STARTING_LIVES'] = True
+          else:
+            GAME_MODE_OPTIONS['GAME_MODE'] = True
+            GAME_MODE_OPTIONS['STARTING_LIVES'] = False
+          GAME_MODE_OPTIONS['START_GAME'] = False
+
+      if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+        GAME_CONTROLS['PLAYER_1']['RIGHT'] = False
+        if GAME_MODE_OPTIONS['PLAYERS']:
+          if GAME_MODE_OPTIONS['ONE_PLAYER']:
+            GAME_MODE_OPTIONS['ONE_PLAYER'] = False
+            GAME_MODE_OPTIONS['TWO_PLAYERS'] = True
+          elif GAME_MODE_OPTIONS['TWO_PLAYERS']:
+            GAME_MODE_OPTIONS['ONE_PLAYER'] = True
+            GAME_MODE_OPTIONS['TWO_PLAYERS'] = False
+            if GAME_MODE_OPTIONS['DOG_FIGHT']:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+              GAME_MODE_OPTIONS['MISSION'] = True
+        if GAME_MODE_OPTIONS['GAME_MODE']:
+          if GAME_MODE_OPTIONS['MISSION']:
+            GAME_MODE_OPTIONS['MISSION'] = False
+            GAME_MODE_OPTIONS['ARENA'] = True
+            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+          elif GAME_MODE_OPTIONS['ARENA']:
+            if GAME_MODE_OPTIONS['ONE_PLAYER']:
+              GAME_MODE_OPTIONS['MISSION'] = True
+            else:
+              GAME_MODE_OPTIONS['MISSION'] = False
+            GAME_MODE_OPTIONS['ARENA'] = False
+            if GAME_MODE_OPTIONS['TWO_PLAYERS']:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = True
+            else:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+          elif GAME_MODE_OPTIONS['DOG_FIGHT']:
+            GAME_MODE_OPTIONS['MISSION'] = True
+            GAME_MODE_OPTIONS['ARENA'] = False
+            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+        if GAME_MODE_OPTIONS['STARTING_LIVES']:
+          GAME_MODE_OPTIONS['LIVES_COUNT'] = GAME_MODE_OPTIONS['LIVES_COUNT'] + 1
+          if GAME_MODE_OPTIONS['LIVES_COUNT'] > 5:
+            GAME_MODE_OPTIONS['LIVES_COUNT'] = 1
+
+      if GAME_CONTROLS['PLAYER_1']['LEFT']:
+        GAME_CONTROLS['PLAYER_1']['LEFT'] = False
+        if GAME_MODE_OPTIONS['PLAYERS']:
+          if GAME_MODE_OPTIONS['ONE_PLAYER']:
+            GAME_MODE_OPTIONS['ONE_PLAYER'] = False
+            GAME_MODE_OPTIONS['TWO_PLAYERS'] = True
+          elif GAME_MODE_OPTIONS['TWO_PLAYERS']:
+            GAME_MODE_OPTIONS['ONE_PLAYER'] = True
+            GAME_MODE_OPTIONS['TWO_PLAYERS'] = False
+            if GAME_MODE_OPTIONS['DOG_FIGHT']:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+              GAME_MODE_OPTIONS['MISSION'] = True
+        if GAME_MODE_OPTIONS['GAME_MODE']:
+          if GAME_MODE_OPTIONS['MISSION']:
+            GAME_MODE_OPTIONS['MISSION'] = False
+            if GAME_MODE_OPTIONS['ONE_PLAYER']:
+              GAME_MODE_OPTIONS['ARENA'] = True
+            else:
+              GAME_MODE_OPTIONS['ARENA'] = False
+            if GAME_MODE_OPTIONS['TWO_PLAYERS']:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = True
+            else:
+              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+          elif GAME_MODE_OPTIONS['ARENA']:
+            GAME_MODE_OPTIONS['MISSION'] = True
+            GAME_MODE_OPTIONS['ARENA'] = False
+            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+          elif GAME_MODE_OPTIONS['DOG_FIGHT']:
+            GAME_MODE_OPTIONS['MISSION'] = False
+            GAME_MODE_OPTIONS['ARENA'] = True
+            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+        if GAME_MODE_OPTIONS['STARTING_LIVES']:
+          GAME_MODE_OPTIONS['LIVES_COUNT'] = GAME_MODE_OPTIONS['LIVES_COUNT'] - 1
+          if GAME_MODE_OPTIONS['LIVES_COUNT'] < 1:
+            GAME_MODE_OPTIONS['LIVES_COUNT'] = 5
+
+    players = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"PLAYERS:", True, GAME_COLORS['ALMOST_BLACK'])
+    if GAME_MODE_OPTIONS['PLAYERS']:
+      players = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"PLAYERS:", True, GAME_COLORS['SHMUP_ORANGE'])
     THE_SCREEN.blit(players, players.get_rect(topright = (GAME_CONSTANTS['SQUARE_SIZE'] * 15, GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)))
 
-    red_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], 0, 2)
+    red_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER_GRAY'], 0, 2)
+    if GAME_MODE_OPTIONS['ONE_PLAYER']:
+      red_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], 0, 2)
     THE_SCREEN.blit(red_plane, red_plane.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 19.5, GAME_CONSTANTS['SQUARE_SIZE'] * 3.5)))
 
     red_plane_multiplayer = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER_GRAY'], 0, 2)
-    THE_SCREEN.blit(red_plane_multiplayer, red_plane_multiplayer.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 24.5, GAME_CONSTANTS['SQUARE_SIZE'] * 3.5)))
     blue_plane_multiplayer = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER_GRAY'], 0, 2)
+    if GAME_MODE_OPTIONS['TWO_PLAYERS']:
+      red_plane_multiplayer = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_A_FIGHTER'], 0, 2)
+      blue_plane_multiplayer = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_A_FIGHTER'], 0, 2)
+
+    THE_SCREEN.blit(red_plane_multiplayer, red_plane_multiplayer.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 24.5, GAME_CONSTANTS['SQUARE_SIZE'] * 3.5)))
     THE_SCREEN.blit(blue_plane_multiplayer, blue_plane_multiplayer.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 27, GAME_CONSTANTS['SQUARE_SIZE'] * 3.5)))
 
     game_mode = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"GAME MODE:", True, GAME_COLORS['ALMOST_BLACK'])
+    if GAME_MODE_OPTIONS['GAME_MODE']:
+      game_mode = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"GAME MODE:", True, GAME_COLORS['SHMUP_ORANGE'])
     THE_SCREEN.blit(game_mode, game_mode.get_rect(topright = (GAME_CONSTANTS['SQUARE_SIZE'] * 15, GAME_CONSTANTS['SQUARE_SIZE'] * 6.5)))
 
-    mission_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"MISSION", True, GAME_COLORS['SHMUP_GREEN'])
+    mission_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"MISSION", True, GAME_COLORS['SHMUP_GRAY'])
+    if GAME_MODE_OPTIONS['MISSION']:
+      mission_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"MISSION", True, GAME_COLORS['SHMUP_GREEN'])
     THE_SCREEN.blit(mission_mode, mission_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 18, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
     arena_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"ARENA", True, GAME_COLORS['SHMUP_GRAY'])
+    if GAME_MODE_OPTIONS['ARENA']:
+      arena_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"ARENA", True, GAME_COLORS['SHMUP_GREEN'])
     THE_SCREEN.blit(arena_mode, arena_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 23, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
-    dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['SHMUP_GRAY'])
+    dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['ALMOST_BLACK'])
+    if GAME_MODE_OPTIONS['TWO_PLAYERS']:
+      dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['SHMUP_GRAY'])
+      if GAME_MODE_OPTIONS['DOG_FIGHT']:
+        dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['SHMUP_GREEN'])
+    
     THE_SCREEN.blit(dog_fight_mode, dog_fight_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 27.5, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
-    starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['ALMOST_BLACK'])
-    THE_SCREEN.blit(starting_lives, starting_lives.get_rect(topright = (GAME_CONSTANTS['SQUARE_SIZE'] * 15, GAME_CONSTANTS['SQUARE_SIZE'] * 10.5)))
+    if GAME_MODE_OPTIONS['DOG_FIGHT']:
+      starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['ALMOST_BLACK'])
+      if GAME_MODE_OPTIONS['STARTING_LIVES']:
+        starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['SHMUP_ORANGE'])
+      THE_SCREEN.blit(starting_lives, starting_lives.get_rect(topright = (GAME_CONSTANTS['SQUARE_SIZE'] * 15, GAME_CONSTANTS['SQUARE_SIZE'] * 10.5)))
 
-    yellow_plane_lives_1 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
-    THE_SCREEN.blit(yellow_plane_lives_1, yellow_plane_lives_1.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 19.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
-    yellow_plane_lives_2 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
-    THE_SCREEN.blit(yellow_plane_lives_2, yellow_plane_lives_2.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 22.0, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
-    yellow_plane_lives_3 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
-    THE_SCREEN.blit(yellow_plane_lives_3, yellow_plane_lives_3.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 24.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
-    yellow_plane_lives_4 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
-    THE_SCREEN.blit(yellow_plane_lives_4, yellow_plane_lives_4.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 27.0, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
-    yellow_plane_lives_5 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
-    THE_SCREEN.blit(yellow_plane_lives_5, yellow_plane_lives_5.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 29.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
+      yellow_plane_lives_1 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
+      yellow_plane_lives_2 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
+      yellow_plane_lives_3 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
+      yellow_plane_lives_4 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
+      yellow_plane_lives_5 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER_GRAY'], 0, 2)
+
+      if GAME_MODE_OPTIONS['LIVES_COUNT'] >= 2:
+        yellow_plane_lives_2 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
+      if GAME_MODE_OPTIONS['LIVES_COUNT'] >= 3:
+        yellow_plane_lives_3 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
+      if GAME_MODE_OPTIONS['LIVES_COUNT'] >= 4:
+        yellow_plane_lives_4 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
+      if GAME_MODE_OPTIONS['LIVES_COUNT'] >= 5:
+        yellow_plane_lives_5 = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 0, 2)
+
+      THE_SCREEN.blit(yellow_plane_lives_1, yellow_plane_lives_1.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 19.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
+      THE_SCREEN.blit(yellow_plane_lives_2, yellow_plane_lives_2.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 22.0, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
+      THE_SCREEN.blit(yellow_plane_lives_3, yellow_plane_lives_3.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 24.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
+      THE_SCREEN.blit(yellow_plane_lives_4, yellow_plane_lives_4.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 27.0, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
+      THE_SCREEN.blit(yellow_plane_lives_5, yellow_plane_lives_5.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE'] * 29.5, GAME_CONSTANTS['SQUARE_SIZE'] * 11.5)))
 
     start_game = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"START GAME", True, GAME_COLORS['ALMOST_BLACK'])
+    if GAME_MODE_OPTIONS['START_GAME']:
+      start_game = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"START GAME", True, GAME_COLORS['SHMUP_ORANGE'])
+    if GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN']:
+      start_game = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"START GAME", True, GAME_COLORS['SHMUP_WHITE'])
+      start_game.set_alpha(int((GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] / TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN']) * 255))
+      
+
     THE_SCREEN.blit(start_game, start_game.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SQUARE_SIZE'] * 16.0)))
+
+    if GAME_MODE_OPTIONS['START_GAME'] and not GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] and (GAME_CONTROLS['PLAYER_1']['GREEN'] or GAME_CONTROLS['PLAYER_1']['RED'] or GAME_CONTROLS['PLAYER_1']['BLUE'] or GAME_CONTROLS['PLAYER_1']['YELLOW'] or GAME_CONTROLS['PLAYER_2']['GREEN'] or GAME_CONTROLS['PLAYER_2']['RED'] or GAME_CONTROLS['PLAYER_2']['BLUE'] or GAME_CONTROLS['PLAYER_2']['YELLOW']):
+      GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = True
+    if GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN']:
+      GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] - ELAPSED_MS
+      if GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] <= 0:
+        initialize_instructions_screen()
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
