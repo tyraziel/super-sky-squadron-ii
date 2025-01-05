@@ -103,6 +103,37 @@
     with_fileglob:
       - "./tmp/pixel-shmup/Tilemap/*_packed.png"
 
+  - name: Download Kenney Space Shooter Redux (https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip)
+    ansible.builtin.get_url:
+      url: https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip
+      dest: ./tmp/kenney_space-shooter-redux.zip
+      #checksum: sha256:e33fd626b799de343f18c81ebaa6f3bc161772fdd717acf3f223589ce74cf952
+
+  - name: Create ./tmp/space-shooter-redux/
+    ansible.builtin.file:
+      path: ./tmp/space-shooter-redux/
+      state: directory
+      mode: '0755'
+
+  - name: Unzip kenney_space-shooter-redux.zip to ./tmp/space-shooter-redux/
+    ansible.builtin.unarchive:
+      src: ./tmp/kenney_space-shooter-redux.zip
+      dest: ./tmp/space-shooter-redux/
+
+  - name: Create ../sfx/space-shooter-redux/ directory for the game
+    ansible.builtin.file:
+      path: ../sfx/space-shooter-redux/
+      state: directory
+      mode: '0755'
+
+  - name: Copy sfx from ./tmp/space-shooter-redux/Bonus/*.ogg to ../sfx/kenney_space-shooter-redux/
+    ansible.builtin.copy:
+      remote_src: true
+      src: "{{ item }}"
+      dest: ../sfx/space-shooter-redux
+    with_fileglob:
+      - "./tmp/space-shooter-redux/Bonus/*.ogg"
+
   - name: Create ../sprites/pixel-shmup/
     ansible.builtin.file:
       path: ../sprites/pixel-shmup/
