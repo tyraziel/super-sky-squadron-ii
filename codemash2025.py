@@ -1026,6 +1026,10 @@ while GAME_STATE['RUNNING']:
   #
   ####################################################################
 
+  ####################################################################
+  # TITLE_SCREEN - If we're at the title screen, draw that screen
+  #
+  ####################################################################
   if GAME_STATE['TITLE_SCREEN']:
     
     press_start_blink_ttl = press_start_blink_ttl - ELAPSED_MS
@@ -1076,6 +1080,10 @@ while GAME_STATE['RUNNING']:
       if GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] <= 0:
         initialize_game_mode_screen()
 
+  ####################################################################
+  # GAME_MODE_SCREEN - If we're at the game mode screen, draw that screen
+  #
+  ####################################################################
   if GAME_STATE['GAME_MODE_SCREEN']:
     if not GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN']:
       ## UPDATE THE GAME MODE BASED ON CONTROLS
@@ -1290,6 +1298,14 @@ while GAME_STATE['RUNNING']:
       GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] - ELAPSED_MS
       if GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] <= 0:
         initialize_instructions_screen()
+
+  ####################################################################
+  # INSTRUCTIONS_SCREEN - If we're at the instructions screen, draw that screen
+  #
+  ####################################################################
+  if GAME_STATE['INSTRUCTIONS_SCREEN']:
+    a = 1
+
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
