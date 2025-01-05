@@ -19,16 +19,16 @@ This guide assumes you already have a version of python 3 installed and have wor
 ### Windows
 
 ```shell
-python3 -m venv .pygame-ce-codemash25
+python -m venv .pygame-ce-codemash25
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 ./.pygame-ce-codemash25/Scripts/activate
 git clone https://github.com/tyraziel/codemash25-pygame-ce.git
 cd codemash25-pygame-ce
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 cd setup
 ./.setup.ps1
 cd ../
-python3 codemash2025.py
+python codemash2025.py
 ```
 
 ### Linux Based Environments
