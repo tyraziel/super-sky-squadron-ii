@@ -16,7 +16,11 @@ In order to get the most out of the session, it is strongly advisable that the p
 
 This guide assumes you already have a version of python 3 installed and have working knowledge of python, python virtual environments and the command line.
 
-### Windows
+*NOTE:*  A major difference between Windows and Linux is windows generally uses `python` and Linux generally uses `python3`.
+
+### Windows (via Windows Powershell)
+
+Run the following commands from a Powershell Command Prompt
 
 ```shell
 python -m venv .pygame-ce-codemash25
@@ -26,7 +30,7 @@ git clone https://github.com/tyraziel/codemash25-pygame-ce.git
 cd codemash25-pygame-ce
 pip install -r requirements.txt
 cd setup
-./.setup.ps1
+./setup.ps1
 cd ../
 python codemash2025.py
 ```
