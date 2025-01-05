@@ -215,7 +215,7 @@ def initialize_instructions_screen():
 
   GAME_STATE['INSTRUCTIONS_SCREEN'] = True
 
-def setup_for_dog_fight_mode_quick_jump():
+def setup_for_dogfight_mode_quick_jump():
   global GAME_MODE_OPTIONS
 
   GAME_MODE_OPTIONS['ONE_PLAYER'] = False
@@ -226,7 +226,7 @@ def setup_for_dog_fight_mode_quick_jump():
   GAME_MODE_OPTIONS['LIVES_COUNT'] = 3
   GAME_STATE['MULTIPLAYER'] = True
 
-def initialize_dog_fight_mode():
+def initialize_dogfight_mode():
   global GAME_STATE
 
   reset_for_game_state_transition()
@@ -235,6 +235,8 @@ def initialize_dog_fight_mode():
   ### Initialize the map
   ### Re-Initialize player 1, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
   ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
+  PLAYER_1['LIVES'] = GAME_MODE_OPTIONS['LIVES_COUNT']
+  PLAYER_2['LIVES'] = GAME_MODE_OPTIONS['LIVES_COUNT']
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -718,8 +720,8 @@ while GAME_STATE['RUNNING']:
         if the_event.key == K_F3:
           initialize_instructions_screen()
         if the_event.key == K_F4:
-          setup_for_dog_fight_mode_quick_jump()
-          initialize_dog_fight_mode()
+          setup_for_dogfight_mode_quick_jump()
+          initialize_dogfight_mode()
         if the_event.key == K_F5:
           initialize_mission_mode()
         if the_event.key == K_F6:
@@ -1253,13 +1255,13 @@ while GAME_STATE['RUNNING']:
       arena_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"ARENA", True, GAME_COLORS['SHMUP_GREEN'])
     THE_SCREEN.blit(arena_mode, arena_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 23, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
-    dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['ALMOST_BLACK'])
+    dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['ALMOST_BLACK'])
     if GAME_MODE_OPTIONS['TWO_PLAYERS']:
-      dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GRAY'])
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GRAY'])
       if GAME_MODE_OPTIONS['DOGFIGHT']:
-        dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GREEN'])
+        dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GREEN'])
     
-    THE_SCREEN.blit(dog_fight_mode, dog_fight_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 27.5, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
+    THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 27.5, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
     if GAME_MODE_OPTIONS['DOGFIGHT']:
       starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['ALMOST_BLACK'])
@@ -1527,10 +1529,10 @@ while GAME_STATE['RUNNING']:
       game_state_game_over_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER SCREEN", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_game_over_screen_text_surface, game_state_game_over_screen_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 160 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    game_state_dogfight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['DOGFIGHT_MODE']:
-      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['GREEN'])
-    THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 448 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 558 - debug_y_offset)))
+      game_state_dogfight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_dogfight_text_surface, game_state_dogfight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 448 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 558 - debug_y_offset)))
 
     game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['MISSION_MODE']:
