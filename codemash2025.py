@@ -182,7 +182,6 @@ def destroy_alert():
   alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
   alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 
-
 def initialize_title_screen():
   global GAME_STATE
   global press_start_color
@@ -243,7 +242,7 @@ def initialize_mission_mode():
   reset_for_game_state_transition()
 
   GAME_STATE['MISSION_MODE'] = True
-  ### Re-Initialize player 1 - 3 lives
+  ### Re-Initialize player 1 - 3 lives - if GAME_STATE['LIVES_CHEAT_CODE'] is active then 10
   ### Re-Initialize player 2 - 3 lives
   ### Load Level
 
@@ -253,7 +252,7 @@ def initialize_arena_mode():
   reset_for_game_state_transition()
 
   GAME_STATE['ARENA_MODE'] = True
-  ### Re-Initialize player 1 - 1 life
+  ### Re-Initialize player 1 - 1 life - if GAME_STATE['LIVES_CHEAT_CODE'] is active then 3
   ### Re-Initialize player 2 - 1 life
   ### Dynamically load the level based on YYYYMMDD seed, so this will always seed the same per day (could possibly do this for week though?)
 
@@ -351,7 +350,7 @@ TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCR
 GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENTS.debug_grid, 'DEBUG_TO_CONSOLE': GAME_CLI_ARGUMENTS.debug_to_console, 'DEBUG_EVENTS': GAME_CLI_ARGUMENTS.debug_events, 'DEBUG_JOYSTICK_EVENTS': GAME_CLI_ARGUMENTS.debug_joystick_events, 'DEBUG_EVENTS_VERBOSE': GAME_CLI_ARGUMENTS.debug_events_verbose, 
               'TEST_MODE': GAME_CLI_ARGUMENTS.test_mode or GAME_CLI_ARGUMENTS.debug or GAME_CLI_ARGUMENTS.debug_grid or GAME_CLI_ARGUMENTS.debug_to_console or GAME_CLI_ARGUMENTS.debug_events or GAME_CLI_ARGUMENTS.debug_events_verbose,
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
-              'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
+              'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False, 'LIVES_CHEAT_CODE': False,
               'MULTIPLAYER': False,
               'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOGFIGHT_MODE': False, 'MISSION_MODE': False, 'ARENA_MODE': False, 'GAME_OVER_SCREEN': False,
               'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False, 'TRANSITION_TO_ARENA_MODE': False, 'TRANSITION_TO_GAME_OVER_SCREEN': False,
@@ -528,12 +527,6 @@ for subtexture in pixel_shmup_ships_xml_subtextures:
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Completed")
-
-######################################################################
-# TRANSLATE THE MAP INTO INDEXABLE ELEMETS FOR EASIER "MAPPING"
-######################################################################
-
-
 
 ######################################################################
 # SETUP THE DISPLAY
@@ -1471,6 +1464,11 @@ while GAME_STATE['RUNNING']:
     if GAME_STATE['MULTIPLAYER']:
       game_state_multiplayer_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MULTIPLAYER", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_multiplayer_text_surface, game_state_multiplayer_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 192 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
+
+    game_state_lives_cheat_code_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"LIVES CHEAT CODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['LIVES_CHEAT_CODE']:
+      game_state_lives_cheat_code_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MULTIPLAYER", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(game_state_lives_cheat_code_text_surface, game_state_lives_cheat_code_text_surface.get_rect(bottomleft = (16 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 590 - debug_y_offset)))
 
     game_state_title_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"TITLE SCREEN", True, GAME_COLORS['NOT_QUITE_BLACK'])
     if GAME_STATE['TITLE_SCREEN']:
