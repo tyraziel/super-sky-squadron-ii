@@ -71,9 +71,38 @@ And you should see the command prompt return to normal (the virutal environment 
 
 Linux Based:
 
+If the venv command fails, install the proper python3-venv package from your system's package manager.
+wsl ubnutu 22.04LTS:
+
+```
+$ python3 -m venv .pygame-ce-codemash25
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.10-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: ['/home/andrew/sbx/.pygame-ce-codemash25/bin/python3', '-Im', 'ensurepip', '--upgrade', '--default-pip']
+
+$ sudo apt update
+$ sudo apt install python3-venv
+```
+
 create venv, activate, install pip reqs and install ansible-core.
 If not present install unzip/zip
 
+If the ansible-playbook command fails with the following error, install zip.
+
+```
+Unable to find required 'unzip' or 'unzip' binary in the path.
+```
+
+```
+sudo apt install zip
+```
 
 
 Chromebook: (tested on amd64 architecture)
