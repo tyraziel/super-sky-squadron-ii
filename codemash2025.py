@@ -17,6 +17,9 @@
 #############################################################################################################################################
 import pygame
 import argparse
+import random
+from datetime import datetime
+import time
 
 import xml.etree.ElementTree as element_tree
 
@@ -85,6 +88,7 @@ def reset_game_state():
   GAME_STATE['GAME_OVER'] = False
   GAME_STATE['PAUSED'] = False
   GAME_STATE['MULTIPLAYER'] = False
+  random.seed(round(time.time() * 1000))
 
 def reset_screens():
   global GAME_STATE
@@ -257,7 +261,7 @@ def initialize_arena_mode():
   ### Re-Initialize player 1 - 1 life - if GAME_STATE['LIVES_CHEAT_CODE'] is active then 3
   ### Re-Initialize player 2 - 1 life
   ### Dynamically load the level based on YYYYMMDD seed, so this will always seed the same per day (could possibly do this for week though?)
-
+  random.seed(int(datetime.today().strftime("%Y%m%d")))
 
 def initialize_game_over_screen():
   global GAME_STATE
@@ -581,10 +585,11 @@ alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
 alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 
 # Initialize Players
-PLAYER_1 = {'LIVES': 0, 'SCORE': 0}
-PLAYER_2 = {'LIVES': 0, 'SCORE': 0}
+PLAYER_1 = {'LIVES': 0, 'SCORE': 0, 'speed_x': 0, 'speed_y': 0, 'rotation': 0, 'speed_rotation':0, 'speed': 0}
+PLAYER_2 = {'LIVES': 0, 'SCORE': 0, 'speed_x': 0, 'speed_y': 0, 'rotation': 0, 'speed_rotation':0, 'speed': 0}
 
 # Set to Title Screen
+reset_game_state()
 initialize_title_screen()
 
 ######################################################################
