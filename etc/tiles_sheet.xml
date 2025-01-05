@@ -59,6 +59,7 @@
 	<SubTexture name="map_green_tree.png" x="0" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_left.png" x="16" y="64" width="16" height="16"/>
 	<SubTexture name="map_green.png" x="32" y="64" width="16" height="16"/>
+	<SubTexture name="G0.png" x="32" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_right.png" x="48" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_right.png" x="64" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_left.png" x="80" y="64" width="16" height="16"/>
