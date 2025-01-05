@@ -59,7 +59,6 @@
 	<SubTexture name="map_green_tree.png" x="0" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_left.png" x="16" y="64" width="16" height="16"/>
 	<SubTexture name="map_green.png" x="32" y="64" width="16" height="16"/>
-	<SubTexture name="G0.png" x="32" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_right.png" x="48" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_right.png" x="64" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_left.png" x="80" y="64" width="16" height="16"/>
@@ -127,6 +126,90 @@
 	<SubTexture name="map_brown_river_e_stop.png" x="176" y="128" width="16" height="16"/>
 
 	<!-- 10 -->
+	<SubTexture name="map_green_no_flag.png" x="0" y="144" width="16" height="16"/>
+	<SubTexture name="map_green_farm.png" x="16" y="144" width="16" height="16"/>
+	<SubTexture name="map_green_2.png" x="32" y="144" width="16" height="16"/>
+	<SubTexture name="map_green_spot.png" x="48" y="144" width="16" height="16"/>
+	<SubTexture name="map_green_road_n_stop.png" x="64" y="144" width="16" height="16"/>
+	<SubTexture name="map_green_road_w_stop.png" x="80" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_no_flag.png" x="96" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_farm.png" x="112" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_2.png" x="128" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_spot.png" x="144" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_river_n_stop.png" x="160" y="144" width="16" height="16"/>
+	<SubTexture name="map_brown_river_w_stop.png" x="176" y="144" width="16" height="16"/>
+
+	<!-- 5 MAPPED -->
+	<SubTexture name="map_green_tree.png" x="0" y="64" width="16" height="16"/>
+	<SubTexture name="map_green_beach_left.png" x="16" y="64" width="16" height="16"/>
+	<SubTexture name="G0.png" x="32" y="64" width="16" height="16"/>
+	<SubTexture name="map_green_beach_right.png" x="48" y="64" width="16" height="16"/>
+	<SubTexture name="map_green_beach_inner_upper_right.png" x="64" y="64" width="16" height="16"/>
+	<SubTexture name="map_green_beach_inner_upper_left.png" x="80" y="64" width="16" height="16"/>
+	<SubTexture name="map_brown_tree.png" x="96" y="64" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_left.png" x="112" y="64" width="16" height="16"/>
+	<SubTexture name="B0.png" x="128" y="64" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_right.png" x="144" y="64" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_inner_lower_right.png" x="160" y="64" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_inner_lower_left.png" x="176" y="64" width="16" height="16"/>
+
+	<!-- 6 MAPPED -->
+	<SubTexture name="map_green_trees.png" x="0" y="80" width="16" height="16"/>
+	<SubTexture name="map_green_beach_bottom_left.png" x="16" y="80" width="16" height="16"/>
+	<SubTexture name="map_green_beach_bottom.png" x="32" y="80" width="16" height="16"/>
+	<SubTexture name="map_green_beach_bottom_right.png" x="48" y="80" width="16" height="16"/>
+	<SubTexture name="map_green_solo_island.png" x="64" y="80" width="16" height="16"/>
+	<SubTexture name="map_green_two_islands.png" x="80" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_trees.png" x="96" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_bottom_left.png" x="112" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_bottom.png" x="128" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_bottom_right.png" x="144" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_solo_island.png" x="160" y="80" width="16" height="16"/>
+	<SubTexture name="map_brown_two_islands.png" x="176" y="80" width="16" height="16"/>
+
+	<!-- 7 MAPPED -->
+	<SubTexture name="map_green_red_house.png" x="0" y="96" width="16" height="16"/>
+	<SubTexture name="map_green_road_s_to_e.png" x="16" y="96" width="16" height="16"/>
+	<SubTexture name="map_green_road_w_to_e.png" x="32" y="96" width="16" height="16"/>
+	<SubTexture name="map_green_road_w_to_s.png" x="48" y="96" width="16" height="16"/>
+	<SubTexture name="map_green_road_t_right.png" x="64" y="96" width="16" height="16"/>
+	<SubTexture name="map_green_road_t_left.png" x="80" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_blue_house.png" x="96" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_river_s_to_e.png" x="112" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_river_w_to_e.png" x="128" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_river_w_to_s.png" x="144" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_river_t_right.png" x="160" y="96" width="16" height="16"/>
+	<SubTexture name="map_brown_river_t_left.png" x="176" y="96" width="16" height="16"/>
+
+	<!-- 8 MAPPED -->
+	<SubTexture name="map_green_red_tent.png" x="0" y="112" width="16" height="16"/>
+	<SubTexture name="map_green_road_n_to_s.png" x="16" y="112" width="16" height="16"/>
+	<SubTexture name="map_green_road_4_way.png" x="32" y="112" width="16" height="16"/>
+	<SubTexture name="map_green_road_s_to_n.png" x="48" y="112" width="16" height="16"/>
+	<SubTexture name="map_green_road_t_down.png" x="64" y="112" width="16" height="16"/>
+	<SubTexture name="map_green_road_t_up.png" x="80" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_blue_tent.png" x="96" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_river_n_to_s.png" x="112" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_river_4_way.png" x="128" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_river_s_to_n.png" x="144" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_river_t_down.png" x="160" y="112" width="16" height="16"/>
+	<SubTexture name="map_brown_river_t_up.png" x="176" y="112" width="16" height="16"/>
+
+	<!-- 9 MAPPED -->
+	<SubTexture name="map_green_red_flag.png" x="0" y="128" width="16" height="16"/>
+	<SubTexture name="map_green_road_n_to_e.png" x="16" y="128" width="16" height="16"/>
+	<SubTexture name="map_green_road_e_to_w.png" x="32" y="128" width="16" height="16"/>
+	<SubTexture name="map_green_road_w_to_n.png" x="48" y="128" width="16" height="16"/>
+	<SubTexture name="map_green_road_s_stop.png" x="64" y="128" width="16" height="16"/>
+	<SubTexture name="map_green_road_e_stop.png" x="80" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_blue_flag.png" x="96" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_river_n_to_e.png" x="112" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_river_e_to_w.png" x="128" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_river_w_to_n.png" x="144" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_river_s_stop.png" x="160" y="128" width="16" height="16"/>
+	<SubTexture name="map_brown_river_e_stop.png" x="176" y="128" width="16" height="16"/>
+
+	<!-- 10 MAPPED -->
 	<SubTexture name="map_green_no_flag.png" x="0" y="144" width="16" height="16"/>
 	<SubTexture name="map_green_farm.png" x="16" y="144" width="16" height="16"/>
 	<SubTexture name="map_green_2.png" x="32" y="144" width="16" height="16"/>
