@@ -103,19 +103,6 @@
     with_fileglob:
       - "./tmp/pixel-shmup/Tilemap/*_packed.png"
 
-# $the_assets = @(
-#     @{the_file = "$temp_dir/kenney_space-shooter-redux.zip"; 
-#       the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
-#       the_source = @("$temp_dir/space-shooter-redux/Spritesheet/sheet.*", "$temp_dir/space-shooter-redux/Bonus/*.ogg"); 
-#       the_target = @("$project_root/sprites/space-shooter-redux/", "$project_root/sfx/space-shooter-redux/");
-#       the_temp = "space-shooter-redux/"}
-#     @{the_file = "$temp_dir/kenney_pixel-shmup.zip"; 
-#       the_url = "";
-#       the_source = @("$temp_dir/pixel-shmup/Tilemap/*_packed.png"); 
-#       the_target = @("$project_root/sprites/pixel-shmup/");
-#       the_temp = "pixel-shmup/"}
-# )
-
   - name: Create ../sprites/pixel-shmup/
     ansible.builtin.file:
       path: ../sprites/pixel-shmup/
