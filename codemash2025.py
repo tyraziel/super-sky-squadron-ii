@@ -579,6 +579,8 @@ alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
 alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 
 # Initialize Players
+PLAYER_1 = {'LIVES': 0, 'SCORE': 0}
+PLAYER_2 = {'LIVES': 0, 'SCORE': 0}
 
 # Set to Title Screen
 initialize_title_screen()
@@ -1346,21 +1348,56 @@ while GAME_STATE['RUNNING']:
 
     top_hud_player_one = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 1", True, GAME_COLORS['ALMOST_BLACK'])
     THE_SCREEN.blit(top_hud_player_one, top_hud_player_one.get_rect(topleft = (16, -6)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'].get_rect(topleft = (160, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY'].get_rect(topleft = (192, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (224, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (256, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(topleft = (288, 0)))
+
+    player_one_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
+    player_one_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
+    player_one_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
+    player_one_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
+    player_one_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
+
+    if PLAYER_1['LIVES'] > 4:
+      player_one_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
+    if PLAYER_1['LIVES'] > 3:
+      player_one_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
+    if PLAYER_1['LIVES'] > 2:
+      player_one_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
+    if PLAYER_1['LIVES'] > 1:
+      player_one_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
+    if PLAYER_1['LIVES'] > 0:
+      player_one_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
+
+    THE_SCREEN.blit(player_one_life_5, player_one_life_5.get_rect(topleft = (160, 0)))
+    THE_SCREEN.blit(player_one_life_4, player_one_life_4.get_rect(topleft = (192, 0)))
+    THE_SCREEN.blit(player_one_life_3, player_one_life_3.get_rect(topleft = (224, 0)))
+    THE_SCREEN.blit(player_one_life_2, player_one_life_2.get_rect(topleft = (256, 0)))
+    THE_SCREEN.blit(player_one_life_1, player_one_life_1.get_rect(topleft = (288, 0)))
 
     top_hud_player_two = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"PLAYER 2", True, GAME_COLORS['ALMOST_BLACK'])
     THE_SCREEN.blit(top_hud_player_two, top_hud_player_two.get_rect(topleft = (912, -6)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'].get_rect(topleft = (1056+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY'].get_rect(topleft = (1088+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1120+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1152+16, 0)))
-    THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(topleft = (1184+16, 0)))
-    
 
+    player_two_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
+    player_two_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
+    player_two_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
+    player_two_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
+    player_two_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
+
+    if PLAYER_2['LIVES'] > 4:
+      player_two_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
+    if PLAYER_2['LIVES'] > 3:
+      player_two_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
+    if PLAYER_2['LIVES'] > 2:
+      player_two_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
+    if PLAYER_2['LIVES'] > 1:
+      player_two_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
+    if PLAYER_2['LIVES'] > 0:
+      player_two_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
+
+    THE_SCREEN.blit(player_two_life_5, player_two_life_5.get_rect(topleft = (1056+16, 0)))
+    THE_SCREEN.blit(player_two_life_4, player_two_life_4.get_rect(topleft = (1088+16, 0)))
+    THE_SCREEN.blit(player_two_life_3, player_two_life_3.get_rect(topleft = (1120+16, 0)))
+    THE_SCREEN.blit(player_two_life_2, player_two_life_2.get_rect(topleft = (1152+16, 0)))
+    THE_SCREEN.blit(player_two_life_1, player_two_life_1.get_rect(topleft = (1184+16, 0)))
+    
     top_hud_high_score_text = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"HI-SCORE:", True, GAME_COLORS['ALMOST_BLACK'])
     THE_SCREEN.blit(top_hud_high_score_text, top_hud_high_score_text.get_rect(topleft = (480, -6)))
 
