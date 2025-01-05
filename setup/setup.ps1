@@ -35,17 +35,30 @@ $the_assets = @(
       the_source = "$created_temp_directory\input-prompts\Tilemap\tilemap_packed.png"; 
       the_target = "$project_root\sprites\input-prompts\pixel-16\";
       the_temp = "input-prompts\"},
-    @{the_file = "$created_temp_directory\kenney_space-shooter-redux.zip"; 
-      the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
-      the_source = @("$created_temp_directory\space-shooter-redux\Spritesheet\sheet.*", "$created_temp_directory\space-shooter-redux\Bonus\*.ogg"); 
-      the_target = @("$project_root\sprites\space-shooter-redux\", "$project_root\sfx\space-shooter-redux\");
-      the_temp = "space-shooter-redux\"}
+    # @{the_file = "$created_temp_directory\kenney_space-shooter-redux.zip"; 
+    #   the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
+    #   the_source = @("$created_temp_directory\space-shooter-redux\Spritesheet\sheet.*", "$created_temp_directory\space-shooter-redux\Bonus\*.ogg"); 
+    #   the_target = @("$project_root\sprites\space-shooter-redux\", "$project_root\sfx\space-shooter-redux\");
+    #   the_temp = "space-shooter-redux\"},
     @{the_file = "$created_temp_directory\kenney_pixel-shmup.zip"; 
       the_url = "https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip";
       the_source = @("$created_temp_directory\pixel-shmup\Tilemap\*_packed.png"); 
       the_target = @("$project_root\sprites\pixel-shmup\");
       the_temp = "pixel-shmup\"}
 )
+
+#https://kenney.nl/media/pages/assets/music-jingles/acd2ca8b8f-1677590399/kenney_music-jingles.zip
+#https://kenney.nl/media/pages/assets/digital-audio/cd01f555fb-1677590265/kenney_digital-audio.zip
+#https://kenney.nl/media/pages/assets/impact-sounds/6eeae25aef-1677589768/kenney_impact-sounds.zip
+
+#shttps://kenney.nl/media/pages/assets/sci-fi-sounds/81d6323e0a-1677589334/kenney_sci-fi-sounds.zip
+#https://kenney.nl/media/pages/assets/interface-sounds/f3134a7c4c-1677589452/kenney_interface-sounds.zip
+#https://kenney.nl/media/pages/assets/rpg-audio/20c02ef17c-1677590336/kenney_rpg-audio.zip
+#https://kenney.nl/media/pages/assets/ui-audio/6ecc8f60b2-1677590494/kenney_ui-audio.zip
+
+#https://kenney.nl/media/pages/assets/voiceover-pack-fighter/08afb354ef-1677589837/kenney_voiceover-pack-fighter.zip
+#https://kenney.nl/media/pages/assets/voiceover-pack/73832acf09-1677589897/kenney_voiceover-pack.zip
+
 
 #https://kenney.nl/media/pages/assets/simple-space/f694a6eca6-1677578143/kenney_simple-space.zip -- maybe for enemy hud stuff
 #https://kenney.nl/media/pages/assets/planets/b62f72bfc7-1677495391/kenney_planets.zip
