@@ -266,12 +266,14 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
                'SHMUP_YELLOW': (218, 199, 52),
                'SHMUP_ROYAL_PURPLE': (75, 52, 218),
                'SHMUP_PURPLE': (51, 153, 218),
-               'SHMUP_BLACK': (51, 51, 51)
+               'SHMUP_BLACK': (51, 51, 51),
+               'SHMUP_GRAY': (153, 153, 153),
+               'SHUMP_WHITE': (218, 218, 218),
                }
 
 #Time to live defaults are within this dictionary
 # ***LESSON***
-TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 250, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
+TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 1000, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000}
 
 ######################################################################
@@ -998,7 +1000,14 @@ while GAME_STATE['RUNNING']:
     yellow_plane = pygame.transform.rotozoom(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['YELLOW_A_FIGHTER'], 90, 2)
     THE_SCREEN.blit(yellow_plane, yellow_plane.get_rect(center=(GAME_CONSTANTS['SCREEN_WIDTH'] / 4 * 3 + 3.5 * GAME_CONSTANTS['SQUARE_SIZE'], GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 + GAME_CONSTANTS['SQUARE_SIZE'])))
 
+    if GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN']:
+      press_start_color = GAME_COLORS['SHUMP_WHITE']
+      
     press_start = GAME_FONTS['KENNEY_MINI_SQUARE_64'].render(f"PRESS START", True, press_start_color)
+
+    if GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN']:
+      press_start.set_alpha(int((GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] / TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN']) * 255))
+    
     THE_SCREEN.blit(press_start, press_start.get_rect(midtop = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 8 * 5.5 - GAME_CONSTANTS['SQUARE_SIZE'] / 2)))
 
     #Evaluate pressing start and then transitioning to the next state of the game after TTL expires
