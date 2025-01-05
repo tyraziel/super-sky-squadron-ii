@@ -91,7 +91,7 @@ def reset_screens():
   GAME_STATE['TITLE_SCREEN'] = False
   GAME_STATE['GAME_MODE_SCREEN'] = False
   GAME_STATE['INSTRUCTIONS_SCREEN'] = False
-  GAME_STATE['DOG_FIGHT_MODE'] = False
+  GAME_STATE['DOGFIGHT_MODE'] = False
   GAME_STATE['MISSION_MODE'] = False
   GAME_STATE['ARENA_MODE'] = False
   GAME_STATE['GAME_OVER_SCREEN'] = False
@@ -195,6 +195,7 @@ def initialize_title_screen():
   reset_players()
   
   GAME_STATE['TITLE_SCREEN'] = True
+  GAME_STATE['MULTIPLAYER'] = False
 
 def initialize_game_mode_screen():
   global GAME_STATE
@@ -202,6 +203,7 @@ def initialize_game_mode_screen():
   reset_for_game_state_transition()
 
   GAME_STATE['GAME_MODE_SCREEN'] = True
+  GAME_STATE['MULTIPLAYER'] = False
   GAME_MODE_OPTIONS['PLAYERS'] = True
   GAME_MODE_OPTIONS['GAME_MODE'] = False
   GAME_MODE_OPTIONS['STARTING_LIVES'] = False
@@ -214,12 +216,26 @@ def initialize_instructions_screen():
 
   GAME_STATE['INSTRUCTIONS_SCREEN'] = True
 
+def setup_for_dog_fight_mode_quick_jump():
+  global GAME_MODE_OPTIONS
+
+  GAME_MODE_OPTIONS['ONE_PLAYER'] = False
+  GAME_MODE_OPTIONS['TWO_PLAYERS'] = True
+  GAME_MODE_OPTIONS['MISSION'] = False
+  GAME_MODE_OPTIONS['ARENA'] = False
+  GAME_MODE_OPTIONS['DOGFIGHT'] = True
+  GAME_MODE_OPTIONS['LIVES_COUNT'] = 3
+  GAME_STATE['MULTIPLAYER'] = True
+
 def initialize_dog_fight_mode():
   global GAME_STATE
 
   reset_for_game_state_transition()
 
-  GAME_STATE['DOG_FIGHT_MODE'] = True
+  GAME_STATE['DOGFIGHT_MODE'] = True
+  ### Initialize the map
+  ### Re-Initialize player 1, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
+  ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -227,6 +243,9 @@ def initialize_mission_mode():
   reset_for_game_state_transition()
 
   GAME_STATE['MISSION_MODE'] = True
+  ### Re-Initialize player 1 - 3 lives
+  ### Re-Initialize player 2 - 3 lives
+  ### Load Level
 
 def initialize_arena_mode():
   global GAME_STATE
@@ -234,6 +253,10 @@ def initialize_arena_mode():
   reset_for_game_state_transition()
 
   GAME_STATE['ARENA_MODE'] = True
+  ### Re-Initialize player 1 - 1 life
+  ### Re-Initialize player 2 - 1 life
+  ### Dynamically load the level based on YYYYMMDD seed, so this will always seed the same per day (could possibly do this for week though?)
+
 
 def initialize_game_over_screen():
   global GAME_STATE
@@ -330,13 +353,13 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
               'LAYER_1': True, 'LAYER_2': True, 'LAYER_3': True, 'LAYER_4': True, 'LAYER_5': True,
               'RUNNING': True, 'GAME_OVER': False, 'PAUSED': False,
               'MULTIPLAYER': False,
-              'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOG_FIGHT_MODE': False, 'MISSION_MODE': False, 'ARENA_MODE': False, 'GAME_OVER_SCREEN': False,
+              'TITLE_SCREEN': False, 'GAME_MODE_SCREEN': False, 'INSTRUCTIONS_SCREEN': False, 'DOGFIGHT_MODE': False, 'MISSION_MODE': False, 'ARENA_MODE': False, 'GAME_OVER_SCREEN': False,
               'TRANSITION_TO_TITLE_SCREEN': False, 'TRANSITION_TO_GAME_MODE_SCREEN': False, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': False, 'TRANSITION_TO_DOGFIGHT_MODE': False, 'TRANSITION_TO_MISSION_MODE': False, 'TRANSITION_TO_ARENA_MODE': False, 'TRANSITION_TO_GAME_OVER_SCREEN': False,
              }
 
 GAME_MODE_OPTIONS = {'PLAYERS': True, 'GAME_MODE': False, 'STARTING_LIVES': False, 'START_GAME': False,
                      'ONE_PLAYER': True, 'TWO_PLAYERS': False, 
-                     'MISSION': True, 'ARENA': False, 'DOG_FIGHT': False,
+                     'MISSION': True, 'ARENA': False, 'DOGFIGHT': False,
                      'LIVES_COUNT': 3}
 
 GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE'], 'TRANSITION_TO_ARENA_MODE': TTL_DEFAULTS['TRANSITION_TO_ARENA_MODE'], 'TRANSITION_TO_GAME_OVER_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']}
@@ -486,7 +509,7 @@ for subtexture in pixel_shmup_tiles_xml_subtextures:
   subsurface_y = int(subtexture.attrib['y'])
   subsurface_width = int(subtexture.attrib['width'])
   subsurface_height = int(subtexture.attrib['height'])
-  GAME_SURFACES['PIXEL_SHMUP_TILES'][subsurface_name] = GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
+  GAME_SURFACES['PIXEL_SHMUP_TILES'][subsurface_name] = pygame.transform.scale(GAME_SURFACES['PIXEL_SHMUP_TILES']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height)), (subsurface_width*2, subsurface_height*2))
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: pixel-shmup-ships")
@@ -542,26 +565,13 @@ print(f"PyGame Display Info:\n{pygame.display.Info()}")
 # LESSON - Initialize other game elements
 CAMERA = {'X': 0, 'Y': 0}
 
-MAP = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      ]
+# Build out a default map 19 high and 40 wide
+MAP = []
+for i in range(19):
+  for j in range (40):
+    if j == 0:
+      MAP.append([])
+    MAP[i].append("G0")
 
 press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
 press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
@@ -713,6 +723,7 @@ while GAME_STATE['RUNNING']:
         if the_event.key == K_F3:
           initialize_instructions_screen()
         if the_event.key == K_F4:
+          setup_for_dog_fight_mode_quick_jump()
           initialize_dog_fight_mode()
         if the_event.key == K_F5:
           initialize_mission_mode()
@@ -1097,7 +1108,7 @@ while GAME_STATE['RUNNING']:
         elif GAME_MODE_OPTIONS['GAME_MODE']:
           GAME_MODE_OPTIONS['PLAYERS'] = False
           GAME_MODE_OPTIONS['GAME_MODE'] = False
-          if GAME_MODE_OPTIONS['DOG_FIGHT']:
+          if GAME_MODE_OPTIONS['DOGFIGHT']:
             GAME_MODE_OPTIONS['STARTING_LIVES'] = True
             GAME_MODE_OPTIONS['START_GAME'] = False
           else:
@@ -1133,7 +1144,7 @@ while GAME_STATE['RUNNING']:
           GAME_MODE_OPTIONS['START_GAME'] = False
         elif GAME_MODE_OPTIONS['START_GAME']:
           GAME_MODE_OPTIONS['PLAYERS'] = False
-          if GAME_MODE_OPTIONS['DOG_FIGHT']:
+          if GAME_MODE_OPTIONS['DOGFIGHT']:
             GAME_MODE_OPTIONS['GAME_MODE'] = False
             GAME_MODE_OPTIONS['STARTING_LIVES'] = True
           else:
@@ -1150,14 +1161,14 @@ while GAME_STATE['RUNNING']:
           elif GAME_MODE_OPTIONS['TWO_PLAYERS']:
             GAME_MODE_OPTIONS['ONE_PLAYER'] = True
             GAME_MODE_OPTIONS['TWO_PLAYERS'] = False
-            if GAME_MODE_OPTIONS['DOG_FIGHT']:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+            if GAME_MODE_OPTIONS['DOGFIGHT']:
+              GAME_MODE_OPTIONS['DOGFIGHT'] = False
               GAME_MODE_OPTIONS['MISSION'] = True
         if GAME_MODE_OPTIONS['GAME_MODE']:
           if GAME_MODE_OPTIONS['MISSION']:
             GAME_MODE_OPTIONS['MISSION'] = False
             GAME_MODE_OPTIONS['ARENA'] = True
-            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+            GAME_MODE_OPTIONS['DOGFIGHT'] = False
           elif GAME_MODE_OPTIONS['ARENA']:
             if GAME_MODE_OPTIONS['ONE_PLAYER']:
               GAME_MODE_OPTIONS['MISSION'] = True
@@ -1165,13 +1176,13 @@ while GAME_STATE['RUNNING']:
               GAME_MODE_OPTIONS['MISSION'] = False
             GAME_MODE_OPTIONS['ARENA'] = False
             if GAME_MODE_OPTIONS['TWO_PLAYERS']:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = True
+              GAME_MODE_OPTIONS['DOGFIGHT'] = True
             else:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
-          elif GAME_MODE_OPTIONS['DOG_FIGHT']:
+              GAME_MODE_OPTIONS['DOGFIGHT'] = False
+          elif GAME_MODE_OPTIONS['DOGFIGHT']:
             GAME_MODE_OPTIONS['MISSION'] = True
             GAME_MODE_OPTIONS['ARENA'] = False
-            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+            GAME_MODE_OPTIONS['DOGFIGHT'] = False
         if GAME_MODE_OPTIONS['STARTING_LIVES']:
           GAME_MODE_OPTIONS['LIVES_COUNT'] = GAME_MODE_OPTIONS['LIVES_COUNT'] + 1
           if GAME_MODE_OPTIONS['LIVES_COUNT'] > 5:
@@ -1186,8 +1197,8 @@ while GAME_STATE['RUNNING']:
           elif GAME_MODE_OPTIONS['TWO_PLAYERS']:
             GAME_MODE_OPTIONS['ONE_PLAYER'] = True
             GAME_MODE_OPTIONS['TWO_PLAYERS'] = False
-            if GAME_MODE_OPTIONS['DOG_FIGHT']:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+            if GAME_MODE_OPTIONS['DOGFIGHT']:
+              GAME_MODE_OPTIONS['DOGFIGHT'] = False
               GAME_MODE_OPTIONS['MISSION'] = True
         if GAME_MODE_OPTIONS['GAME_MODE']:
           if GAME_MODE_OPTIONS['MISSION']:
@@ -1197,17 +1208,17 @@ while GAME_STATE['RUNNING']:
             else:
               GAME_MODE_OPTIONS['ARENA'] = False
             if GAME_MODE_OPTIONS['TWO_PLAYERS']:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = True
+              GAME_MODE_OPTIONS['DOGFIGHT'] = True
             else:
-              GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+              GAME_MODE_OPTIONS['DOGFIGHT'] = False
           elif GAME_MODE_OPTIONS['ARENA']:
             GAME_MODE_OPTIONS['MISSION'] = True
             GAME_MODE_OPTIONS['ARENA'] = False
-            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
-          elif GAME_MODE_OPTIONS['DOG_FIGHT']:
+            GAME_MODE_OPTIONS['DOGFIGHT'] = False
+          elif GAME_MODE_OPTIONS['DOGFIGHT']:
             GAME_MODE_OPTIONS['MISSION'] = False
             GAME_MODE_OPTIONS['ARENA'] = True
-            GAME_MODE_OPTIONS['DOG_FIGHT'] = False
+            GAME_MODE_OPTIONS['DOGFIGHT'] = False
         if GAME_MODE_OPTIONS['STARTING_LIVES']:
           GAME_MODE_OPTIONS['LIVES_COUNT'] = GAME_MODE_OPTIONS['LIVES_COUNT'] - 1
           if GAME_MODE_OPTIONS['LIVES_COUNT'] < 1:
@@ -1247,15 +1258,15 @@ while GAME_STATE['RUNNING']:
       arena_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"ARENA", True, GAME_COLORS['SHMUP_GREEN'])
     THE_SCREEN.blit(arena_mode, arena_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 23, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
-    dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['ALMOST_BLACK'])
+    dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['ALMOST_BLACK'])
     if GAME_MODE_OPTIONS['TWO_PLAYERS']:
-      dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['SHMUP_GRAY'])
-      if GAME_MODE_OPTIONS['DOG_FIGHT']:
-        dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOG FIGHT", True, GAME_COLORS['SHMUP_GREEN'])
+      dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GRAY'])
+      if GAME_MODE_OPTIONS['DOGFIGHT']:
+        dog_fight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"DOGFIGHT", True, GAME_COLORS['SHMUP_GREEN'])
     
     THE_SCREEN.blit(dog_fight_mode, dog_fight_mode.get_rect(topleft = (GAME_CONSTANTS['SQUARE_SIZE'] * 27.5, GAME_CONSTANTS['SQUARE_SIZE'] * 6.85)))
 
-    if GAME_MODE_OPTIONS['DOG_FIGHT']:
+    if GAME_MODE_OPTIONS['DOGFIGHT']:
       starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['ALMOST_BLACK'])
       if GAME_MODE_OPTIONS['STARTING_LIVES']:
         starting_lives = GAME_FONTS['KENNEY_MINI_SQUARE_48'].render(f"STARTING LIVES:", True, GAME_COLORS['SHMUP_ORANGE'])
@@ -1306,6 +1317,19 @@ while GAME_STATE['RUNNING']:
   if GAME_STATE['INSTRUCTIONS_SCREEN']:
     a = 1
 
+  ####################################################################
+  # DOGFIGHT_MODE - If we're in dog fight mode, draw that screen
+  #
+  ####################################################################
+  if GAME_STATE['DOGFIGHT_MODE']:
+    ####################################################################
+    # Draw Layer One (The Map Tiles)
+    ####################################################################
+    if GAME_STATE['LAYER_1']:
+      for i in range(len(MAP)):
+        for j in range(len(MAP[i])):
+          map_tile = GAME_SURFACES['PIXEL_SHMUP_TILES'][MAP[i][j]]
+          THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
@@ -1468,9 +1492,9 @@ while GAME_STATE['RUNNING']:
       game_state_game_over_screen_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"GAME OVER SCREEN", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_game_over_screen_text_surface, game_state_game_over_screen_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 160 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 574 - debug_y_offset)))
 
-    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
-    if GAME_STATE['DOG_FIGHT_MODE']:
-      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOG FIGHT MODE", True, GAME_COLORS['GREEN'])
+    game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
+    if GAME_STATE['DOGFIGHT_MODE']:
+      game_state_dog_fight_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"DOGFIGHT MODE", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(game_state_dog_fight_text_surface, game_state_dog_fight_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 448 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 558 - debug_y_offset)))
 
     game_state_mission_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"MISSION MODE", True, GAME_COLORS['NOT_QUITE_BLACK'])
