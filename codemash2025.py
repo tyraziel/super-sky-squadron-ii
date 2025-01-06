@@ -40,6 +40,18 @@ from pygame.locals import (
 ######################################################################
 # Classes Created to support game objects
 ######################################################################
+class Player():
+  def __init__(self):
+    self.lives = 0
+    self.score = 0
+    self.speed_x = 0
+    self.speed_y = 0
+    self.speed = 0
+    self.speed_rotation = 0
+    self.x = 0
+    self.y = 0
+    self.rotation = 0
+
 class Plane(pygame.sprite.Sprite):
   PLANE_DEATH_TTL = 1000
 
@@ -239,8 +251,8 @@ def initialize_dogfight_mode():
   ### Initialize the map
   ### Re-Initialize player 1, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
   ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
-  PLAYER_1['LIVES'] = GAME_MODE_OPTIONS['LIVES_COUNT']
-  PLAYER_2['LIVES'] = GAME_MODE_OPTIONS['LIVES_COUNT']
+  PLAYER_1.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
+  PLAYER_2.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -585,8 +597,8 @@ alert_fadeout_ttl = TTL_DEFAULTS['ALERT_FADEOUT']
 alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 
 # Initialize Players
-PLAYER_1 = {'LIVES': 0, 'SCORE': 0, 'speed_x': 0, 'speed_y': 0, 'rotation': 0, 'speed_rotation':0, 'speed': 0}
-PLAYER_2 = {'LIVES': 0, 'SCORE': 0, 'speed_x': 0, 'speed_y': 0, 'rotation': 0, 'speed_rotation':0, 'speed': 0}
+PLAYER_1 = Player()
+PLAYER_2 = Player()
 
 # Set to Title Screen
 reset_game_state()
@@ -1362,15 +1374,15 @@ while GAME_STATE['RUNNING']:
     player_one_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
     player_one_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER_GRAY']
 
-    if PLAYER_1['LIVES'] > 4:
+    if PLAYER_1.lives > 4:
       player_one_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
-    if PLAYER_1['LIVES'] > 3:
+    if PLAYER_1.lives > 3:
       player_one_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
-    if PLAYER_1['LIVES'] > 2:
+    if PLAYER_1.lives > 2:
       player_one_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
-    if PLAYER_1['LIVES'] > 1:
+    if PLAYER_1.lives > 1:
       player_one_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
-    if PLAYER_1['LIVES'] > 0:
+    if PLAYER_1.lives > 0:
       player_one_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER']
 
     THE_SCREEN.blit(player_one_life_5, player_one_life_5.get_rect(topleft = (160, 0)))
@@ -1388,15 +1400,15 @@ while GAME_STATE['RUNNING']:
     player_two_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
     player_two_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER_GRAY']
 
-    if PLAYER_2['LIVES'] > 4:
+    if PLAYER_2.lives > 4:
       player_two_life_5 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
-    if PLAYER_2['LIVES'] > 3:
+    if PLAYER_2.lives > 3:
       player_two_life_4 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
-    if PLAYER_2['LIVES'] > 2:
+    if PLAYER_2.lives > 2:
       player_two_life_3 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
-    if PLAYER_2['LIVES'] > 1:
+    if PLAYER_2.lives > 1:
       player_two_life_2 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
-    if PLAYER_2['LIVES'] > 0:
+    if PLAYER_2.lives > 0:
       player_two_life_1 = GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER']
 
     THE_SCREEN.blit(player_two_life_5, player_two_life_5.get_rect(topleft = (1056+16, 0)))
