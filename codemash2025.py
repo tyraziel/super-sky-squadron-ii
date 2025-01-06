@@ -41,26 +41,45 @@ from pygame.locals import (
 # Classes Created to support game objects
 ######################################################################
 class Plane(pygame.sprite.Sprite):
-  PLANE_DEATH_TTL = 1000
+  PLANE_DEATH_TTL = 1500
 
-  def __init__(self, x=0, y=0, rotation=0, style=None):
+  def __init__(self, x=0, y=0, rotation=0, image=None):
     super().__init__()
     self.x = x
     self.y = y
+    self.rect = (self.x, self.y)
+    self.image = None
     self.speed_x = 0
     self.speed_y = 0
     self.health = 0
     self.rotation = rotation
-    self.style = style
+    if image != None:
+      self.image = image.copy()
+      self.rect = self.image.get_rect(center=(self.x, self.y))
     self.speed = 0
     self.speed_rotation = 0
     self.weapon_1_cooldown = 0
     self.weapon_2_cooldown = 0
     self.weapon_3_cooldown = 0
+    self.weapon_1_cooldown_default = 0
+    self.weapon_2_cooldown_default = 0
+    self.weapon_3_cooldown_default = 0
+    self.effect_1_ttl = 0
+    self.effect_2_ttl = 0
+    self.effect_3_ttl = 0
+    self.effect_1_ttl_default = 0
+    self.effect_2_ttl_default = 0
+    self.effect_3_ttl_default = 0
+    self.activated = True
+
+  def set_image(self, image):
+    self.image = image.copy
+    self.rect = self.image.get_rect(center=(self.x, self.y))
 
   def set_location(self, x, y):
     self.x = x
     self.y = y
+    self.rect = self.image.get_rect(center=(self.x, self.y))
 
   def set_location_delta(self, x, y):
     self.set_location(self.x + x, self.y + y)
@@ -74,6 +93,15 @@ class Plane(pygame.sprite.Sprite):
   
   def set_rotation_delta(self, rotation):
     self.set_rotation(self.rotation + rotation)
+
+  def set_alpha(self, alpha):
+    self.image.set_alpha(alpha)
+
+  def randomize_alpha(self):
+    self.image.set_alpha(random.choice(range(0,255)))
+  
+  def randomize_alpha_damage(self):
+    self.image.set_alpha(random.choice(range(32,255)))
 
 class Player(Plane):
   def __init__(self):
