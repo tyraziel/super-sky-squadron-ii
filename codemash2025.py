@@ -71,6 +71,9 @@ class Plane(pygame.sprite.Sprite):
     self.weapon_1_cooldown_default = 0
     self.weapon_2_cooldown_default = 0
     self.weapon_3_cooldown_default = 0
+    self.weapon_1_speed = 0
+    self.weapon_2_speed = 0
+    self.weapon_3_speed = 0
     self.effect_1_ttl = 0
     self.effect_2_ttl = 0
     self.effect_3_ttl = 0
@@ -680,6 +683,10 @@ alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 # Initialize Players
 PLAYER_1 = Player()
 PLAYER_2 = Player()
+
+#Initialize Player Bullets
+player_1_bullets = pygame.sprite.Group()
+player_2_bullets = pygame.sprite.Group()
 
 # Set to Title Screen
 reset_game_state()
@@ -1447,7 +1454,6 @@ while GAME_STATE['RUNNING']:
     if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
       PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
 
-    #### UPDATE PLAYERS 1 - 270 -- 2 - 90
     PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
     PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
     PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
