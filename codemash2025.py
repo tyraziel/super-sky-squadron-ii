@@ -20,6 +20,7 @@ import argparse
 import random
 from datetime import datetime
 import time
+import math
 
 import xml.etree.ElementTree as element_tree
 
@@ -56,8 +57,10 @@ class Plane(pygame.sprite.Sprite):
     if image != None:
       self.image = image.copy()
       self.rect = self.image.get_rect(center=(self.x, self.y))
-    self.speed = 0
+    self.speed = 0 # [math.cos(self.rotation), math.sin(self.rotation)]
+    self.max_speed = 0
     self.speed_rotation = 0
+    self.max_speed_rotation = 0
     self.weapon_1_cooldown = 0
     self.weapon_2_cooldown = 0
     self.weapon_3_cooldown = 0
@@ -73,7 +76,7 @@ class Plane(pygame.sprite.Sprite):
     self.activated = True
 
   def set_image(self, image):
-    self.image = image.copy
+    self.image = image.copy()
     self.rect = self.image.get_rect(center=(self.x, self.y))
 
   def set_location(self, x, y):
@@ -84,12 +87,13 @@ class Plane(pygame.sprite.Sprite):
   def set_location_delta(self, x, y):
     self.set_location(self.x + x, self.y + y)
 
+  #We're going to assume that rotation is set something reasonable so our "fix" will help the rotation of the object stay smooth and within a reasonable number
   def set_rotation(self, rotation):
     self.rotation = rotation
     if self.rotation < 0:
-      self.rotation = 0
+      self.rotation = self.rotation + 360
     if self.rotation > 360:
-      self.rotation = 360
+      self.rotation = self.rotation - 360
   
   def set_rotation_delta(self, rotation):
     self.set_rotation(self.rotation + rotation)
@@ -102,6 +106,18 @@ class Plane(pygame.sprite.Sprite):
   
   def randomize_alpha_damage(self):
     self.image.set_alpha(random.choice(range(32,255)))
+
+  # def set_speed(self, speed):
+  #   self.speed = speed
+
+  # def set_speed_rotation(self, speed_rotation):
+  #   self.speed_rotation = speed_rotation
+
+  # def set_max_speed(self, max_speed):
+  #   self.max_speed = max_speed
+  
+  # def set_max_speed_rotation(self, max_speed_rotation):
+  #   self.max_speed_rotation = max_speed_rotation
 
 class Player(Plane):
   def __init__(self):
@@ -168,7 +184,11 @@ def destroy_all():
   return
 
 def reset_players():
-  return
+  global PLAYER_1
+  global PLAYER_2
+
+  PLAYER_1 = Player()
+  PLAYER_2 = Player()
 
 def reset_for_game_state_transition():
   destroy_all()
@@ -269,6 +289,7 @@ def initialize_dogfight_mode():
   global GAME_STATE
 
   reset_for_game_state_transition()
+  reset_players()
 
   GAME_STATE['DOGFIGHT_MODE'] = True
   ### Initialize the map
@@ -276,6 +297,22 @@ def initialize_dogfight_mode():
   ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
   PLAYER_1.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
   PLAYER_2.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
+
+  PLAYER_1.set_image(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'])
+  PLAYER_2.set_image(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'])
+
+  PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+  PLAYER_2.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+
+  PLAYER_1.set_rotation(270)
+  PLAYER_2.set_rotation(90)
+
+  PLAYER_1.speed = 64
+  PLAYER_2.speed = 64
+
+  PLAYER_1.max_speed = 256
+  PLAYER_2.max_speed = 256
+
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -1367,6 +1404,16 @@ while GAME_STATE['RUNNING']:
         for j in range(len(MAP[i])):
           map_tile = GAME_SURFACES['PIXEL_SHMUP_TILES'][MAP[i][j]]
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
+
+    #### UPDATE PLAYERS
+    PLAYER_1.speed_x = math.cos(PLAYER_1.rotation)
+    PLAYER_1.speed_y = math.sin(PLAYER_1.rotation)
+#    PLAYER_1.rotation
+
+    ### DISPLAY THE PLAYERS (if layer 3 is active!)
+    if GAME_STATE['LAYER_3']:
+      THE_SCREEN.blit(pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1), PLAYER_1.rect)
+      THE_SCREEN.blit(pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1), PLAYER_2.rect)
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
