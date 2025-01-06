@@ -58,9 +58,13 @@ class Plane(pygame.sprite.Sprite):
       self.image = image.copy()
       self.rect = self.image.get_rect(center=(self.x, self.y))
     self.speed = 0 # [math.cos(self.rotation), math.sin(self.rotation)]
+    self.speed_delta = 0
     self.max_speed = 0
+    self.min_speed = 0
     self.speed_rotation = 0
+    self.speed_rotation_delta = 0
     self.max_speed_rotation = 0
+    self.min_speed_rotation = 0
     self.weapon_1_cooldown = 0
     self.weapon_2_cooldown = 0
     self.weapon_3_cooldown = 0
@@ -310,12 +314,26 @@ def initialize_dogfight_mode():
   PLAYER_1.speed = 64
   PLAYER_2.speed = 64
 
-  PLAYER_1.speed_rotation = 90
-  PLAYER_2.speed_rotation = 90
+  PLAYER_1.speed_delta = 96
+  PLAYER_2.speed_delta = 96
+
+  PLAYER_1.min_speed = 64
+  PLAYER_2.min_speed = 64
 
   PLAYER_1.max_speed = 256
   PLAYER_2.max_speed = 256
 
+  PLAYER_1.speed_rotation = 180
+  PLAYER_2.speed_rotation = 180
+
+  PLAYER_1.speed_rotation_delta = 45
+  PLAYER_2.speed_rotation_delta = 45
+
+  PLAYER_1.min_speed_rotation = 90
+  PLAYER_2.min_speed_rotation = 90
+
+  PLAYER_1.max_speed_rotation = 180
+  PLAYER_2.max_speed_rotation = 180
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -1412,11 +1430,22 @@ while GAME_STATE['RUNNING']:
       PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
     if GAME_CONTROLS['PLAYER_1']['RIGHT']:
       PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
+    if GAME_CONTROLS['PLAYER_1']['BLUE']:
+      PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
+      PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
+    else:
+      PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
+      PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
+    
+    if PLAYER_1.speed > PLAYER_1.max_speed:
+      PLAYER_1.speed = PLAYER_1.max_speed
+    if PLAYER_1.speed < PLAYER_1.min_speed:
+      PLAYER_1.speed = PLAYER_1.min_speed
 
-    if GAME_CONTROLS['PLAYER_2']['LEFT']:
-      PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
-    if GAME_CONTROLS['PLAYER_2']['RIGHT']:
-      PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
+    if PLAYER_1.speed_rotation > PLAYER_1.max_speed_rotation:
+      PLAYER_1.speed_rotation = PLAYER_1.max_speed_rotation
+    if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
+      PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
 
     #### UPDATE PLAYERS 1 - 270 -- 2 - 90
     PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
@@ -1431,6 +1460,27 @@ while GAME_STATE['RUNNING']:
       PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
     if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
       PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+
+    if GAME_CONTROLS['PLAYER_2']['LEFT']:
+      PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
+    if GAME_CONTROLS['PLAYER_2']['RIGHT']:
+      PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
+    if GAME_CONTROLS['PLAYER_2']['BLUE']:
+      PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
+      PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
+    else:
+      PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
+      PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
+    
+    if PLAYER_2.speed > PLAYER_2.max_speed:
+      PLAYER_2.speed = PLAYER_2.max_speed
+    if PLAYER_2.speed < PLAYER_2.min_speed:
+      PLAYER_2.speed = PLAYER_2.min_speed
+
+    if PLAYER_2.speed_rotation > PLAYER_2.max_speed_rotation:
+      PLAYER_2.speed_rotation = PLAYER_2.max_speed_rotation
+    if PLAYER_2.speed_rotation < PLAYER_2.min_speed_rotation:
+      PLAYER_2.speed_rotation = PLAYER_2.min_speed_rotation
 
     PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
     PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
