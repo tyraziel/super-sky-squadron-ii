@@ -40,22 +40,10 @@ from pygame.locals import (
 ######################################################################
 # Classes Created to support game objects
 ######################################################################
-class Player():
-  def __init__(self):
-    self.lives = 0
-    self.score = 0
-    self.speed_x = 0
-    self.speed_y = 0
-    self.speed = 0
-    self.speed_rotation = 0
-    self.x = 0
-    self.y = 0
-    self.rotation = 0
-
 class Plane(pygame.sprite.Sprite):
   PLANE_DEATH_TTL = 1000
 
-  def __init__(self, x, y, rotation, style):
+  def __init__(self, x=0, y=0, rotation=0, style=None):
     super().__init__()
     self.x = x
     self.y = y
@@ -64,6 +52,11 @@ class Plane(pygame.sprite.Sprite):
     self.health = 0
     self.rotation = rotation
     self.style = style
+    self.speed = 0
+    self.speed_rotation = 0
+    self.weapon_1_cooldown = 0
+    self.weapon_2_cooldown = 0
+    self.weapon_3_cooldown = 0
 
   def set_location(self, x, y):
     self.x = x
@@ -82,9 +75,11 @@ class Plane(pygame.sprite.Sprite):
   def set_rotation_delta(self, rotation):
     self.set_rotation(self.rotation + rotation)
 
-  def copy(self):
-    plane = Plane(self.x, self.y, self.rotation, self.style)
-    return plane
+class Player(Plane):
+  def __init__(self):
+    super().__init__()
+    self.lives = 0
+    self.score = 0
 
 ######################################################################
 # Functions Created to support game initialization and transitions
