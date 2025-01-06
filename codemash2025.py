@@ -310,6 +310,9 @@ def initialize_dogfight_mode():
   PLAYER_1.speed = 64
   PLAYER_2.speed = 64
 
+  PLAYER_1.speed_rotation = 90
+  PLAYER_2.speed_rotation = 90
+
   PLAYER_1.max_speed = 256
   PLAYER_2.max_speed = 256
 
@@ -1405,15 +1408,49 @@ while GAME_STATE['RUNNING']:
           map_tile = GAME_SURFACES['PIXEL_SHMUP_TILES'][MAP[i][j]]
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
 
-    #### UPDATE PLAYERS
-    PLAYER_1.speed_x = math.cos(PLAYER_1.rotation)
-    PLAYER_1.speed_y = math.sin(PLAYER_1.rotation)
-#    PLAYER_1.rotation
+    if GAME_CONTROLS['PLAYER_1']['LEFT']:
+      PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
+    if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+      PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
+
+    if GAME_CONTROLS['PLAYER_2']['LEFT']:
+      PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
+    if GAME_CONTROLS['PLAYER_2']['RIGHT']:
+      PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
+
+    #### UPDATE PLAYERS 1 - 270 -- 2 - 90
+    PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+    PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+    PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
+
+    if PLAYER_1.x < 0:
+      PLAYER_1.set_location(0, PLAYER_1.y)
+    if PLAYER_1.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+      PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_1.y)
+    if PLAYER_1.y < GAME_CONSTANTS['SQUARE_SIZE']:
+      PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
+    if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+      PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+
+    PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+    PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+    PLAYER_2.set_location_delta(PLAYER_2.speed_x, PLAYER_2.speed_y)
+
+    if PLAYER_2.x < 0:
+      PLAYER_2.set_location(0, PLAYER_2.y)
+    if PLAYER_2.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+      PLAYER_2.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_2.y)
+    if PLAYER_2.y < GAME_CONSTANTS['SQUARE_SIZE']:
+      PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SQUARE_SIZE'])
+    if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+      PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
     ### DISPLAY THE PLAYERS (if layer 3 is active!)
     if GAME_STATE['LAYER_3']:
-      THE_SCREEN.blit(pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1), PLAYER_1.rect)
-      THE_SCREEN.blit(pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1), PLAYER_2.rect)
+      player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
+      THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
+      player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
+      THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
 
   ####################################################################
   # Draw Layer One (The Map Tiles)
