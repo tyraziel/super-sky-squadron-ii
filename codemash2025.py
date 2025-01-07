@@ -63,6 +63,9 @@ class GameSprite(pygame.sprite.Sprite):
     self.max_speed_rotation = 0
     self.min_speed_rotation = 0
     self.activated = True
+    self.effect_1_active = False
+    self.effect_2_active = False
+    self.effect_3_active = False
     self.effect_1_ttl = 0
     self.effect_2_ttl = 0
     self.effect_3_ttl = 0
@@ -378,6 +381,15 @@ def initialize_dogfight_mode():
   PLAYER_2.weapon_2_cooldown_default = 1000
   PLAYER_2.weapon_1_speed = 256
   PLAYER_2.weapon_2_speed = 128
+
+  PLAYER_1.effect_1_ttl = 3000
+  PLAYER_2.effect_1_ttl = 3000
+
+  PLAYER_1.effect_1_ttl_default = 3000
+  PLAYER_2.effect_1_ttl_default = 3000
+
+  PLAYER_1.effect_1_active = True
+  PLAYER_2.effect_1_active = True
 
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
@@ -866,7 +878,7 @@ while GAME_STATE['RUNNING']:
         if the_event.key == K_p and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
           destroy_alert()
         if the_event.key == K_t and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
-          create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "SINGLE LINE TEST", "", 0, False, 0)          
+          create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "SINGLE LINE TEST", "", 0, False, 0)
         if the_event.key == K_y and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
           create_alert(GAME_COLORS['SHMUP_YELLOW'], "", "SINGLE LINE TEST FADEOUT", "", 2500, True, 1500)
         if the_event.key == K_u and (the_event.mod & KMOD_SHIFT) and (the_event.mod & KMOD_CTRL):
@@ -1492,10 +1504,12 @@ while GAME_STATE['RUNNING']:
           total_map_tiles = total_map_tiles + 1
 
     if dogfighting_pvp_active:
-      PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
-      PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
 
       if PLAYER_1.activated:
+        PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
+        PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
+        PLAYER_1.effect_1_ttl = PLAYER_1.effect_1_ttl - ELAPSED_MS
+
         if GAME_CONTROLS['PLAYER_1']['LEFT']:
           PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
         if GAME_CONTROLS['PLAYER_1']['RIGHT']:
@@ -1549,9 +1563,17 @@ while GAME_STATE['RUNNING']:
         if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
           PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
+        if PLAYER_1.effect_1_ttl > 0:
+          PLAYER_1.effect_1_active = True
+          PLAYER_1.randomize_alpha()
+        else:
+          PLAYER_1.effect_1_active = False
+          PLAYER_1.set_alpha(255)
+
       if PLAYER_2.activated:
         PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
         PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown - ELAPSED_MS
+        PLAYER_2.effect_1_ttl = PLAYER_2.effect_1_ttl - ELAPSED_MS
 
         if GAME_CONTROLS['PLAYER_2']['LEFT']:
           PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
@@ -1605,6 +1627,13 @@ while GAME_STATE['RUNNING']:
         if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
           PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
+        if PLAYER_2.effect_1_ttl > 0:
+          PLAYER_2.effect_1_active = True
+          PLAYER_2.randomize_alpha()
+        else:
+          PLAYER_2.effect_1_active = False
+          PLAYER_2.set_alpha(255)
+
       ### Update/Move the bullets and check collisions
       for bullet in reversed(player_1_bullets.sprites()):
         bullet.speed_x = math.cos(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
@@ -1620,21 +1649,48 @@ while GAME_STATE['RUNNING']:
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
 
-      if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.75))) > 0:
-        a = 1
-        #print("PLANES COLLIDED!")
+      if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.45))) > 0:
+        if not PLAYER_1.effect_1_active and not PLAYER_2.effect_1_active:
+          PLAYER_1.lives = PLAYER_1.lives - 1
+          PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+          PLAYER_1.set_rotation(270)
+          PLAYER_1.speed = 64
+          PLAYER_1.effect_1_ttl = 3000
+          PLAYER_1.effect_1_active = True
+          PLAYER_2.lives = PLAYER_2.lives - 1
+          PLAYER_2.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+          PLAYER_2.set_rotation(90)
+          PLAYER_2.speed = 64
+          PLAYER_2.effect_1_ttl = 3000
+          PLAYER_2.effect_1_active = True
 
-      collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False)
+      #def create_alert(color, font, txt_1, txt_2, ttl, fadeout, fadeout_ttl):
+      #create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "SINGLE LINE TEST", "", 0, False, 0)
+      collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.45))
       if len(collisions) > 0:
         for bullet in collisions:
           if not bullet.bomb:
             bullet.kill()
+            if not PLAYER_1.effect_1_active:
+              PLAYER_1.lives = PLAYER_1.lives - 1
+              PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+              PLAYER_1.set_rotation(270)
+              PLAYER_1.speed = 64
+              PLAYER_1.effect_1_ttl = 3000
+              PLAYER_1.effect_1_active = True
 
-      collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False)
+      collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.45))
       if len(collisions) > 0:
         for bullet in collisions:
           if not bullet.bomb:
             bullet.kill()
+            if not PLAYER_2.effect_1_active:
+              PLAYER_2.lives = PLAYER_2.lives - 1
+              PLAYER_2.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+              PLAYER_2.set_rotation(90)
+              PLAYER_2.speed = 64
+              PLAYER_2.effect_1_ttl = 3000
+              PLAYER_2.effect_1_active = True
 
       ### DISPLAY THE BULLETS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
