@@ -41,23 +41,20 @@ from pygame.locals import (
 ######################################################################
 # Classes Created to support game objects
 ######################################################################
-class Plane(pygame.sprite.Sprite):
-  PLANE_DEATH_TTL = 1500
-
-  def __init__(self, x=0, y=0, rotation=0, image=None):
+class GameSprite(pygame.sprite.Sprite):
+  def __init__(self, x=0, y=0, speed_x=0, speed_y=0, rotation=0, speed=0, image=None):
     super().__init__()
     self.x = x
     self.y = y
     self.rect = (self.x, self.y)
     self.image = None
-    self.speed_x = 0
-    self.speed_y = 0
-    self.health = 0
     self.rotation = rotation
     if image != None:
       self.image = image.copy()
       self.rect = self.image.get_rect(center=(self.x, self.y))
-    self.speed = 0 # [math.cos(self.rotation), math.sin(self.rotation)]
+    self.speed = speed
+    self.speed_x = speed_x
+    self.speed_y = speed_y
     self.speed_delta = 0
     self.max_speed = 0
     self.min_speed = 0
@@ -65,6 +62,52 @@ class Plane(pygame.sprite.Sprite):
     self.speed_rotation_delta = 0
     self.max_speed_rotation = 0
     self.min_speed_rotation = 0
+    self.activated = True
+    self.effect_1_ttl = 0
+    self.effect_2_ttl = 0
+    self.effect_3_ttl = 0
+    self.effect_1_ttl_default = 0
+    self.effect_2_ttl_default = 0
+    self.effect_3_ttl_default = 0
+
+  def set_image(self, image):
+    self.image = image.copy()
+    self.rect = self.image.get_rect(center=(self.x, self.y))
+
+  def set_location(self, x, y):
+    self.x = x
+    self.y = y
+    self.rect = self.image.get_rect(center=(self.x, self.y))
+
+  def set_location_delta(self, x, y):
+    self.set_location(self.x + x, self.y + y)
+
+  #We're going to assume that rotation is set something reasonable so our "fix" will help the rotation of the object stay smooth and within a reasonable number
+  def set_rotation(self, rotation):
+    self.rotation = rotation
+    if self.rotation < 0:
+      self.rotation = self.rotation + 360
+    if self.rotation > 360:
+      self.rotation = self.rotation - 360
+  
+  def set_rotation_delta(self, rotation):
+    self.set_rotation(self.rotation + rotation)
+
+  def set_alpha(self, alpha):
+    self.image.set_alpha(alpha)
+
+  def randomize_alpha(self):
+    self.image.set_alpha(random.choice(range(0,255)))
+  
+  def randomize_alpha_damage(self):
+    self.image.set_alpha(random.choice(range(32,255)))
+
+class Plane(GameSprite):
+  PLANE_DEATH_TTL = 1500
+
+  def __init__(self, x=0, y=0, rotation=0, image=None):
+    super().__init__(x, y, 0, 0, rotation, 0, image)
+    self.health = 0
     self.weapon_1_cooldown = 0
     self.weapon_2_cooldown = 0
     self.weapon_3_cooldown = 0
@@ -74,57 +117,6 @@ class Plane(pygame.sprite.Sprite):
     self.weapon_1_speed = 0
     self.weapon_2_speed = 0
     self.weapon_3_speed = 0
-    self.effect_1_ttl = 0
-    self.effect_2_ttl = 0
-    self.effect_3_ttl = 0
-    self.effect_1_ttl_default = 0
-    self.effect_2_ttl_default = 0
-    self.effect_3_ttl_default = 0
-    self.activated = True
-
-  def set_image(self, image):
-    self.image = image.copy()
-    self.rect = self.image.get_rect(center=(self.x, self.y))
-
-  def set_location(self, x, y):
-    self.x = x
-    self.y = y
-    self.rect = self.image.get_rect(center=(self.x, self.y))
-
-  def set_location_delta(self, x, y):
-    self.set_location(self.x + x, self.y + y)
-
-  #We're going to assume that rotation is set something reasonable so our "fix" will help the rotation of the object stay smooth and within a reasonable number
-  def set_rotation(self, rotation):
-    self.rotation = rotation
-    if self.rotation < 0:
-      self.rotation = self.rotation + 360
-    if self.rotation > 360:
-      self.rotation = self.rotation - 360
-  
-  def set_rotation_delta(self, rotation):
-    self.set_rotation(self.rotation + rotation)
-
-  def set_alpha(self, alpha):
-    self.image.set_alpha(alpha)
-
-  def randomize_alpha(self):
-    self.image.set_alpha(random.choice(range(0,255)))
-  
-  def randomize_alpha_damage(self):
-    self.image.set_alpha(random.choice(range(32,255)))
-
-  # def set_speed(self, speed):
-  #   self.speed = speed
-
-  # def set_speed_rotation(self, speed_rotation):
-  #   self.speed_rotation = speed_rotation
-
-  # def set_max_speed(self, max_speed):
-  #   self.max_speed = max_speed
-  
-  # def set_max_speed_rotation(self, max_speed_rotation):
-  #   self.max_speed_rotation = max_speed_rotation
 
 class Player(Plane):
   def __init__(self):
@@ -132,53 +124,10 @@ class Player(Plane):
     self.lives = 0
     self.score = 0
 
-class Bullet(pygame.sprite.Sprite):
+class Bullet(GameSprite):
   def __init__(self, x=0, y=0, speed_x=0, speed_y=0, rotation=0, speed=0, image=None, bomb=False):
-    super().__init__()
-    self.x = x
-    self.y = y
-    self.rect = (self.x, self.y)
-    self.image = None
+    super().__init__(x, y, speed_x, speed_y, rotation, speed, image)
     self.bomb = bomb
-    self.rotation = rotation
-    if image != None:
-      self.image = image.copy()
-      self.rect = self.image.get_rect(center=(self.x, self.y))
-    self.speed = speed
-    self.speed_x = speed_x
-    self.speed_y = speed_y
-
-  def set_image(self, image):
-    self.image = image.copy()
-    self.rect = self.image.get_rect(center=(self.x, self.y))
-
-  def set_location(self, x, y):
-    self.x = x
-    self.y = y
-    self.rect = self.image.get_rect(center=(self.x, self.y))
-
-  def set_location_delta(self, x, y):
-    self.set_location(self.x + x, self.y + y)
-
-  #We're going to assume that rotation is set something reasonable so our "fix" will help the rotation of the object stay smooth and within a reasonable number
-  def set_rotation(self, rotation):
-    self.rotation = rotation
-    if self.rotation < 0:
-      self.rotation = self.rotation + 360
-    if self.rotation > 360:
-      self.rotation = self.rotation - 360
-  
-  def set_rotation_delta(self, rotation):
-    self.set_rotation(self.rotation + rotation)
-
-  def set_alpha(self, alpha):
-    self.image.set_alpha(alpha)
-
-  def randomize_alpha(self):
-    self.image.set_alpha(random.choice(range(0,255)))
-  
-  def randomize_alpha_damage(self):
-    self.image.set_alpha(random.choice(range(32,255)))
 
 ######################################################################
 # Functions Created to support game initialization and transitions
@@ -229,15 +178,19 @@ def stop_all_sounds():
 def destroy_dogfight_objects():
   global player_1_bullets
   global player_2_bullets
+  global explosions
 
   #clean up the objects
   for bullet in reversed(player_1_bullets.sprites()):
     bullet.kill()
   for bullet in reversed(player_2_bullets.sprites()):
     bullet.kill()
-
+  for explosion in reversed(explosions.sprites()):
+    explosion.kill()
+  
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
+  explosions = pygame.sprite.Group()
 
 def destroy_mission_objects():
   return
@@ -428,6 +381,7 @@ def initialize_dogfight_mode():
 
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
+  explosions = pygame.sprite.Group()
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -533,7 +487,7 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 # ***LESSON***
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
-                'READY': 1500, 'SET': 1500, 'FIGHT': 750}
+                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 'PLANE_HIT_EXPLOSION_MIN': 500, 'PLANE_HIT_EXPLOSION_MAX': 1500}
 
 ######################################################################
 # SET GAME DEFAULTS
@@ -780,6 +734,7 @@ PLAYER_2 = Player()
 #Initialize Player Bullets
 player_1_bullets = pygame.sprite.Group()
 player_2_bullets = pygame.sprite.Group()
+explosions = pygame.sprite.Group()
 
 #Initialize DogFighting Variables
 dogfighting_pvp_active = False
@@ -1540,113 +1495,115 @@ while GAME_STATE['RUNNING']:
       PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
       PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
 
-      if GAME_CONTROLS['PLAYER_1']['LEFT']:
-        PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
-      if GAME_CONTROLS['PLAYER_1']['RIGHT']:
-        PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
+      if PLAYER_1.activated:
+        if GAME_CONTROLS['PLAYER_1']['LEFT']:
+          PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
+        if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+          PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
 
-      if GAME_CONTROLS['PLAYER_1']['BLUE']:
-        PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
-        PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
-      else:
-        PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
-        PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
+        if GAME_CONTROLS['PLAYER_1']['BLUE']:
+          PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
+          PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
+        else:
+          PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
+          PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
 
-      if GAME_CONTROLS['PLAYER_1']['GREEN']:
-        if PLAYER_1.weapon_1_cooldown <= 0:
-          #Fire weapon 1
-          bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_1_speed + PLAYER_1.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
-          player_1_bullets.add(bullet)
+        if GAME_CONTROLS['PLAYER_1']['GREEN']:
+          if PLAYER_1.weapon_1_cooldown <= 0:
+            #Fire weapon 1
+            bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_1_speed + PLAYER_1.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
+            player_1_bullets.add(bullet)
 
-          GAME_CONTROLS['PLAYER_1']['GREEN'] = False
-          PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown_default
+            #GAME_CONTROLS['PLAYER_1']['GREEN'] = False
+            PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown_default
 
-      if GAME_CONTROLS['PLAYER_1']['RED']:
-        if PLAYER_1.weapon_2_cooldown <= 0:
-          #Fire weapon 2
-          bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
-          player_1_bullets.add(bullet)
+        if GAME_CONTROLS['PLAYER_1']['RED']:
+          if PLAYER_1.weapon_2_cooldown <= 0:
+            #Fire weapon 2
+            bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
+            player_1_bullets.add(bullet)
 
-          GAME_CONTROLS['PLAYER_1']['RED'] = False
-          PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown_default
-      
-      if PLAYER_1.speed > PLAYER_1.max_speed:
-        PLAYER_1.speed = PLAYER_1.max_speed
-      if PLAYER_1.speed < PLAYER_1.min_speed:
-        PLAYER_1.speed = PLAYER_1.min_speed
+            #GAME_CONTROLS['PLAYER_1']['RED'] = False
+            PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown_default
+        
+        if PLAYER_1.speed > PLAYER_1.max_speed:
+          PLAYER_1.speed = PLAYER_1.max_speed
+        if PLAYER_1.speed < PLAYER_1.min_speed:
+          PLAYER_1.speed = PLAYER_1.min_speed
 
-      if PLAYER_1.speed_rotation > PLAYER_1.max_speed_rotation:
-        PLAYER_1.speed_rotation = PLAYER_1.max_speed_rotation
-      if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
-        PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
+        if PLAYER_1.speed_rotation > PLAYER_1.max_speed_rotation:
+          PLAYER_1.speed_rotation = PLAYER_1.max_speed_rotation
+        if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
+          PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
 
-      PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
-      PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
-      PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
+        PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+        PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+        PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
 
-      if PLAYER_1.x < 0:
-        PLAYER_1.set_location(0, PLAYER_1.y)
-      if PLAYER_1.x > GAME_CONSTANTS['SCREEN_WIDTH']:
-        PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_1.y)
-      if PLAYER_1.y < GAME_CONSTANTS['SQUARE_SIZE']:
-        PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
-      if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
-        PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+        if PLAYER_1.x < 0:
+          PLAYER_1.set_location(0, PLAYER_1.y)
+        if PLAYER_1.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+          PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_1.y)
+        if PLAYER_1.y < GAME_CONSTANTS['SQUARE_SIZE']:
+          PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
+        if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+          PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
-      PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
-      PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown - ELAPSED_MS
+      if PLAYER_2.activated:
+        PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
+        PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown - ELAPSED_MS
 
-      if GAME_CONTROLS['PLAYER_2']['LEFT']:
-        PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
-      if GAME_CONTROLS['PLAYER_2']['RIGHT']:
-        PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
-      if GAME_CONTROLS['PLAYER_2']['BLUE']:
-        PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
-        PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
-      else:
-        PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
-        PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
-      
-      if GAME_CONTROLS['PLAYER_2']['GREEN']:
-        if PLAYER_2.weapon_1_cooldown <= 0:
-          #Fire weapon 1
-          bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_1_speed + PLAYER_2.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
-          player_2_bullets.add(bullet)
+        if GAME_CONTROLS['PLAYER_2']['LEFT']:
+          PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
+        if GAME_CONTROLS['PLAYER_2']['RIGHT']:
+          PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
+        if GAME_CONTROLS['PLAYER_2']['BLUE']:
+          PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
+          PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
+        else:
+          PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
+          PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
+        
+        if GAME_CONTROLS['PLAYER_2']['GREEN']:
+          if PLAYER_2.weapon_1_cooldown <= 0:
+            #Fire weapon 1
+            bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_1_speed + PLAYER_2.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
+            player_2_bullets.add(bullet)
 
-          GAME_CONTROLS['PLAYER_2']['GREEN'] = False
-          PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown_default
+            #GAME_CONTROLS['PLAYER_2']['GREEN'] = False
+            PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown_default
 
-      if GAME_CONTROLS['PLAYER_2']['RED']:
-        if PLAYER_2.weapon_2_cooldown <= 0:
-          #Fire weapon 2
-          bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
-          player_2_bullets.add(bullet)
+        if GAME_CONTROLS['PLAYER_2']['RED']:
+          if PLAYER_2.weapon_2_cooldown <= 0:
+            #Fire weapon 2
+            bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
+            player_2_bullets.add(bullet)
 
-          GAME_CONTROLS['PLAYER_2']['RED'] = False
-          PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown_default
+            #GAME_CONTROLS['PLAYER_2']['RED'] = False
+            PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown_default
 
-      if PLAYER_2.speed > PLAYER_2.max_speed:
-        PLAYER_2.speed = PLAYER_2.max_speed
-      if PLAYER_2.speed < PLAYER_2.min_speed:
-        PLAYER_2.speed = PLAYER_2.min_speed
+        if PLAYER_2.speed > PLAYER_2.max_speed:
+          PLAYER_2.speed = PLAYER_2.max_speed
+        if PLAYER_2.speed < PLAYER_2.min_speed:
+          PLAYER_2.speed = PLAYER_2.min_speed
 
-      if PLAYER_2.speed_rotation > PLAYER_2.max_speed_rotation:
-        PLAYER_2.speed_rotation = PLAYER_2.max_speed_rotation
-      if PLAYER_2.speed_rotation < PLAYER_2.min_speed_rotation:
-        PLAYER_2.speed_rotation = PLAYER_2.min_speed_rotation
+        if PLAYER_2.speed_rotation > PLAYER_2.max_speed_rotation:
+          PLAYER_2.speed_rotation = PLAYER_2.max_speed_rotation
+        if PLAYER_2.speed_rotation < PLAYER_2.min_speed_rotation:
+          PLAYER_2.speed_rotation = PLAYER_2.min_speed_rotation
 
-      PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
-      PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
-      PLAYER_2.set_location_delta(PLAYER_2.speed_x, PLAYER_2.speed_y)
+        PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+        PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+        PLAYER_2.set_location_delta(PLAYER_2.speed_x, PLAYER_2.speed_y)
 
-      if PLAYER_2.x < 0:
-        PLAYER_2.set_location(0, PLAYER_2.y)
-      if PLAYER_2.x > GAME_CONSTANTS['SCREEN_WIDTH']:
-        PLAYER_2.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_2.y)
-      if PLAYER_2.y < GAME_CONSTANTS['SQUARE_SIZE']:
-        PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SQUARE_SIZE'])
-      if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
-        PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+        if PLAYER_2.x < 0:
+          PLAYER_2.set_location(0, PLAYER_2.y)
+        if PLAYER_2.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+          PLAYER_2.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_2.y)
+        if PLAYER_2.y < GAME_CONSTANTS['SQUARE_SIZE']:
+          PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SQUARE_SIZE'])
+        if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+          PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
       ### Update/Move the bullets and check collisions
       for bullet in reversed(player_1_bullets.sprites()):
@@ -1662,6 +1619,10 @@ while GAME_STATE['RUNNING']:
         bullet.set_location_delta(bullet.speed_x, bullet.speed_y)
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
+
+      if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.75))) > 0:
+        a = 1
+        #print("PLANES COLLIDED!")
 
       collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False)
       if len(collisions) > 0:
@@ -1994,6 +1955,11 @@ while GAME_STATE['RUNNING']:
     THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 464 - debug_y_offset)))
     camera_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"CAMERA Y: {CAMERA['Y']}", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(camera_text_surface, camera_text_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 170 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 446 - debug_y_offset)))
+
+    ######################################################################
+    # Show the Player Information
+    ######################################################################
+    PLAYER_1.activated
 
     ######################################################################
     # Show the Player Controls Debug
