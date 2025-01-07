@@ -134,6 +134,35 @@
     with_fileglob:
       - "./tmp/space-shooter-redux/Bonus/*.ogg"
 
+  - name: Download Kenney UI Pack (https://kenney.nl/media/pages/assets/ui-pack/008d5df50e-1718203990/kenney_ui-pack.zip)
+    ansible.builtin.get_url:
+      url: https://kenney.nl/media/pages/assets/ui-pack/008d5df50e-1718203990/kenney_ui-pack.zip
+      dest: ./tmp/kenney_ui-pack.zip
+      checksum: sha256:a8a14a234911eb648c062622915c93e79e94e97cb7f9f375a70f6617f1174318
+
+  - name: Create ./tmp/ui-pack/
+    ansible.builtin.file:
+      path: ./tmp/ui-pack/
+      state: directory
+      mode: '0755'
+
+  - name: Unzip kenney_ui-pack.zip to ./tmp/ui-pack/
+    ansible.builtin.unarchive:
+      src: ./tmp/kenney_ui-pack.zip
+      dest: ./tmp/ui-pack/
+
+  - name: Create ../sprites/ui-pack/grey/Default/ directory for the game
+    ansible.builtin.file:
+      path: ../sprites/ui-pack/grey/Default/
+      state: directory
+      mode: '0755'
+
+  - name: Copy sfx from ./tmp/ui-pack/PNG/Grey/Default/button_square_flat.png to ../sprites/ui-pack/grey/Default/
+    ansible.builtin.copy:
+      remote_src: true
+      src: "./tmp/ui-pack/PNG/Grey/Default/button_square_flat.png"
+      dest: ../sprites/ui-pack/grey/Default/
+
   - name: Create ../sprites/pixel-shmup/
     ansible.builtin.file:
       path: ../sprites/pixel-shmup/

@@ -45,11 +45,21 @@ $the_assets = @(
     #   the_source = @("$created_temp_directory\space-shooter-redux\Spritesheet\sheet.*", "$created_temp_directory\space-shooter-redux\Bonus\*.ogg"); 
     #   the_target = @("$project_root\sprites\space-shooter-redux\", "$project_root\sfx\space-shooter-redux\");
     #   the_temp = "space-shooter-redux\"},
+    @{the_file = "$created_temp_directory\kenney_space-shooter-redux.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/space-shooter-redux/ea9a7effda-1677669442/kenney_space-shooter-redux.zip";
+      the_source = @("$created_temp_directory\space-shooter-redux\Bonus\*.ogg"); 
+      the_target = @("$project_root\sfx\space-shooter-redux\");
+      the_temp = "space-shooter-redux\"},
     @{the_file = "$created_temp_directory\kenney_pixel-shmup.zip"; 
       the_url = "https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip";
       the_source = @("$created_temp_directory\pixel-shmup\Tilemap\*_packed.png"); 
       the_target = @("$project_root\sprites\pixel-shmup\");
-      the_temp = "pixel-shmup\"}
+      the_temp = "pixel-shmup\"},
+    @{the_file = "$created_temp_directory\kenney_ui-pack.zip"; 
+      the_url = "https://kenney.nl/media/pages/assets/ui-pack/008d5df50e-1718203990/kenney_ui-pack.zip";
+      the_source = @("$created_temp_directory\ui-pack\PNG\Grey\Default\button_square_flat.png"); 
+      the_target = @("$project_root\sprites\ui-pack\grey\default\");
+      the_temp = "ui-pack\"},
 )
 
 #https://kenney.nl/media/pages/assets/music-jingles/acd2ca8b8f-1677590399/kenney_music-jingles.zip
