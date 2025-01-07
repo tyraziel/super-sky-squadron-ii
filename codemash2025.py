@@ -1663,6 +1663,16 @@ while GAME_STATE['RUNNING']:
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
 
+      collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False)
+      if len(collisions) > 0:
+        for bullet in collisions:
+          bullet.kill()
+
+      collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False)
+      if len(collisions) > 0:
+        for bullet in collisions:
+          bullet.kill()
+
       ### DISPLAY THE BULLETS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
         for bullet in (player_1_bullets.sprites()):
