@@ -228,7 +228,10 @@ def destroy_dogfight_objects():
   global player_2_bullets
 
   #clean up the objects
-  
+  for bullet in reversed(player_1_bullets.sprites()):
+    bullet.kill()
+  for bullet in reversed(player_2_bullets.sprites()):
+    bullet.kill()
 
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
@@ -1232,6 +1235,9 @@ while GAME_STATE['RUNNING']:
   #
   ####################################################################
 
+  total_sprite_objects = 0
+  total_map_tiles = 0
+
   ####################################################################
   # TITLE_SCREEN - If we're at the title screen, draw that screen
   #
@@ -1525,6 +1531,7 @@ while GAME_STATE['RUNNING']:
         for j in range(len(MAP[i])):
           map_tile = GAME_SURFACES['PIXEL_SHMUP_TILES'][MAP[i][j]]
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
+          total_map_tiles = total_map_tiles + 1
 
     if dogfighting_pvp_active:
       PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
@@ -1545,7 +1552,8 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_1']['GREEN']:
         if PLAYER_1.weapon_1_cooldown <= 0:
           #Fire weapon 1
-          #player_1_bullets.add()
+          bullet = Bullet()
+          player_1_bullets.add(bullet)
 
           GAME_CONTROLS['PLAYER_1']['GREEN'] = False
           PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown_default
@@ -1553,6 +1561,9 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_1']['RED']:
         if PLAYER_1.weapon_2_cooldown <= 0:
           #Fire weapon 2
+          bullet = Bullet()
+          player_1_bullets.add(bullet)
+
           GAME_CONTROLS['PLAYER_1']['RED'] = False
           PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown_default
       
@@ -1596,12 +1607,18 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_2']['GREEN']:
         if PLAYER_2.weapon_1_cooldown <= 0:
           #Fire weapon 1
+          bullet = Bullet()
+          player_2_bullets.add(bullet)
+
           GAME_CONTROLS['PLAYER_2']['GREEN'] = False
           PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown_default
 
       if GAME_CONTROLS['PLAYER_2']['RED']:
         if PLAYER_2.weapon_2_cooldown <= 0:
           #Fire weapon 2
+          bullet = Bullet()
+          player_2_bullets.add(bullet)
+
           GAME_CONTROLS['PLAYER_2']['RED'] = False
           PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown_default
 
@@ -1628,12 +1645,26 @@ while GAME_STATE['RUNNING']:
       if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
         PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
+      ### Update the bullets and check collisions
+
       ### DISPLAY THE PLAYERS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
         player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
         THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
         player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
         THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
+      
+      ### DISPLAY THE BULLETS (if layer 4 is active!)
+      if GAME_STATE['LAYER_4']:
+        player_1_bullets.draw(THE_SCREEN)
+        player_1_bullets.update()
+        player_2_bullets.draw(THE_SCREEN)
+        player_2_bullets.update()
+
+      total_sprite_objects = total_sprite_objects + 2 #(for the planes)
+      total_sprite_objects = total_sprite_objects + len(player_1_bullets.sprites())
+      total_sprite_objects = total_sprite_objects + len(player_2_bullets.sprites())
+
     else:
       if dogfighting_pvp_ready_ttl > 0:
         dogfighting_pvp_ready_ttl = dogfighting_pvp_ready_ttl - ELAPSED_MS
@@ -1816,6 +1847,12 @@ while GAME_STATE['RUNNING']:
     ######################################################################
     time_passed_ms_text_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"{ELAPSED_MS}ms", True, GAME_COLORS['GREEN'])
     THE_SCREEN.blit(time_passed_ms_text_surface, time_passed_ms_text_surface.get_rect(bottomright = (GAME_CONSTANTS['SCREEN_WIDTH'] - 5 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 494 - debug_y_offset)))
+
+    total_sprite_objects_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"Sprites: {total_sprite_objects}", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(total_sprite_objects_surface, total_sprite_objects_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 128 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 518 - debug_y_offset)))
+
+    total_map_tiles_surface = GAME_FONTS['KENNEY_MINI_16'].render(f"Map Tiles: {total_map_tiles}", True, GAME_COLORS['GREEN'])
+    THE_SCREEN.blit(total_map_tiles_surface, total_map_tiles_surface.get_rect(bottomleft = (GAME_CONSTANTS['SCREEN_WIDTH'] - 140 - debug_x_offset, GAME_CONSTANTS['SCREEN_HEIGHT'] - 534 - debug_y_offset)))
 
     ######################################################################
     # Show "Game Information" that we care about
