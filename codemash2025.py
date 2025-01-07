@@ -133,17 +133,20 @@ class Player(Plane):
     self.score = 0
 
 class Bullet(pygame.sprite.Sprite):
-  def __init__(self, x=0, y=0, rotation=0, speed=0, image=None):
+  def __init__(self, x=0, y=0, speed_x=0, speed_y=0, rotation=0, speed=0, image=None, bomb=False):
     super().__init__()
     self.x = x
     self.y = y
     self.rect = (self.x, self.y)
     self.image = None
+    self.bomb = bomb
     self.rotation = rotation
     if image != None:
       self.image = image.copy()
       self.rect = self.image.get_rect(center=(self.x, self.y))
-    self.speed = 0
+    self.speed = speed
+    self.speed_x = speed_x
+    self.speed_y = speed_y
 
   def set_image(self, image):
     self.image = image.copy()
@@ -413,15 +416,15 @@ def initialize_dogfight_mode():
   PLAYER_1.weapon_2_cooldown = 0
   PLAYER_1.weapon_1_cooldown_default = 250
   PLAYER_1.weapon_2_cooldown_default = 1000
-  PLAYER_1.weapon_1_speed = 128
-  PLAYER_1.weapon_2_speed = 64
+  PLAYER_1.weapon_1_speed = 256
+  PLAYER_1.weapon_2_speed = 128
 
   PLAYER_2.weapon_1_cooldown = 0
   PLAYER_2.weapon_2_cooldown = 0
   PLAYER_2.weapon_1_cooldown_default = 250
   PLAYER_2.weapon_2_cooldown_default = 1000
-  PLAYER_2.weapon_1_speed = 128
-  PLAYER_2.weapon_2_speed = 64
+  PLAYER_2.weapon_1_speed = 256
+  PLAYER_2.weapon_2_speed = 128
 
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
@@ -1552,7 +1555,7 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_1']['GREEN']:
         if PLAYER_1.weapon_1_cooldown <= 0:
           #Fire weapon 1
-          bullet = Bullet()
+          bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_1_speed + PLAYER_1.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
           player_1_bullets.add(bullet)
 
           GAME_CONTROLS['PLAYER_1']['GREEN'] = False
@@ -1561,7 +1564,7 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_1']['RED']:
         if PLAYER_1.weapon_2_cooldown <= 0:
           #Fire weapon 2
-          bullet = Bullet()
+          bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
           player_1_bullets.add(bullet)
 
           GAME_CONTROLS['PLAYER_1']['RED'] = False
@@ -1607,7 +1610,7 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_2']['GREEN']:
         if PLAYER_2.weapon_1_cooldown <= 0:
           #Fire weapon 1
-          bullet = Bullet()
+          bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_1_speed + PLAYER_2.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
           player_2_bullets.add(bullet)
 
           GAME_CONTROLS['PLAYER_2']['GREEN'] = False
@@ -1616,7 +1619,7 @@ while GAME_STATE['RUNNING']:
       if GAME_CONTROLS['PLAYER_2']['RED']:
         if PLAYER_2.weapon_2_cooldown <= 0:
           #Fire weapon 2
-          bullet = Bullet()
+          bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
           player_2_bullets.add(bullet)
 
           GAME_CONTROLS['PLAYER_2']['RED'] = False
@@ -1645,22 +1648,47 @@ while GAME_STATE['RUNNING']:
       if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
         PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
-      ### Update the bullets and check collisions
+      ### Update/Move the bullets and check collisions
+      for bullet in reversed(player_1_bullets.sprites()):
+        bullet.speed_x = math.cos(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
+        bullet.speed_y = -math.sin(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
+        bullet.set_location_delta(bullet.speed_x, bullet.speed_y)
+        if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
+          bullet.kill()
+        
+      for bullet in reversed(player_2_bullets.sprites()):
+        bullet.speed_x = math.cos(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
+        bullet.speed_y = -math.sin(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
+        bullet.set_location_delta(bullet.speed_x, bullet.speed_y)
+        if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
+          bullet.kill()
 
-      ### DISPLAY THE PLAYERS (if layer 3 is active!)
+      ### DISPLAY THE BULLETS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
+        for bullet in (player_1_bullets.sprites()):
+          temp_size = 0.5
+          if bullet.bomb:
+            temp_size = 1
+          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, temp_size)
+          THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
+        for bullet in (player_2_bullets.sprites()):
+          temp_size = 0.5
+          if bullet.bomb:
+            temp_size = 1
+          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, temp_size)
+          THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
+        #player_1_bullets.draw(THE_SCREEN)
+        #player_1_bullets.update()
+        #player_2_bullets.draw(THE_SCREEN)
+        #player_2_bullets.update()
+
+      ### DISPLAY THE PLAYERS (if layer 4 is active!)
+      if GAME_STATE['LAYER_4']:
         player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
         THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
         player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
         THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
       
-      ### DISPLAY THE BULLETS (if layer 4 is active!)
-      if GAME_STATE['LAYER_4']:
-        player_1_bullets.draw(THE_SCREEN)
-        player_1_bullets.update()
-        player_2_bullets.draw(THE_SCREEN)
-        player_2_bullets.update()
-
       total_sprite_objects = total_sprite_objects + 2 #(for the planes)
       total_sprite_objects = total_sprite_objects + len(player_1_bullets.sprites())
       total_sprite_objects = total_sprite_objects + len(player_2_bullets.sprites())
