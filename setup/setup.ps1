@@ -59,7 +59,7 @@ $the_assets = @(
       the_url = "https://kenney.nl/media/pages/assets/ui-pack/008d5df50e-1718203990/kenney_ui-pack.zip";
       the_source = @("$created_temp_directory\ui-pack\PNG\Grey\Default\button_square_flat.png"); 
       the_target = @("$project_root\sprites\ui-pack\grey\default\");
-      the_temp = "ui-pack\"},
+      the_temp = "ui-pack\"}
 )
 
 #https://kenney.nl/media/pages/assets/music-jingles/acd2ca8b8f-1677590399/kenney_music-jingles.zip
