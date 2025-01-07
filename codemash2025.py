@@ -1666,12 +1666,14 @@ while GAME_STATE['RUNNING']:
       collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False)
       if len(collisions) > 0:
         for bullet in collisions:
-          bullet.kill()
+          if not bullet.bomb:
+            bullet.kill()
 
       collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False)
       if len(collisions) > 0:
         for bullet in collisions:
-          bullet.kill()
+          if not bullet.bomb:
+            bullet.kill()
 
       ### DISPLAY THE BULLETS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
