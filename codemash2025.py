@@ -294,6 +294,17 @@ def setup_for_dogfight_mode_quick_jump():
 
 def initialize_dogfight_mode():
   global GAME_STATE
+  global PLAYER_1
+  global PLAYER_2
+  global dogfighting_pvp_active
+  global dogfighting_pvp_ready_ttl
+  global dogfighting_pvp_set_ttl
+  global dogfighting_pvp_fight_ttl
+
+  dogfighting_pvp_active = False
+  dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
+  dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
+  dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
 
   reset_for_game_state_transition()
   reset_players()
@@ -436,12 +447,13 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
                'SHMUP_BLACK': (51, 51, 51),
                'SHMUP_GRAY': (153, 153, 153),
                'SHMUP_WHITE': (218, 218, 218),
-               }
+              }
 
 #Time to live defaults are within this dictionary
 # ***LESSON***
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
-                'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000}
+                'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
+                'READY': 1500, 'SET': 1500, 'FIGHT': 750}
 
 ######################################################################
 # SET GAME DEFAULTS
@@ -523,6 +535,7 @@ GAME_FONTS = {'KENNEY_MINI_16': pygame.font.Font('./fonts/Kenney Mini.ttf', 16),
               'KENNEY_MINI_SQUARE_64': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 64),
               'KENNEY_MINI_SQUARE_80': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 80),
               'KENNEY_MINI_SQUARE_96': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 96),
+              'KENNEY_MINI_SQUARE_128': pygame.font.Font('./fonts/Kenney Mini Square.ttf', 128),
               'KENNEY_PIXEL_16': pygame.font.Font('./fonts/Kenney Pixel.ttf', 16),
               'KENNEY_PIXEL_SQUARE_16': pygame.font.Font('./fonts/Kenney Pixel Square.ttf', 16),
               'KENNEY_BLOCKS_16': pygame.font.Font('./fonts/Kenney Blocks.ttf', 16),
@@ -687,6 +700,12 @@ PLAYER_2 = Player()
 #Initialize Player Bullets
 player_1_bullets = pygame.sprite.Group()
 player_2_bullets = pygame.sprite.Group()
+
+#Initialize DogFighting Variables
+dogfighting_pvp_active = False
+dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
+dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
+dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
 
 # Set to Title Screen
 reset_game_state()
@@ -1433,81 +1452,115 @@ while GAME_STATE['RUNNING']:
           map_tile = GAME_SURFACES['PIXEL_SHMUP_TILES'][MAP[i][j]]
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
 
-    if GAME_CONTROLS['PLAYER_1']['LEFT']:
-      PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
-    if GAME_CONTROLS['PLAYER_1']['RIGHT']:
-      PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
-    if GAME_CONTROLS['PLAYER_1']['BLUE']:
-      PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
-      PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
+    if dogfighting_pvp_active:
+
+      if GAME_CONTROLS['PLAYER_1']['LEFT']:
+        PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
+      if GAME_CONTROLS['PLAYER_1']['RIGHT']:
+        PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
+      if GAME_CONTROLS['PLAYER_1']['BLUE']:
+        PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
+        PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
+      else:
+        PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
+        PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
+      
+      if PLAYER_1.speed > PLAYER_1.max_speed:
+        PLAYER_1.speed = PLAYER_1.max_speed
+      if PLAYER_1.speed < PLAYER_1.min_speed:
+        PLAYER_1.speed = PLAYER_1.min_speed
+
+      if PLAYER_1.speed_rotation > PLAYER_1.max_speed_rotation:
+        PLAYER_1.speed_rotation = PLAYER_1.max_speed_rotation
+      if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
+        PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
+
+      PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+      PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
+      PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
+
+      if PLAYER_1.x < 0:
+        PLAYER_1.set_location(0, PLAYER_1.y)
+      if PLAYER_1.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+        PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_1.y)
+      if PLAYER_1.y < GAME_CONSTANTS['SQUARE_SIZE']:
+        PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
+      if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+        PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+
+      if GAME_CONTROLS['PLAYER_2']['LEFT']:
+        PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
+      if GAME_CONTROLS['PLAYER_2']['RIGHT']:
+        PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
+      if GAME_CONTROLS['PLAYER_2']['BLUE']:
+        PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
+        PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
+      else:
+        PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
+        PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
+      
+      if PLAYER_2.speed > PLAYER_2.max_speed:
+        PLAYER_2.speed = PLAYER_2.max_speed
+      if PLAYER_2.speed < PLAYER_2.min_speed:
+        PLAYER_2.speed = PLAYER_2.min_speed
+
+      if PLAYER_2.speed_rotation > PLAYER_2.max_speed_rotation:
+        PLAYER_2.speed_rotation = PLAYER_2.max_speed_rotation
+      if PLAYER_2.speed_rotation < PLAYER_2.min_speed_rotation:
+        PLAYER_2.speed_rotation = PLAYER_2.min_speed_rotation
+
+      PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+      PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
+      PLAYER_2.set_location_delta(PLAYER_2.speed_x, PLAYER_2.speed_y)
+
+      if PLAYER_2.x < 0:
+        PLAYER_2.set_location(0, PLAYER_2.y)
+      if PLAYER_2.x > GAME_CONSTANTS['SCREEN_WIDTH']:
+        PLAYER_2.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_2.y)
+      if PLAYER_2.y < GAME_CONSTANTS['SQUARE_SIZE']:
+        PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SQUARE_SIZE'])
+      if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
+        PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
+
+      ### DISPLAY THE PLAYERS (if layer 3 is active!)
+      if GAME_STATE['LAYER_3']:
+        player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
+        THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
+        player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
+        THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
     else:
-      PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
-      PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
-    
-    if PLAYER_1.speed > PLAYER_1.max_speed:
-      PLAYER_1.speed = PLAYER_1.max_speed
-    if PLAYER_1.speed < PLAYER_1.min_speed:
-      PLAYER_1.speed = PLAYER_1.min_speed
-
-    if PLAYER_1.speed_rotation > PLAYER_1.max_speed_rotation:
-      PLAYER_1.speed_rotation = PLAYER_1.max_speed_rotation
-    if PLAYER_1.speed_rotation < PLAYER_1.min_speed_rotation:
-      PLAYER_1.speed_rotation = PLAYER_1.min_speed_rotation
-
-    PLAYER_1.speed_x = math.cos(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
-    PLAYER_1.speed_y = -math.sin(math.radians(PLAYER_1.rotation + 90)) * PLAYER_1.speed * ELAPSED_S
-    PLAYER_1.set_location_delta(PLAYER_1.speed_x, PLAYER_1.speed_y)
-
-    if PLAYER_1.x < 0:
-      PLAYER_1.set_location(0, PLAYER_1.y)
-    if PLAYER_1.x > GAME_CONSTANTS['SCREEN_WIDTH']:
-      PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_1.y)
-    if PLAYER_1.y < GAME_CONSTANTS['SQUARE_SIZE']:
-      PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SQUARE_SIZE'])
-    if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
-      PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
-
-    if GAME_CONTROLS['PLAYER_2']['LEFT']:
-      PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
-    if GAME_CONTROLS['PLAYER_2']['RIGHT']:
-      PLAYER_2.set_rotation_delta(-PLAYER_2.speed_rotation * ELAPSED_S)
-    if GAME_CONTROLS['PLAYER_2']['BLUE']:
-      PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
-      PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
-    else:
-      PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
-      PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
-    
-    if PLAYER_2.speed > PLAYER_2.max_speed:
-      PLAYER_2.speed = PLAYER_2.max_speed
-    if PLAYER_2.speed < PLAYER_2.min_speed:
-      PLAYER_2.speed = PLAYER_2.min_speed
-
-    if PLAYER_2.speed_rotation > PLAYER_2.max_speed_rotation:
-      PLAYER_2.speed_rotation = PLAYER_2.max_speed_rotation
-    if PLAYER_2.speed_rotation < PLAYER_2.min_speed_rotation:
-      PLAYER_2.speed_rotation = PLAYER_2.min_speed_rotation
-
-    PLAYER_2.speed_x = math.cos(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
-    PLAYER_2.speed_y = -math.sin(math.radians(PLAYER_2.rotation + 90)) * PLAYER_2.speed * ELAPSED_S
-    PLAYER_2.set_location_delta(PLAYER_2.speed_x, PLAYER_2.speed_y)
-
-    if PLAYER_2.x < 0:
-      PLAYER_2.set_location(0, PLAYER_2.y)
-    if PLAYER_2.x > GAME_CONSTANTS['SCREEN_WIDTH']:
-      PLAYER_2.set_location(GAME_CONSTANTS['SCREEN_WIDTH'], PLAYER_2.y)
-    if PLAYER_2.y < GAME_CONSTANTS['SQUARE_SIZE']:
-      PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SQUARE_SIZE'])
-    if PLAYER_2.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
-      PLAYER_2.set_location(PLAYER_2.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
-
-    ### DISPLAY THE PLAYERS (if layer 3 is active!)
-    if GAME_STATE['LAYER_3']:
-      player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
-      THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
-      player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
-      THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
-
+      if dogfighting_pvp_ready_ttl > 0:
+        dogfighting_pvp_ready_ttl = dogfighting_pvp_ready_ttl - ELAPSED_MS
+        size_zoom = dogfighting_pvp_ready_ttl / TTL_DEFAULTS['READY']
+        if size_zoom < 0.45:
+          size_zoom = 0.45
+        ready = GAME_FONTS['KENNEY_MINI_SQUARE_96'].render(f"READY", True, GAME_COLORS['SHMUP_PURPLE'])
+        ready = pygame.transform.rotozoom(ready, 0, size_zoom)
+        THE_SCREEN.blit(ready, ready.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 3)))
+      elif dogfighting_pvp_set_ttl > 0:
+        dogfighting_pvp_set_ttl = dogfighting_pvp_set_ttl - ELAPSED_MS
+        size_zoom = dogfighting_pvp_set_ttl / TTL_DEFAULTS['SET']
+        if size_zoom < 0.45:
+          size_zoom = 0.45
+        set_text = GAME_FONTS['KENNEY_MINI_SQUARE_96'].render(f"SET", True, GAME_COLORS['SHMUP_ORANGE'])
+        set_text = pygame.transform.rotozoom(set_text, 0, size_zoom)
+        THE_SCREEN.blit(set_text, set_text.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 3)))
+      elif dogfighting_pvp_fight_ttl > 0:
+        dogfighting_pvp_fight_ttl = dogfighting_pvp_fight_ttl - ELAPSED_MS
+        size_zoom = 1.0
+        if(dogfighting_pvp_fight_ttl > 100):
+          size_zoom = 1.0 + 1 / (dogfighting_pvp_fight_ttl / TTL_DEFAULTS['FIGHT'])
+        else:
+          size_zoom  = 7.5
+        if size_zoom > 3.0:
+          size_zoom = 3.0
+        alpha_blend = (dogfighting_pvp_fight_ttl / TTL_DEFAULTS['FIGHT']) * 255
+        fight = GAME_FONTS['KENNEY_MINI_SQUARE_96'].render(f"FIGHT!", True, GAME_COLORS['SHMUP_RED'])
+        fight = pygame.transform.rotozoom(fight, 0, size_zoom)
+        fight.set_alpha(alpha_blend)
+        THE_SCREEN.blit(fight, fight.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 3)))
+      else:
+        dogfighting_pvp_active = True
   ####################################################################
   # Draw Layer One (The Map Tiles)
   #
