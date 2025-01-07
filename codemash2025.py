@@ -132,6 +132,51 @@ class Player(Plane):
     self.lives = 0
     self.score = 0
 
+class Bullet(pygame.sprite.Sprite):
+  def __init__(self, x=0, y=0, rotation=0, speed=0, image=None):
+    super().__init__()
+    self.x = x
+    self.y = y
+    self.rect = (self.x, self.y)
+    self.image = None
+    self.rotation = rotation
+    if image != None:
+      self.image = image.copy()
+      self.rect = self.image.get_rect(center=(self.x, self.y))
+    self.speed = 0
+
+  def set_image(self, image):
+    self.image = image.copy()
+    self.rect = self.image.get_rect(center=(self.x, self.y))
+
+  def set_location(self, x, y):
+    self.x = x
+    self.y = y
+    self.rect = self.image.get_rect(center=(self.x, self.y))
+
+  def set_location_delta(self, x, y):
+    self.set_location(self.x + x, self.y + y)
+
+  #We're going to assume that rotation is set something reasonable so our "fix" will help the rotation of the object stay smooth and within a reasonable number
+  def set_rotation(self, rotation):
+    self.rotation = rotation
+    if self.rotation < 0:
+      self.rotation = self.rotation + 360
+    if self.rotation > 360:
+      self.rotation = self.rotation - 360
+  
+  def set_rotation_delta(self, rotation):
+    self.set_rotation(self.rotation + rotation)
+
+  def set_alpha(self, alpha):
+    self.image.set_alpha(alpha)
+
+  def randomize_alpha(self):
+    self.image.set_alpha(random.choice(range(0,255)))
+  
+  def randomize_alpha_damage(self):
+    self.image.set_alpha(random.choice(range(32,255)))
+
 ######################################################################
 # Functions Created to support game initialization and transitions
 ######################################################################
@@ -179,7 +224,14 @@ def stop_all_sounds():
   return
 
 def destroy_dogfight_objects():
-  return
+  global player_1_bullets
+  global player_2_bullets
+
+  #clean up the objects
+  
+
+  player_1_bullets = pygame.sprite.Group()
+  player_2_bullets = pygame.sprite.Group()
 
 def destroy_mission_objects():
   return
@@ -188,7 +240,10 @@ def destroy_mission_level_objects():
   return
 
 def destroy_all():
-  return
+  destroy_dogfight_objects()
+  destroy_mission_level_objects()
+  destroy_mission_objects()
+  reset_players()
 
 def reset_players():
   global PLAYER_1
@@ -300,6 +355,8 @@ def initialize_dogfight_mode():
   global dogfighting_pvp_ready_ttl
   global dogfighting_pvp_set_ttl
   global dogfighting_pvp_fight_ttl
+  global player_1_bullets
+  global player_2_bullets
 
   dogfighting_pvp_active = False
   dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
@@ -348,6 +405,23 @@ def initialize_dogfight_mode():
 
   PLAYER_1.max_speed_rotation = 180
   PLAYER_2.max_speed_rotation = 180
+
+  PLAYER_1.weapon_1_cooldown = 0
+  PLAYER_1.weapon_2_cooldown = 0
+  PLAYER_1.weapon_1_cooldown_default = 250
+  PLAYER_1.weapon_2_cooldown_default = 1000
+  PLAYER_1.weapon_1_speed = 128
+  PLAYER_1.weapon_2_speed = 64
+
+  PLAYER_2.weapon_1_cooldown = 0
+  PLAYER_2.weapon_2_cooldown = 0
+  PLAYER_2.weapon_1_cooldown_default = 250
+  PLAYER_2.weapon_2_cooldown_default = 1000
+  PLAYER_2.weapon_1_speed = 128
+  PLAYER_2.weapon_2_speed = 64
+
+  player_1_bullets = pygame.sprite.Group()
+  player_2_bullets = pygame.sprite.Group()
 
 def initialize_mission_mode():
   global GAME_STATE
@@ -1453,17 +1527,34 @@ while GAME_STATE['RUNNING']:
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
 
     if dogfighting_pvp_active:
+      PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
+      PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
 
       if GAME_CONTROLS['PLAYER_1']['LEFT']:
         PLAYER_1.set_rotation_delta(PLAYER_1.speed_rotation * ELAPSED_S)
       if GAME_CONTROLS['PLAYER_1']['RIGHT']:
         PLAYER_1.set_rotation_delta(-PLAYER_1.speed_rotation * ELAPSED_S)
+
       if GAME_CONTROLS['PLAYER_1']['BLUE']:
         PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
         PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
       else:
         PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
         PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
+
+      if GAME_CONTROLS['PLAYER_1']['GREEN']:
+        if PLAYER_1.weapon_1_cooldown <= 0:
+          #Fire weapon 1
+          #player_1_bullets.add()
+
+          GAME_CONTROLS['PLAYER_1']['GREEN'] = False
+          PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown_default
+
+      if GAME_CONTROLS['PLAYER_1']['RED']:
+        if PLAYER_1.weapon_2_cooldown <= 0:
+          #Fire weapon 2
+          GAME_CONTROLS['PLAYER_1']['RED'] = False
+          PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown_default
       
       if PLAYER_1.speed > PLAYER_1.max_speed:
         PLAYER_1.speed = PLAYER_1.max_speed
@@ -1488,6 +1579,9 @@ while GAME_STATE['RUNNING']:
       if PLAYER_1.y > GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5:
         PLAYER_1.set_location(PLAYER_1.x, GAME_CONSTANTS['SCREEN_HEIGHT'] - GAME_CONSTANTS['SQUARE_SIZE'] * 2.5)
 
+      PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
+      PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown - ELAPSED_MS
+
       if GAME_CONTROLS['PLAYER_2']['LEFT']:
         PLAYER_2.set_rotation_delta(PLAYER_2.speed_rotation * ELAPSED_S)
       if GAME_CONTROLS['PLAYER_2']['RIGHT']:
@@ -1499,6 +1593,18 @@ while GAME_STATE['RUNNING']:
         PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
         PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
       
+      if GAME_CONTROLS['PLAYER_2']['GREEN']:
+        if PLAYER_2.weapon_1_cooldown <= 0:
+          #Fire weapon 1
+          GAME_CONTROLS['PLAYER_2']['GREEN'] = False
+          PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown_default
+
+      if GAME_CONTROLS['PLAYER_2']['RED']:
+        if PLAYER_2.weapon_2_cooldown <= 0:
+          #Fire weapon 2
+          GAME_CONTROLS['PLAYER_2']['RED'] = False
+          PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown_default
+
       if PLAYER_2.speed > PLAYER_2.max_speed:
         PLAYER_2.speed = PLAYER_2.max_speed
       if PLAYER_2.speed < PLAYER_2.min_speed:
@@ -1548,7 +1654,7 @@ while GAME_STATE['RUNNING']:
       elif dogfighting_pvp_fight_ttl > 0:
         dogfighting_pvp_fight_ttl = dogfighting_pvp_fight_ttl - ELAPSED_MS
         size_zoom = 1.0
-        if(dogfighting_pvp_fight_ttl > 100):
+        if(dogfighting_pvp_fight_ttl > 150):
           size_zoom = 1.0 + 1 / (dogfighting_pvp_fight_ttl / TTL_DEFAULTS['FIGHT'])
         else:
           size_zoom  = 7.5
