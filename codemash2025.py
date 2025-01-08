@@ -72,6 +72,7 @@ class GameSprite(pygame.sprite.Sprite):
     self.effect_1_ttl_default = 0
     self.effect_2_ttl_default = 0
     self.effect_3_ttl_default = 0
+    self.size_modifier = 1
 
   def set_image(self, image):
     self.image = image.copy()
@@ -1526,6 +1527,7 @@ while GAME_STATE['RUNNING']:
           if PLAYER_1.weapon_1_cooldown <= 0:
             #Fire weapon 1
             bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_1_speed + PLAYER_1.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
+            bullet.size_modifier = 0.5
             player_1_bullets.add(bullet)
 
             #GAME_CONTROLS['PLAYER_1']['GREEN'] = False
@@ -1590,6 +1592,7 @@ while GAME_STATE['RUNNING']:
           if PLAYER_2.weapon_1_cooldown <= 0:
             #Fire weapon 1
             bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_1_speed + PLAYER_2.speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], False)
+            bullet.size_modifier = 0.5
             player_2_bullets.add(bullet)
 
             #GAME_CONTROLS['PLAYER_2']['GREEN'] = False
@@ -1651,6 +1654,19 @@ while GAME_STATE['RUNNING']:
 
       if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.45))) > 0:
         if not PLAYER_1.effect_1_active and not PLAYER_2.effect_1_active:
+          explosion = GameSprite(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+          explosion.effect_1_ttl = 350
+          explosion.effect_2_ttl = 150
+          explosion.effect_3_ttl = 150
+          explosion.effect_1_active = True
+          explosions.add(explosion)
+          explosion = GameSprite(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+          explosion.effect_1_ttl = 350
+          explosion.effect_2_ttl = 150
+          explosion.effect_3_ttl = 150
+          explosion.effect_1_active = True
+          explosions.add(explosion)
+          
           PLAYER_1.lives = PLAYER_1.lives - 1
           PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
           PLAYER_1.set_rotation(270)
@@ -1670,6 +1686,12 @@ while GAME_STATE['RUNNING']:
       if len(collisions) > 0:
         for bullet in collisions:
           if not bullet.bomb:
+            explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+            explosion.effect_1_ttl = 350
+            explosion.effect_2_ttl = 150
+            explosion.effect_3_ttl = 150
+            explosion.effect_1_active = True
+            explosions.add(explosion)
             bullet.kill()
             if not PLAYER_1.effect_1_active:
               PLAYER_1.lives = PLAYER_1.lives - 1
@@ -1677,12 +1699,18 @@ while GAME_STATE['RUNNING']:
               PLAYER_1.set_rotation(270)
               PLAYER_1.speed = 64
               PLAYER_1.effect_1_ttl = 3000
-              PLAYER_1.effect_1_active = True
+              PLAYER_1.effect_1_active = True              
 
       collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.45))
       if len(collisions) > 0:
         for bullet in collisions:
           if not bullet.bomb:
+            explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+            explosion.effect_1_ttl = 350
+            explosion.effect_2_ttl = 150
+            explosion.effect_3_ttl = 150
+            explosion.effect_1_active = True
+            explosions.add(explosion)
             bullet.kill()
             if not PLAYER_2.effect_1_active:
               PLAYER_2.lives = PLAYER_2.lives - 1
@@ -1692,24 +1720,34 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.effect_1_ttl = 3000
               PLAYER_2.effect_1_active = True
 
+      for explosion in reversed(explosions.sprites()):
+        if explosion.effect_1_active and explosion.effect_1_ttl <= 0:
+          explosion.effect_1_active = False
+          explosion.effect_2_active = True
+          explosion.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['EXPLOSION'])
+        elif explosion.effect_1_active:
+          explosion.effect_1_ttl = explosion.effect_1_ttl - ELAPSED_MS
+        
+        if explosion.effect_2_active and explosion.effect_2_ttl <= 0:
+          explosion.effect_2_active = False
+          explosion.effect_3_active = True
+          explosion.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['EXPLOSION_SMOKE'])
+        elif explosion.effect_2_active:
+          explosion.effect_2_ttl = explosion.effect_2_ttl - ELAPSED_MS
+
+        if explosion.effect_3_active and explosion.effect_3_ttl <= 0:
+          explosion.kill()
+        elif explosion.effect_3_active:
+          explosion.effect_3_ttl = explosion.effect_3_ttl - ELAPSED_MS
+          
       ### DISPLAY THE BULLETS (if layer 3 is active!)
       if GAME_STATE['LAYER_3']:
         for bullet in (player_1_bullets.sprites()):
-          temp_size = 0.5
-          if bullet.bomb:
-            temp_size = 1
-          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, temp_size)
+          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
           THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
         for bullet in (player_2_bullets.sprites()):
-          temp_size = 0.5
-          if bullet.bomb:
-            temp_size = 1
-          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, temp_size)
+          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
           THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
-        #player_1_bullets.draw(THE_SCREEN)
-        #player_1_bullets.update()
-        #player_2_bullets.draw(THE_SCREEN)
-        #player_2_bullets.update()
 
       ### DISPLAY THE PLAYERS (if layer 4 is active!)
       if GAME_STATE['LAYER_4']:
@@ -1717,10 +1755,17 @@ while GAME_STATE['RUNNING']:
         THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
         player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
         THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
-      
+
+      ### DISPLAY THE EXPLOSIONS (if layer 3 is active!)
+      if GAME_STATE['LAYER_3']:
+        for explosion in (explosions.sprites()):
+          temp_explosion = pygame.transform.rotozoom(explosion.image, explosion.rotation, explosion.size_modifier)
+          THE_SCREEN.blit(temp_explosion, temp_explosion.get_rect(center = (explosion.x, explosion.y)))
+
       total_sprite_objects = total_sprite_objects + 2 #(for the planes)
       total_sprite_objects = total_sprite_objects + len(player_1_bullets.sprites())
       total_sprite_objects = total_sprite_objects + len(player_2_bullets.sprites())
+      total_sprite_objects = total_sprite_objects + len(explosions.sprites())
 
     else:
       if dogfighting_pvp_ready_ttl > 0:
