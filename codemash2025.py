@@ -330,6 +330,7 @@ def initialize_dogfight_mode():
   reset_players()
 
   GAME_STATE['DOGFIGHT_MODE'] = True
+  GAME_STATE['MULTIPLAYER'] = True #Dogfighting can only be multiplayer
   ### Initialize the map
   ### Re-Initialize player 1, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
   ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
@@ -1487,7 +1488,11 @@ while GAME_STATE['RUNNING']:
   #
   ####################################################################
   if GAME_STATE['INSTRUCTIONS_SCREEN']:
-    a = 1
+    if GAME_MODE_OPTIONS['DOGFIGHT']:
+      initialize_dogfight_mode()
+    else:
+      initialize_title_screen()
+
 
   ####################################################################
   # DOGFIGHT_MODE - If we're in dog fight mode, draw that screen
