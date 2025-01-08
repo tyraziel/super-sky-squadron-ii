@@ -1651,7 +1651,7 @@ while GAME_STATE['RUNNING']:
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
 
-      if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.45))) > 0:
+      if pygame.sprite.collide_circle_ratio(0.45)(PLAYER_1, PLAYER_2): #a simpler approach, courtesy of nuclear pasta
         if not PLAYER_1.effect_1_active and not PLAYER_2.effect_1_active:
           explosion = GameSprite(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
           explosion.effect_1_ttl = 350
@@ -1971,7 +1971,7 @@ while GAME_STATE['RUNNING']:
     # In our example here, we are copying the contents of time_passed_ms_text_surface to our THE_SCREEN surface.
     # Effectively this will "paint" time_passed_ms_text_surface on THE_SCREEN in the location we tell it to (and we craete the rect for the surface and use that).
 
-    #From my friend and pygame-ce maintainer - Andrew from the pygame-ce community
+    #From my friend and pygame-ce maintainer - Andrew (oddbookworm) - from the pygame-ce community
     #It’s actually called “bit blit”, and it means “bit block transfer (bit blt)”. It’s a generic term for combining multiple bitmaps into one output bitmap using some set of bool operations.
     #Graphics however, has generally taken the name and replaced that definition with some form of mathematical operation, usually with some form of alpha compositing
     #I’d just call it block transfer. It’s not bit-wise, and alpha is complicated
