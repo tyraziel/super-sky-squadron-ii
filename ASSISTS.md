@@ -36,3 +36,11 @@ From the below:
 #     # draw rectangle around the image
 #     # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()),2)
 ```
+
+
+nuclear pasta:
+if len(pygame.sprite.spritecollide(PLAYER_1, pygame.sprite.GroupSingle(PLAYER_2), False, collided=pygame.sprite.collide_circle_ratio(0.75))) > 0:
+
+to
+
+if pygame.sprite.collide_circle_ratio(0.75)(PLAYER_1, PLAYER_2):
