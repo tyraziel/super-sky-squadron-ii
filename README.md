@@ -79,6 +79,7 @@ Since this has been released to the Public Domain under Creative Commons CC0 1.0
 - Pygame-CE - [https://github.com/pygame-community/pygame-ce](https://github.com/pygame-community/pygame-ce)
 - Pygame-CE Mantainer - Andrew (oddbookworm)[https://github.com/oddbookworm]
 - Pygame-CE Contributor - Mzivic (mzivic7)[https://github.com/mzivic7]
+- Pygame-CE Contributor - nuclear pasta (aatle)[https://github.com/aatle]
 - The Pygame-CE Community - [discord.com/invite/pygame](discord.com/invite/pygame)
 
 - Those that attend "So you want to make video games?"
