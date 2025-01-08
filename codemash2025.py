@@ -1811,6 +1811,22 @@ while GAME_STATE['RUNNING']:
       else:
         dogfighting_pvp_active = True
     else:        #DOG FIGHT IS OVER AND SOMEONE WON!  EXECUTE TRANSITION
+      if GAME_STATE['LAYER_4']:
+        if PLAYER_1.lives > 0:
+          PLAYER_1.set_alpha(255)
+          player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
+          THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
+        if PLAYER_2.lives > 0:
+          PLAYER_2.set_alpha(255)
+          player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
+          THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
+
+      ### DISPLAY THE EXPLOSIONS (if layer 3 is active!)
+      if GAME_STATE['LAYER_3']:
+        for explosion in (explosions.sprites()):
+          temp_explosion = pygame.transform.rotozoom(explosion.image, explosion.rotation, explosion.size_modifier)
+          THE_SCREEN.blit(temp_explosion, temp_explosion.get_rect(center = (explosion.x, explosion.y)))
+
       GAME_STATE['TRANSITION_TO_TITLE_SCREEN'] = True
       if GAME_STATE['TRANSITION_TO_TITLE_SCREEN']:
         GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] - ELAPSED_MS
