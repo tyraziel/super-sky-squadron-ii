@@ -1505,7 +1505,6 @@ while GAME_STATE['RUNNING']:
           total_map_tiles = total_map_tiles + 1
 
     if dogfighting_pvp_active:
-
       if PLAYER_1.activated:
         PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
         PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
@@ -1666,7 +1665,7 @@ while GAME_STATE['RUNNING']:
           explosion.effect_3_ttl = 150
           explosion.effect_1_active = True
           explosions.add(explosion)
-          
+
           PLAYER_1.lives = PLAYER_1.lives - 1
           PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
           PLAYER_1.set_rotation(270)
@@ -1739,35 +1738,46 @@ while GAME_STATE['RUNNING']:
           explosion.kill()
         elif explosion.effect_3_active:
           explosion.effect_3_ttl = explosion.effect_3_ttl - ELAPSED_MS
-          
-      ### DISPLAY THE BULLETS (if layer 3 is active!)
-      if GAME_STATE['LAYER_3']:
-        for bullet in (player_1_bullets.sprites()):
-          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
-          THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
-        for bullet in (player_2_bullets.sprites()):
-          temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
-          THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
 
-      ### DISPLAY THE PLAYERS (if layer 4 is active!)
-      if GAME_STATE['LAYER_4']:
-        player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
-        THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
-        player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
-        THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
+      if PLAYER_1.lives <= 0 or PLAYER_2.lives <= 0:
+        dogfighting_pvp_active = False
+        if PLAYER_1.lives > PLAYER_2.lives:
+          create_alert(GAME_COLORS['SHMUP_RED'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "PLAYER 1 WINS!", "", 4750, False, 0)
+        elif PLAYER_1.lives < PLAYER_2.lives:
+          create_alert(GAME_COLORS['SHMUP_BLUE'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "PLAYER 2 WINS!", "", 4750, False, 0)
+        elif PLAYER_1.lives == PLAYER_2.lives:
+          create_alert(GAME_COLORS['SHMUP_ORANGE'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "DRAW!", "", 4750, False, 0)
+        else:
+          create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "GAME STATE FAILURE", "", 4750, False, 0)
+      else:
+        ### DISPLAY THE BULLETS (if layer 3 is active!)
+        if GAME_STATE['LAYER_3']:
+          for bullet in (player_1_bullets.sprites()):
+            temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
+            THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
+          for bullet in (player_2_bullets.sprites()):
+            temp_bullet = pygame.transform.rotozoom(bullet.image, bullet.rotation, bullet.size_modifier)
+            THE_SCREEN.blit(temp_bullet, temp_bullet.get_rect(center = (bullet.x, bullet.y)))
 
-      ### DISPLAY THE EXPLOSIONS (if layer 3 is active!)
-      if GAME_STATE['LAYER_3']:
-        for explosion in (explosions.sprites()):
-          temp_explosion = pygame.transform.rotozoom(explosion.image, explosion.rotation, explosion.size_modifier)
-          THE_SCREEN.blit(temp_explosion, temp_explosion.get_rect(center = (explosion.x, explosion.y)))
+        ### DISPLAY THE PLAYERS (if layer 4 is active!)
+        if GAME_STATE['LAYER_4']:
+          player_one_plane = pygame.transform.rotozoom(PLAYER_1.image, PLAYER_1.rotation, 1)
+          THE_SCREEN.blit(player_one_plane, player_one_plane.get_rect(center = (PLAYER_1.x, PLAYER_1.y)))
+          player_two_plane = pygame.transform.rotozoom(PLAYER_2.image, PLAYER_2.rotation, 1)
+          THE_SCREEN.blit(player_two_plane, player_two_plane.get_rect(center = (PLAYER_2.x, PLAYER_2.y)))
 
-      total_sprite_objects = total_sprite_objects + 2 #(for the planes)
-      total_sprite_objects = total_sprite_objects + len(player_1_bullets.sprites())
-      total_sprite_objects = total_sprite_objects + len(player_2_bullets.sprites())
-      total_sprite_objects = total_sprite_objects + len(explosions.sprites())
+        ### DISPLAY THE EXPLOSIONS (if layer 3 is active!)
+        if GAME_STATE['LAYER_3']:
+          for explosion in (explosions.sprites()):
+            temp_explosion = pygame.transform.rotozoom(explosion.image, explosion.rotation, explosion.size_modifier)
+            THE_SCREEN.blit(temp_explosion, temp_explosion.get_rect(center = (explosion.x, explosion.y)))
 
-    else:
+        total_sprite_objects = total_sprite_objects + 2 #(for the planes)
+        total_sprite_objects = total_sprite_objects + len(player_1_bullets.sprites())
+        total_sprite_objects = total_sprite_objects + len(player_2_bullets.sprites())
+        total_sprite_objects = total_sprite_objects + len(explosions.sprites())
+
+    elif PLAYER_1.lives != 0 and PLAYER_2.lives != 0:
       if dogfighting_pvp_ready_ttl > 0:
         dogfighting_pvp_ready_ttl = dogfighting_pvp_ready_ttl - ELAPSED_MS
         size_zoom = dogfighting_pvp_ready_ttl / TTL_DEFAULTS['READY']
@@ -1800,6 +1810,13 @@ while GAME_STATE['RUNNING']:
         THE_SCREEN.blit(fight, fight.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 3)))
       else:
         dogfighting_pvp_active = True
+    else:        #DOG FIGHT IS OVER AND SOMEONE WON!  EXECUTE TRANSITION
+      GAME_STATE['TRANSITION_TO_TITLE_SCREEN'] = True
+      if GAME_STATE['TRANSITION_TO_TITLE_SCREEN']:
+        GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] - ELAPSED_MS
+        if GAME_STATE_TRANSITION_TTL['TRANSITION_TO_TITLE_SCREEN'] <= 0:
+          initialize_title_screen()
+
   ####################################################################
   # Draw Layer One (The Map Tiles)
   #
