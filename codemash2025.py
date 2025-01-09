@@ -1520,8 +1520,8 @@ while GAME_STATE['RUNNING']:
       instructions_screen_ttl = instructions_screen_ttl - 500
       instructions_screen_ttl = int(instructions_screen_ttl / 1000) * 1000
 
-    if GAME_MODE_OPTIONS['DOGFIGHT'] or True:
-      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOG FIGHT MODE", True, GAME_COLORS['ALMOST_BLACK'])
+    if GAME_MODE_OPTIONS['DOGFIGHT']:
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOGFIGHT MODE", True, GAME_COLORS['ALMOST_BLACK'])
       THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
 
       intro = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"Player One       plays against Player Two       in a BATTLE ROYALE!", True, GAME_COLORS['SHMUP_GREEN'])
@@ -1546,11 +1546,14 @@ while GAME_STATE['RUNNING']:
       THE_SCREEN.blit(good_luck, good_luck.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 468)))
 
     elif GAME_MODE_OPTIONS['MISSION']:
-      a = 1
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"MISSION MODE", True, GAME_COLORS['ALMOST_BLACK'])
+      THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
     elif GAME_MODE_OPTIONS['ARENA']:
-      a = 1
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"ARENA MODE", True, GAME_COLORS['ALMOST_BLACK'])
+      THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
     else:
-      a = 1
+      invalid_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"INVALID MODE", True, GAME_COLORS['SHMUP_ORANGE'])
+      THE_SCREEN.blit(invalid_mode, invalid_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
 
     instructions_seconds = int(instructions_screen_ttl / 1000)
 
