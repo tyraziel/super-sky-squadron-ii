@@ -516,7 +516,7 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
                 'READY': 1500, 'SET': 1500, 'FIGHT': 750, 
-                'INSTRUCTIONS_SCREEN': 15500}
+                'INSTRUCTIONS_SCREEN': 25500}
 
 ######################################################################
 # SET GAME DEFAULTS
@@ -1521,16 +1521,29 @@ while GAME_STATE['RUNNING']:
       instructions_screen_ttl = int(instructions_screen_ttl / 1000) * 1000
 
     if GAME_MODE_OPTIONS['DOGFIGHT'] or True:
-      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOG FIGHT MODE", True, GAME_COLORS['SHMUP_GREEN'])
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOG FIGHT MODE", True, GAME_COLORS['ALMOST_BLACK'])
       THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
 
-      # PLayer one (airplame) plays against player two (airplane) in a battle royale!  Once one (or both players) are out of lives, the game is over.
-      # The planes are always in motion, use LEFT or RIGHT to control the direction of the plane
-      # shift fires, ctrl drops a bomb, alt speeds up
+      intro = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"Player One       plays against Player Two       in a BATTLE ROYALE!", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(intro, intro.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 176)))
 
-      # After a while your base will show up which you will need to protect and defend for if your base is taken out by a bomb, you'll lose a life.
+      THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['RED_B_FIGHTER'].get_rect(center = (342, 176)))
+      THE_SCREEN.blit(GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'], GAME_SURFACES['PIXEL_SHMUP_SHIPS']['BLUE_B_FIGHTER'].get_rect(center = (816, 176)))
 
-      # Good Luck, and may the best pilot win!
+      game_over = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Once one, or both players, are out of lives, the DOGFIGHT is over.", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(game_over, game_over.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 244)))
+
+      movement = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Control the direction of the plane by pressing [LEFT] or [RIGHT].", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(movement, movement.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 324)))
+
+      controls = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("[SHIFT/A] Fires, [CTRL/B] Drops a Bomb, [ALT/X] speeds the plane up.", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(controls, controls.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 356)))
+
+      controls = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Defend your landmarks!  Failure to do so will cost you a life!", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(controls, controls.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 436)))
+
+      good_luck = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Good Luck, and may the best pilot win!", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(good_luck, good_luck.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 468)))
 
     elif GAME_MODE_OPTIONS['MISSION']:
       a = 1
