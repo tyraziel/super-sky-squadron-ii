@@ -294,10 +294,14 @@ def initialize_game_mode_screen():
 
 def initialize_instructions_screen():
   global GAME_STATE
+  global instructions_screen_ttl
 
   reset_for_game_state_transition()
 
   GAME_STATE['INSTRUCTIONS_SCREEN'] = True
+
+  instructions_screen_ttl = TTL_DEFAULTS['INSTRUCTIONS_SCREEN']
+  
 
 def setup_for_dogfight_mode_quick_jump():
   global GAME_MODE_OPTIONS
@@ -307,13 +311,15 @@ def setup_for_dogfight_mode_quick_jump():
   GAME_MODE_OPTIONS['MISSION'] = False
   GAME_MODE_OPTIONS['ARENA'] = False
   GAME_MODE_OPTIONS['DOGFIGHT'] = True
-  GAME_MODE_OPTIONS['LIVES_COUNT'] = 3
+  #GAME_MODE_OPTIONS['LIVES_COUNT'] = 3
   GAME_STATE['MULTIPLAYER'] = True
 
 def initialize_dogfight_mode():
   global GAME_STATE
   global PLAYER_1
   global PLAYER_2
+  global MAP
+  global CAMERA
   global dogfighting_pvp_active
   global dogfighting_pvp_ready_ttl
   global dogfighting_pvp_set_ttl
@@ -329,11 +335,19 @@ def initialize_dogfight_mode():
   reset_for_game_state_transition()
   reset_players()
 
+  CAMERA = {'X': 0, 'Y': 0}
+
+  ### Initialize the map
+  MAP = []
+  for i in range(19):
+    for j in range (40):
+      if j == 0:
+        MAP.append([])
+      MAP[i].append("G0")
+
   GAME_STATE['DOGFIGHT_MODE'] = True
   GAME_STATE['MULTIPLAYER'] = True #Dogfighting can only be multiplayer
-  ### Initialize the map
-  ### Re-Initialize player 1, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
-  ### Re-Initialize player 2, use lives from GAME_MODE_OPTIONS['LIVES_COUNT']
+
   PLAYER_1.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
   PLAYER_2.lives = GAME_MODE_OPTIONS['LIVES_COUNT']
 
@@ -501,7 +515,8 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 # ***LESSON***
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
-                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 'PLANE_HIT_EXPLOSION_MIN': 500, 'PLANE_HIT_EXPLOSION_MAX': 1500}
+                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 
+                'INSTRUCTIONS_SCREEN': 15500}
 
 ######################################################################
 # SET GAME DEFAULTS
@@ -749,6 +764,9 @@ PLAYER_2 = Player()
 player_1_bullets = pygame.sprite.Group()
 player_2_bullets = pygame.sprite.Group()
 explosions = pygame.sprite.Group()
+
+#Initialize Instruction Variables
+instructions_screen_ttl = TTL_DEFAULTS['INSTRUCTIONS_SCREEN']
 
 #Initialize DogFighting Variables
 dogfighting_pvp_active = False
@@ -1488,11 +1506,53 @@ while GAME_STATE['RUNNING']:
   #
   ####################################################################
   if GAME_STATE['INSTRUCTIONS_SCREEN']:
-    if GAME_MODE_OPTIONS['DOGFIGHT']:
-      initialize_dogfight_mode()
-    else:
-      initialize_title_screen()
+    instructions_screen_ttl = instructions_screen_ttl - ELAPSED_MS
 
+    if (GAME_CONTROLS['PLAYER_1']['GREEN'] or GAME_CONTROLS['PLAYER_1']['RED'] or GAME_CONTROLS['PLAYER_1']['BLUE'] or GAME_CONTROLS['PLAYER_1']['YELLOW'] or GAME_CONTROLS['PLAYER_2']['GREEN'] or GAME_CONTROLS['PLAYER_2']['RED'] or GAME_CONTROLS['PLAYER_2']['BLUE'] or GAME_CONTROLS['PLAYER_2']['YELLOW']):
+      GAME_CONTROLS['PLAYER_1']['GREEN'] = False
+      GAME_CONTROLS['PLAYER_1']['RED'] = False
+      GAME_CONTROLS['PLAYER_1']['BLUE'] = False
+      GAME_CONTROLS['PLAYER_1']['YELLOW'] = False
+      GAME_CONTROLS['PLAYER_2']['GREEN'] = False
+      GAME_CONTROLS['PLAYER_2']['RED'] = False
+      GAME_CONTROLS['PLAYER_2']['BLUE'] = False
+      GAME_CONTROLS['PLAYER_2']['YELLOW'] = False
+      instructions_screen_ttl = instructions_screen_ttl - 500
+      instructions_screen_ttl = int(instructions_screen_ttl / 1000) * 1000
+
+    if GAME_MODE_OPTIONS['DOGFIGHT'] or True:
+      dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOG FIGHT MODE", True, GAME_COLORS['SHMUP_GREEN'])
+      THE_SCREEN.blit(dogfight_mode, dogfight_mode.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 96)))
+
+      # PLayer one (airplame) plays against player two (airplane) in a battle royale!  Once one (or both players) are out of lives, the game is over.
+      # The planes are always in motion, use LEFT or RIGHT to control the direction of the plane
+      # shift fires, ctrl drops a bomb, alt speeds up
+
+      # After a while your base will show up which you will need to protect and defend for if your base is taken out by a bomb, you'll lose a life.
+
+      # Good Luck, and may the best pilot win!
+
+    elif GAME_MODE_OPTIONS['MISSION']:
+      a = 1
+    elif GAME_MODE_OPTIONS['ARENA']:
+      a = 1
+    else:
+      a = 1
+
+    instructions_seconds = int(instructions_screen_ttl / 1000)
+
+    seconds_text = GAME_FONTS['KENNEY_MINI_SQUARE_96'].render(f"{instructions_seconds}", True, GAME_COLORS['ALMOST_BLACK'])
+    THE_SCREEN.blit(seconds_text, seconds_text.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] - 160)))
+
+    if instructions_screen_ttl < 0:
+      if GAME_MODE_OPTIONS['DOGFIGHT']:
+        initialize_dogfight_mode()
+      elif GAME_MODE_OPTIONS['MISSION']:
+        initialize_title_screen()
+      elif GAME_MODE_OPTIONS['ARENA']:
+        initialize_title_screen()
+      else:
+        initialize_title_screen()
 
   ####################################################################
   # DOGFIGHT_MODE - If we're in dog fight mode, draw that screen
@@ -1747,9 +1807,15 @@ while GAME_STATE['RUNNING']:
       if PLAYER_1.lives <= 0 or PLAYER_2.lives <= 0:
         dogfighting_pvp_active = False
         if PLAYER_1.lives > PLAYER_2.lives:
-          create_alert(GAME_COLORS['SHMUP_RED'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "PLAYER 1 WINS!", "", 4750, False, 0)
+          ace = ""
+          if PLAYER_1.lives == GAME_MODE_OPTIONS['LIVES_COUNT']:
+            ace = "*****ACE*****"
+          create_alert(GAME_COLORS['SHMUP_RED'], GAME_FONTS['KENNEY_MINI_SQUARE_80'], "PLAYER 1 WINS!", ace, 4750, False, 0)
         elif PLAYER_1.lives < PLAYER_2.lives:
-          create_alert(GAME_COLORS['SHMUP_BLUE'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "PLAYER 2 WINS!", "", 4750, False, 0)
+          ace = ""
+          if PLAYER_2.lives == GAME_MODE_OPTIONS['LIVES_COUNT']:
+            ace = "*****ACE*****"
+          create_alert(GAME_COLORS['SHMUP_BLUE'], GAME_FONTS['KENNEY_MINI_SQUARE_80'], "PLAYER 2 WINS!", ace, 4750, False, 0)
         elif PLAYER_1.lives == PLAYER_2.lives:
           create_alert(GAME_COLORS['SHMUP_ORANGE'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "DRAW!", "", 4750, False, 0)
         else:
