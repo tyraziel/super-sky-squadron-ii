@@ -57,8 +57,8 @@ $the_assets = @(
       the_temp = "pixel-shmup\"},
     @{the_file = "$created_temp_directory\kenney_ui-pack.zip"; 
       the_url = "https://kenney.nl/media/pages/assets/ui-pack/008d5df50e-1718203990/kenney_ui-pack.zip";
-      the_source = @("$created_temp_directory\ui-pack\PNG\Grey\Default\button_square_flat.png"); 
-      the_target = @("$project_root\sprites\ui-pack\grey\default\");
+      the_source = @("$created_temp_directory\ui-pack\PNG\Grey\Default\button_square_flat.png", "$created_temp_directory\ui-pack\PNG\Red\Default\check_square_color.png", "$created_temp_directory\ui-pack\PNG\Red\Default\check_square_grey.png"); 
+      the_target = @("$project_root\sprites\ui-pack\grey\default\", "$project_root\sprites\ui-pack\red\default\", "$project_root\sprites\ui-pack\red\default\");
       the_temp = "ui-pack\"}
 )
 
@@ -130,6 +130,7 @@ foreach ($item in $the_assets){
 }
 
 ###Copy etc assets into the proper locations
+Write-Host "Copying etc assets to proper locations."
 Copy-Item -Path "../etc/ships_sheet.xml" -Destination "../sprites/pixel-shmup/ships_sheet.xml"
 Copy-Item -Path "../etc/tilemap_sheet.xml" -Destination "../sprites/input-prompts/pixel-16/tilemap_sheet.xml"
 Copy-Item -Path "../etc/tiles_sheet.xml" -Destination "../sprites/pixel-shmup/tiles_sheet.xml"
