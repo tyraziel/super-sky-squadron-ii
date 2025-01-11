@@ -613,32 +613,24 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 # LOAD IMAGES AND IMAGE SHEETS AND CONVERT TO GAME SURFACES
 #
 # **** LESSON ****
-#
+# 
+# Load individual surfaces as needed.
 # After the full sheet is loaded we are then going to pull out the parts of the spritesheet (subsurface) that we want and we're making them twice as large (scale)
-# GAME_SURFACES['INPUT_PROMPTS']['W_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 2*16, 16, 16)), (32, 32)) #18,2
-# GAME_SURFACES['INPUT_PROMPTS']['W_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 10*16, 16, 16)), (32, 32)) #18,10
-# GAME_SURFACES['INPUT_PROMPTS']['A_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 3*16, 16, 16)), (32, 32)) #18,3
-# GAME_SURFACES['INPUT_PROMPTS']['A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(18*16, 11*16, 16, 16)), (32, 32)) #18,11
-# GAME_SURFACES['INPUT_PROMPTS']['S_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 3*16, 16, 16)), (32, 32)) #19,3
-# GAME_SURFACES['INPUT_PROMPTS']['S_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(19*16, 11*16, 16, 16)), (32, 32)) #19,11
-# GAME_SURFACES['INPUT_PROMPTS']['D_WHITE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 3*16, 16, 16)), (32, 32)) #20,3
-# GAME_SURFACES['INPUT_PROMPTS']['D_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(20*16, 11*16, 16, 16)), (32, 32)) #20,11
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(13*16, 1*16, 16, 16)), (32, 32)) #13, 1
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(14*16, 1*16, 16, 16)), (32, 32)) #14, 1
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(15*16, 1*16, 16, 16)), (32, 32)) #15, 1
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_GRAY'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(16*16, 1*16, 16, 16)), (32, 32)) #16, 1
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_A_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(4*16, 0*16, 16, 16)), (32, 32)) #4, 0
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_B_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(5*16, 0*16, 16, 16)), (32, 32)) #5, 0
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_X_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(6*16, 0*16, 16, 16)), (32, 32)) #6, 0
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_BUTTON_Y_COLOR'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(7*16, 0*16, 16, 16)), (32, 32)) #7, 0
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_DIRECTIONAL'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(0*16, 20*16, 16, 16)), (32, 32)) #0, 20
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_AXIS_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 20*16, 16, 16)), (32, 32)) #28, 20
-# GAME_SURFACES['INPUT_PROMPTS']['JOY_DPAD_BASE'] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(28*16, 21*16, 16, 16)), (32, 32)) #28, 21
 ######################################################################
 GAME_SURFACES = {}
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Loading")
+
+if GAME_CLI_ARGUMENTS.debug_to_console:
+  print(f"[INIT] [TEXTURE-LOAD] [INDIVIDUAL]: ui-pack")
+
+GAME_SURFACES['UI_PACK'] = {}
+GAME_SURFACES['UI_PACK']['GREY'] = {}
+GAME_SURFACES['UI_PACK']['RED'] = {}
+GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'] = pygame.image.load("./sprites/ui-pack/grey/default/button_square_flat.png")
+GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_GREY'] = pygame.image.load("./sprites/ui-pack/red/default/check_square_grey.png")
+GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_COLOR'] = pygame.image.load("./sprites/ui-pack/red/default/check_square_color.png")
 
 if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: input-prompts-pixel-16")
@@ -656,21 +648,6 @@ for subtexture in input_prompts_pixel_16_xml_subtextures:
   subsurface_height = int(subtexture.attrib['height'])
   # Here we are pulling out the parts of the spritesheet that we want and we're making them twice as large
   GAME_SURFACES['INPUT_PROMPTS'][subsurface_name] = pygame.transform.scale(GAME_SURFACES['INPUT_PROMPTS']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height)), (subsurface_width*2, subsurface_height*2))
-
-# if GAME_CLI_ARGUMENTS.debug_to_console:
-#   print(f"[INIT] [TEXTURE-LOAD] [FULL-SHEET]: space-shooter-redux")
-# GAME_SURFACES['SPACE_SHOOTER_REDUX'] = {}
-# GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'] = pygame.image.load("./sprites/space-shooter-redux/sheet.png")
-# space_shooter_redux_xml_subtextures = element_tree.parse("./sprites/space-shooter-redux/sheet.xml").getroot().findall("SubTexture")
-# for subtexture in space_shooter_redux_xml_subtextures:
-#   subsurface_name = subtexture.attrib['name'].upper().split(".")[0]
-#   if GAME_CLI_ARGUMENTS.debug_to_console:
-#     print(f"[INIT] [TEXTURE-LOAD] [SUBSURFACE]: {subsurface_name}")
-#   subsurface_x = int(subtexture.attrib['x'])
-#   subsurface_y = int(subtexture.attrib['y'])
-#   subsurface_width = int(subtexture.attrib['width'])
-#   subsurface_height = int(subtexture.attrib['height'])
-#   GAME_SURFACES['SPACE_SHOOTER_REDUX'][subsurface_name] = GAME_SURFACES['SPACE_SHOOTER_REDUX']['FULL_SHEET'].subsurface(pygame.Rect(subsurface_x, subsurface_y, subsurface_width, subsurface_height))
 
 ##### CONSIDER REFACTORING THIS INTO A METHOD/FUNCTION IN A SEPARATE FILE
 if GAME_CLI_ARGUMENTS.debug_to_console:
@@ -2003,6 +1980,48 @@ while GAME_STATE['RUNNING']:
 
     #Bottom HUD
     pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
+
+    if GAME_STATE['DOGFIGHT_MODE']:
+      player_1_weapon_1 = GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'].copy()
+      player_1_weapon_1.blit(GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'].get_rect(center=(32,32)))
+      player_1_weapon_1_cooldown_arc = pygame.Surface((128,128))
+      cooldown_min = PLAYER_1.weapon_1_cooldown
+      if cooldown_min < 0:
+        cooldown_min = 0
+      cooldown_math = (((PLAYER_1.weapon_1_cooldown_default - cooldown_min) / PLAYER_1.weapon_1_cooldown_default)) * 360
+      pygame.draw.arc(player_1_weapon_1_cooldown_arc, GAME_COLORS['SHMUP_GRAY'], player_1_weapon_1_cooldown_arc.get_rect(center=(64,64)), math.radians(90), math.radians(cooldown_math+90), 64)
+      player_1_weapon_1_cooldown_arc.set_alpha(128)
+      player_1_weapon_1.blit(player_1_weapon_1_cooldown_arc, player_1_weapon_1_cooldown_arc.get_rect(center=(32,32)))
+      THE_SCREEN.blit(player_1_weapon_1, player_1_weapon_1.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*2.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
+
+      player_1_weapon_2 = GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'].copy()
+      player_1_weapon_2.blit(GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'].get_rect(center=(32,32)))
+      player_1_weapon_2_cooldown_arc = pygame.Surface((128,128))
+      cooldown_min = PLAYER_1.weapon_2_cooldown
+      if cooldown_min < 0:
+        cooldown_min = 0
+      cooldown_math = (((PLAYER_1.weapon_2_cooldown_default - cooldown_min) / PLAYER_1.weapon_2_cooldown_default)) * 360
+      pygame.draw.arc(player_1_weapon_2_cooldown_arc, GAME_COLORS['SHMUP_GRAY'], player_1_weapon_2_cooldown_arc.get_rect(center=(64,64)), math.radians(90), math.radians(cooldown_math+90), 64)
+      player_1_weapon_2_cooldown_arc.set_alpha(128)
+      player_1_weapon_2.blit(player_1_weapon_2_cooldown_arc, player_1_weapon_2_cooldown_arc.get_rect(center=(32,32)))
+
+      THE_SCREEN.blit(player_1_weapon_2, player_1_weapon_2.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*5.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
+
+      player_1_throttle = None
+
+      # PLAYER_1.min_speed = 64
+      # PLAYER_2.min_speed = 64
+
+      # PLAYER_1.max_speed = 256
+      # PLAYER_2.max_speed = 256
+
+      # PLAYER_1.weapon_1_cooldown = 0
+      # PLAYER_1.weapon_2_cooldown = 0
+      # PLAYER_1.weapon_1_cooldown_default = 250
+      # PLAYER_1.weapon_2_cooldown_default = 1000
+
+
+
 
     # bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
     # THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
