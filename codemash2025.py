@@ -205,7 +205,7 @@ def destroy_dogfight_objects():
   PLAYER_1_BASE = Base()
   PLAYER_1_BASE.activated = False
   PLAYER_2_BASE = Base()
-  PLAYER_1_BASE.activated = False
+  PLAYER_2_BASE.activated = False
 
 def destroy_mission_objects():
   return
@@ -754,7 +754,7 @@ PLAYER_2 = Player()
 PLAYER_1_BASE = Base()
 PLAYER_1_BASE.activated = False
 PLAYER_2_BASE = Base()
-PLAYER_1_BASE.activated = False
+PLAYER_2_BASE.activated = False
 
 #Initialize Player Bullets
 player_1_bullets = pygame.sprite.Group()
@@ -1650,11 +1650,13 @@ while GAME_STATE['RUNNING']:
         if PLAYER_1.effect_1_ttl > 0:
           PLAYER_1.effect_1_active = True
           PLAYER_1.randomize_alpha()
-          PLAYER_1_BASE.randomize_alpha()
+          if PLAYER_1_BASE.activated:
+            PLAYER_1_BASE.randomize_alpha()
         else:
           PLAYER_1.effect_1_active = False
           PLAYER_1.set_alpha(255)
-          PLAYER_1_BASE.set_alpha(255)
+          if PLAYER_1_BASE.activated:
+            PLAYER_1_BASE.set_alpha(255)
 
       if PLAYER_2.activated:
         PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
@@ -1720,11 +1722,13 @@ while GAME_STATE['RUNNING']:
         if PLAYER_2.effect_1_ttl > 0:
           PLAYER_2.effect_1_active = True
           PLAYER_2.randomize_alpha()
-          PLAYER_2_BASE.randomize_alpha()
+          if PLAYER_2_BASE.activated:
+            PLAYER_2_BASE.randomize_alpha()
         else:
           PLAYER_2.effect_1_active = False
           PLAYER_2.set_alpha(255)
-          PLAYER_2_BASE.set_alpha(255)
+          if PLAYER_2_BASE.activated:
+            PLAYER_2_BASE.set_alpha(255)
 
       ### Update/Move the bullets and check collisions
       bullets = player_1_bullets.sprites()
@@ -1819,8 +1823,8 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.effect_1_active = True
 
       #Check collisions for "bases" and make life loss accordingly
-      if PLAYER_BASE_1.activated:
-        collisions = pygame.sprite.spritecollide(PLAYER_BASE_1, player_2_bullets, False)
+      if PLAYER_1_BASE.activated:
+        collisions = pygame.sprite.spritecollide(PLAYER_1_BASE, player_2_bullets, False)
         for bullet in collisions:
           if bullet.bomb and bullet.size_modifier <= 0.25:
             explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
@@ -1831,7 +1835,7 @@ while GAME_STATE['RUNNING']:
             explosions.add(explosion)
             bullet.kill()
             if not PLAYER_1.effect_1_active:
-              PLAYER_BASE_1.activated = False
+              PLAYER_1_BASE.activated = False
               PLAYER_1.lives = PLAYER_1.lives - 1
               PLAYER_1.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
               PLAYER_1.set_rotation(90)
@@ -1839,8 +1843,8 @@ while GAME_STATE['RUNNING']:
               PLAYER_1.effect_1_ttl = 3000
               PLAYER_1.effect_1_active = True
 
-      if PLAYER_BASE_2.activated:
-        collisions = pygame.sprite.spritecollide(PLAYER_BASE_2, player_1_bullets, False)
+      if PLAYER_2_BASE.activated:
+        collisions = pygame.sprite.spritecollide(PLAYER_2_BASE, player_1_bullets, False)
         for bullet in collisions:
           if bullet.bomb and bullet.size_modifier <= 0.25:
             explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
@@ -1851,7 +1855,7 @@ while GAME_STATE['RUNNING']:
             explosions.add(explosion)
             bullet.kill()
             if not PLAYER_2.effect_1_active:
-              PLAYER_BASE_2.activated = False
+              PLAYER_2_BASE.activated = False
               PLAYER_2.lives = PLAYER_2.lives - 1
               PLAYER_2.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
               PLAYER_2.set_rotation(90)
@@ -1881,12 +1885,12 @@ while GAME_STATE['RUNNING']:
 
       ### DISPLAY THE GRAPHICS
       if GAME_STATE['LAYER_2']:
-        if PLAYER_BASE_1.activated:
+        if PLAYER_1_BASE.activated:
           #map_green_red_house
           #map_green_red_tent
           #map_green_red_flag
           a = 1
-        if PLAYER_BASE_2.activated:
+        if PLAYER_2_BASE.activated:
           #map_brown_blue_house
           #map_brown_blue_tent
           #map_brown_blue_flag
