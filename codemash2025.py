@@ -128,6 +128,11 @@ class Player(Plane):
     self.lives = 0
     self.score = 0
 
+class Base(GameSprite):
+  def __init__(self, x=0, y=0, style=0):
+    super().__init__(x, y, 0, 0, 0, 0, None)
+    self.style = style
+
 class Bullet(GameSprite):
   def __init__(self, x=0, y=0, speed_x=0, speed_y=0, rotation=0, speed=0, image=None, bomb=False):
     super().__init__(x, y, speed_x, speed_y, rotation, speed, image)
@@ -183,6 +188,8 @@ def destroy_dogfight_objects():
   global player_1_bullets
   global player_2_bullets
   global explosions
+  global PLAYER_1_BASE
+  global PLAYER_2_BASE
 
   #clean up the objects
   for bullet in reversed(player_1_bullets.sprites()):
@@ -195,6 +202,10 @@ def destroy_dogfight_objects():
   player_1_bullets = pygame.sprite.Group()
   player_2_bullets = pygame.sprite.Group()
   explosions = pygame.sprite.Group()
+  PLAYER_1_BASE = Base()
+  PLAYER_1_BASE.activated = False
+  PLAYER_2_BASE = Base()
+  PLAYER_1_BASE.activated = False
 
 def destroy_mission_objects():
   return
@@ -324,6 +335,7 @@ def initialize_dogfight_mode():
   global dogfighting_pvp_ready_ttl
   global dogfighting_pvp_set_ttl
   global dogfighting_pvp_fight_ttl
+  global dogfighting_base_creation_ttl
   global player_1_bullets
   global player_2_bullets
 
@@ -331,6 +343,7 @@ def initialize_dogfight_mode():
   dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
   dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
   dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
+  dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 
   reset_for_game_state_transition()
   reset_players()
@@ -515,7 +528,7 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 # ***LESSON***
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
-                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 
+                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 'BASE_CREATION_MIN':20000, 'BASE_CREATION_MAX': 35000,
                 'INSTRUCTIONS_SCREEN': 25500}
 
 ######################################################################
@@ -737,9 +750,17 @@ alert_font = GAME_FONTS['KENNEY_MINI_SQUARE_64']
 PLAYER_1 = Player()
 PLAYER_2 = Player()
 
+# Initialize Player Bases (for DogFighting)
+PLAYER_1_BASE = Base()
+PLAYER_1_BASE.activated = False
+PLAYER_2_BASE = Base()
+PLAYER_1_BASE.activated = False
+
 #Initialize Player Bullets
 player_1_bullets = pygame.sprite.Group()
 player_2_bullets = pygame.sprite.Group()
+
+#Initialize Explosions
 explosions = pygame.sprite.Group()
 
 #Initialize Instruction Variables
@@ -747,6 +768,7 @@ instructions_screen_ttl = TTL_DEFAULTS['INSTRUCTIONS_SCREEN']
 
 #Initialize DogFighting Variables
 dogfighting_pvp_active = False
+dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
 dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
 dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
@@ -997,12 +1019,6 @@ while GAME_STATE['RUNNING']:
     #                             - ZL=pressed=-1.0,released=0.9999969482421875
     #
     # We have other joysticks that we haven't programmed for yet
-    #
-    #
-    #
-    #
-    #
-    #
     ##################################################################
     
     # Handle hotplugging
@@ -1510,7 +1526,7 @@ while GAME_STATE['RUNNING']:
       game_over = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Once one, or both players, are out of lives, the DOGFIGHT is over.", True, GAME_COLORS['SHMUP_GREEN'])
       THE_SCREEN.blit(game_over, game_over.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 244)))
 
-      movement = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Control the direction of the plane by pressing [LEFT] or [RIGHT].", True, GAME_COLORS['SHMUP_GREEN'])
+      movement = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("Control the direction of the plane by pressing [A/LEFT] or [D/RIGHT].", True, GAME_COLORS['SHMUP_GREEN'])
       THE_SCREEN.blit(movement, movement.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, 324)))
 
       controls = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render("[SHIFT/A] Fires, [CTRL/B] Drops a Bomb, [ALT/X] speeds the plane up.", True, GAME_COLORS['SHMUP_GREEN'])
@@ -1562,7 +1578,13 @@ while GAME_STATE['RUNNING']:
           THE_SCREEN.blit(map_tile, map_tile.get_rect(topleft = (j*GAME_CONSTANTS['SQUARE_SIZE'], (i+1)*GAME_CONSTANTS['SQUARE_SIZE'])))
           total_map_tiles = total_map_tiles + 1
 
+
+
     if dogfighting_pvp_active:
+      ###BASE SHOW TTL
+      dogfighting_base_creation_ttl = dogfighting_base_creation_ttl - ELAPSED_MS
+      #dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
+
       if PLAYER_1.activated:
         PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
         PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown - ELAPSED_MS
@@ -1594,6 +1616,9 @@ while GAME_STATE['RUNNING']:
           if PLAYER_1.weapon_2_cooldown <= 0:
             #Fire weapon 2
             bullet = Bullet(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, PLAYER_1.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
+            bullet.effect_1_ttl = 750
+            bullet.effect_1_ttl_default = 750
+            bullet.effect_1_active = True
             player_1_bullets.add(bullet)
 
             #GAME_CONTROLS['PLAYER_1']['RED'] = False
@@ -1625,9 +1650,11 @@ while GAME_STATE['RUNNING']:
         if PLAYER_1.effect_1_ttl > 0:
           PLAYER_1.effect_1_active = True
           PLAYER_1.randomize_alpha()
+          PLAYER_1_BASE.randomize_alpha()
         else:
           PLAYER_1.effect_1_active = False
           PLAYER_1.set_alpha(255)
+          PLAYER_1_BASE.set_alpha(255)
 
       if PLAYER_2.activated:
         PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown - ELAPSED_MS
@@ -1659,6 +1686,9 @@ while GAME_STATE['RUNNING']:
           if PLAYER_2.weapon_2_cooldown <= 0:
             #Fire weapon 2
             bullet = Bullet(PLAYER_2.x, PLAYER_2.y, 0, 0, PLAYER_2.rotation, PLAYER_2.weapon_2_speed, GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], True)
+            bullet.effect_1_ttl = 750
+            bullet.effect_1_ttl_default = 750
+            bullet.effect_1_active = True
             player_2_bullets.add(bullet)
 
             #GAME_CONTROLS['PLAYER_2']['RED'] = False
@@ -1690,25 +1720,38 @@ while GAME_STATE['RUNNING']:
         if PLAYER_2.effect_1_ttl > 0:
           PLAYER_2.effect_1_active = True
           PLAYER_2.randomize_alpha()
+          PLAYER_2_BASE.randomize_alpha()
         else:
           PLAYER_2.effect_1_active = False
           PLAYER_2.set_alpha(255)
+          PLAYER_2_BASE.set_alpha(255)
 
       ### Update/Move the bullets and check collisions
-      for bullet in reversed(player_1_bullets.sprites()):
+      bullets = player_1_bullets.sprites()
+      bullets.extend(player_2_bullets.sprites())
+      for bullet in reversed(bullets):
+        if bullet.effect_1_active:
+          bullet.effect_1_ttl = bullet.effect_1_ttl - ELAPSED_MS
+        
         bullet.speed_x = math.cos(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
         bullet.speed_y = -math.sin(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
         bullet.set_location_delta(bullet.speed_x, bullet.speed_y)
+        if bullet.bomb == True:
+          bullet.size_modifier = bullet.effect_1_ttl / bullet.effect_1_ttl_default
+          if bullet.size_modifier < 0.25:
+            bullet.size_modifier = 0.25
+          if bullet.effect_1_ttl < 0 and bullet.effect_1_active:
+            bullet.kill()
+            explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+            explosion.effect_1_ttl = 350
+            explosion.effect_2_ttl = 150
+            explosion.effect_3_ttl = 150
+            explosion.effect_1_active = True
+            explosion.size_modifier = 0.5
+            explosions.add(explosion)
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
         
-      for bullet in reversed(player_2_bullets.sprites()):
-        bullet.speed_x = math.cos(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
-        bullet.speed_y = -math.sin(math.radians(bullet.rotation + 90)) * bullet.speed * ELAPSED_S
-        bullet.set_location_delta(bullet.speed_x, bullet.speed_y)
-        if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
-          bullet.kill()
-
       if pygame.sprite.collide_circle_ratio(0.45)(PLAYER_1, PLAYER_2): #a simpler approach, courtesy of nuclear pasta
         if not PLAYER_1.effect_1_active and not PLAYER_2.effect_1_active:
           explosion = GameSprite(PLAYER_1.x, PLAYER_1.y, 0, 0, PLAYER_1.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
@@ -1737,8 +1780,6 @@ while GAME_STATE['RUNNING']:
           PLAYER_2.effect_1_ttl = 3000
           PLAYER_2.effect_1_active = True
 
-      #def create_alert(color, font, txt_1, txt_2, ttl, fadeout, fadeout_ttl):
-      #create_alert(GAME_COLORS['SHMUP_YELLOW'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "SINGLE LINE TEST", "", 0, False, 0)
       collisions = pygame.sprite.spritecollide(PLAYER_1, player_2_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.45))
       if len(collisions) > 0:
         for bullet in collisions:
@@ -1777,6 +1818,47 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.effect_1_ttl = 3000
               PLAYER_2.effect_1_active = True
 
+      #Check collisions for "bases" and make life loss accordingly
+      if PLAYER_BASE_1.activated:
+        collisions = pygame.sprite.spritecollide(PLAYER_BASE_1, player_2_bullets, False)
+        for bullet in collisions:
+          if bullet.bomb and bullet.size_modifier <= 0.25:
+            explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+            explosion.effect_1_ttl = 350
+            explosion.effect_2_ttl = 150
+            explosion.effect_3_ttl = 150
+            explosion.effect_1_active = True
+            explosions.add(explosion)
+            bullet.kill()
+            if not PLAYER_1.effect_1_active:
+              PLAYER_BASE_1.activated = False
+              PLAYER_1.lives = PLAYER_1.lives - 1
+              PLAYER_1.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+              PLAYER_1.set_rotation(90)
+              PLAYER_1.speed = 64
+              PLAYER_1.effect_1_ttl = 3000
+              PLAYER_1.effect_1_active = True
+
+      if PLAYER_BASE_2.activated:
+        collisions = pygame.sprite.spritecollide(PLAYER_BASE_2, player_1_bullets, False)
+        for bullet in collisions:
+          if bullet.bomb and bullet.size_modifier <= 0.25:
+            explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
+            explosion.effect_1_ttl = 350
+            explosion.effect_2_ttl = 150
+            explosion.effect_3_ttl = 150
+            explosion.effect_1_active = True
+            explosions.add(explosion)
+            bullet.kill()
+            if not PLAYER_2.effect_1_active:
+              PLAYER_BASE_2.activated = False
+              PLAYER_2.lives = PLAYER_2.lives - 1
+              PLAYER_2.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+              PLAYER_2.set_rotation(90)
+              PLAYER_2.speed = 64
+              PLAYER_2.effect_1_ttl = 3000
+              PLAYER_2.effect_1_active = True
+
       for explosion in reversed(explosions.sprites()):
         if explosion.effect_1_active and explosion.effect_1_ttl <= 0:
           explosion.effect_1_active = False
@@ -1796,6 +1878,19 @@ while GAME_STATE['RUNNING']:
           explosion.kill()
         elif explosion.effect_3_active:
           explosion.effect_3_ttl = explosion.effect_3_ttl - ELAPSED_MS
+
+      ### DISPLAY THE GRAPHICS
+      if GAME_STATE['LAYER_2']:
+        if PLAYER_BASE_1.activated:
+          #map_green_red_house
+          #map_green_red_tent
+          #map_green_red_flag
+          a = 1
+        if PLAYER_BASE_2.activated:
+          #map_brown_blue_house
+          #map_brown_blue_tent
+          #map_brown_blue_flag
+          b = 1
 
       if PLAYER_1.lives <= 0 or PLAYER_2.lives <= 0:
         dogfighting_pvp_active = False
