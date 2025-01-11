@@ -1981,6 +1981,7 @@ while GAME_STATE['RUNNING']:
     #Bottom HUD
     pygame.draw.rect(THE_SCREEN, GAME_COLORS['STEEL_BLUE'], pygame.Rect(0,640,1280,80))
 
+    #If we're in DOGFIGHT_MODE, then show the lower HUD with the cooldowns for the planes
     if GAME_STATE['DOGFIGHT_MODE']:
       player_1_weapon_1 = GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'].copy()
       player_1_weapon_1.blit(GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'].get_rect(center=(32,32)))
@@ -2045,14 +2046,6 @@ while GAME_STATE['RUNNING']:
       player_2_throttle_value = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_COLOR'], (throttle_math, 24))
       player_2_throttle.blit(player_2_throttle_value, player_2_throttle_value.get_rect(center=(64, 16)))
       THE_SCREEN.blit(player_2_throttle, player_2_throttle.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*36.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
-
-
-    # bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-    # THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 640)))
-
-    # bottom_hud_test = GAME_FONTS['KENNEY_MINI_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
-    # THE_SCREEN.blit(bottom_hud_test, bottom_hud_test.get_rect(topleft = (32, 672)))
-
 
   ####################################################################
   # Draw ALERTS
