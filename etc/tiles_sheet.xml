@@ -139,15 +139,29 @@
 	<SubTexture name="map_brown_river_n_stop.png" x="160" y="144" width="16" height="16"/>
 	<SubTexture name="map_brown_river_w_stop.png" x="176" y="144" width="16" height="16"/>
 
+	<!-- 4 MAPPED -->
+	<SubTexture name="map_green_bush.png" x="0" y="48" width="16" height="16"/>
+	<SubTexture name="map_green_beach_top_left.png" x="16" y="48" width="16" height="16"/>
+	<SubTexture name="map_green_beach_top_middle.png" x="32" y="48" width="16" height="16"/>
+	<SubTexture name="map_green_beach_top_right.png" x="48" y="48" width="16" height="16"/>
+	<SubTexture name="map_green_beach_inner_lower_right.png" x="64" y="48" width="16" height="16"/>
+	<SubTexture name="map_green_beach_inner_lower_left.png" x="80" y="48" width="16" height="16"/>
+	<SubTexture name="W0.png" x="96" y="48" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_top_left.png" x="112" y="48" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_top_middle.png" x="128" y="48" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_top_right.png" x="144" y="48" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_inner_lower_right.png" x="160" y="48" width="16" height="16"/>
+	<SubTexture name="map_brown_beach_inner_lower_left.png" x="176" y="48" width="16" height="16"/>
+
 	<!-- 5 MAPPED -->
 	<SubTexture name="map_green_tree.png" x="0" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_left.png" x="16" y="64" width="16" height="16"/>
 	<SubTexture name="G0.png" x="32" y="64" width="16" height="16"/>
-	<SubTexture name="map_green_beach_right.png" x="48" y="64" width="16" height="16"/>
+	<SubTexture name="GBR.png" x="48" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_right.png" x="64" y="64" width="16" height="16"/>
 	<SubTexture name="map_green_beach_inner_upper_left.png" x="80" y="64" width="16" height="16"/>
 	<SubTexture name="map_brown_tree.png" x="96" y="64" width="16" height="16"/>
-	<SubTexture name="map_brown_beach_left.png" x="112" y="64" width="16" height="16"/>
+	<SubTexture name="BBL.png" x="112" y="64" width="16" height="16"/>
 	<SubTexture name="B0.png" x="128" y="64" width="16" height="16"/>
 	<SubTexture name="map_brown_beach_right.png" x="144" y="64" width="16" height="16"/>
 	<SubTexture name="map_brown_beach_inner_lower_right.png" x="160" y="64" width="16" height="16"/>

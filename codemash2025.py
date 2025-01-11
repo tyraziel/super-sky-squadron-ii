@@ -356,7 +356,18 @@ def initialize_dogfight_mode():
     for j in range (40):
       if j == 0:
         MAP.append([])
-      MAP[i].append("G0")
+      if j == 19 or j == 20:
+        MAP[i].append("W0") 
+      elif j == 18:
+        MAP[i].append("GBR")
+      elif j < 18:
+        MAP[i].append("G0")
+      elif j == 21:
+        MAP[i].append("BBL")
+      elif j > 21:
+        MAP[i].append("B0")
+      else:
+        MAP[i].append("G0")
 
   GAME_STATE['DOGFIGHT_MODE'] = True
   GAME_STATE['MULTIPLAYER'] = True #Dogfighting can only be multiplayer
