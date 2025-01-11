@@ -2004,33 +2004,47 @@ while GAME_STATE['RUNNING']:
       pygame.draw.arc(player_1_weapon_2_cooldown_arc, GAME_COLORS['SHMUP_GRAY'], player_1_weapon_2_cooldown_arc.get_rect(center=(64,64)), math.radians(90), math.radians(cooldown_math+90), 64)
       player_1_weapon_2_cooldown_arc.set_alpha(128)
       player_1_weapon_2.blit(player_1_weapon_2_cooldown_arc, player_1_weapon_2_cooldown_arc.get_rect(center=(32,32)))
-
       THE_SCREEN.blit(player_1_weapon_2, player_1_weapon_2.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*5.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
-      player_1_throttle = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_GREY'], (128, 32))
 
+      player_1_throttle = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_GREY'], (128, 32))
       max_speed_normalized = PLAYER_1.max_speed - PLAYER_1.min_speed
       speed_normalized = PLAYER_1.speed - PLAYER_1.min_speed
       throttle_math = 96 - (((max_speed_normalized - speed_normalized) / max_speed_normalized)) * 96
-
       player_1_throttle_value = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_COLOR'], (throttle_math, 24))
-
       player_1_throttle.blit(player_1_throttle_value, player_1_throttle_value.get_rect(center=(64, 16)))
-
       THE_SCREEN.blit(player_1_throttle, player_1_throttle.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*9.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
 
+      player_2_weapon_1 = GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'].copy()
+      player_2_weapon_1.blit(GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'], GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_SHOT'].get_rect(center=(32,32)))
+      player_2_weapon_1_cooldown_arc = pygame.Surface((128,128))
+      cooldown_min = PLAYER_2.weapon_1_cooldown
+      if cooldown_min < 0:
+        cooldown_min = 0
+      cooldown_math = (((PLAYER_2.weapon_1_cooldown_default - cooldown_min) / PLAYER_2.weapon_1_cooldown_default)) * 360
+      pygame.draw.arc(player_2_weapon_1_cooldown_arc, GAME_COLORS['SHMUP_GRAY'], player_2_weapon_1_cooldown_arc.get_rect(center=(64,64)), math.radians(90), math.radians(cooldown_math+90), 64)
+      player_2_weapon_1_cooldown_arc.set_alpha(128)
+      player_2_weapon_1.blit(player_2_weapon_1_cooldown_arc, player_2_weapon_1_cooldown_arc.get_rect(center=(32,32)))
+      THE_SCREEN.blit(player_2_weapon_1, player_2_weapon_1.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*29.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
 
-      # PLAYER_1.min_speed = 64
-      # PLAYER_2.min_speed = 64
+      player_2_weapon_2 = GAME_SURFACES['UI_PACK']['GREY']['BUTTON_SQUARE_FLAT'].copy()
+      player_2_weapon_2.blit(GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'], GAME_SURFACES['PIXEL_SHMUP_TILES']['SINGLE_BOMB'].get_rect(center=(32,32)))
+      player_2_weapon_2_cooldown_arc = pygame.Surface((128,128))
+      cooldown_min = PLAYER_2.weapon_2_cooldown
+      if cooldown_min < 0:
+        cooldown_min = 0
+      cooldown_math = (((PLAYER_2.weapon_2_cooldown_default - cooldown_min) / PLAYER_2.weapon_2_cooldown_default)) * 360
+      pygame.draw.arc(player_2_weapon_2_cooldown_arc, GAME_COLORS['SHMUP_GRAY'], player_2_weapon_2_cooldown_arc.get_rect(center=(64,64)), math.radians(90), math.radians(cooldown_math+90), 64)
+      player_2_weapon_2_cooldown_arc.set_alpha(128)
+      player_2_weapon_2.blit(player_2_weapon_2_cooldown_arc, player_2_weapon_2_cooldown_arc.get_rect(center=(32,32)))
+      THE_SCREEN.blit(player_2_weapon_2, player_2_weapon_2.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*32.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
 
-      # PLAYER_1.max_speed = 256
-      # PLAYER_2.max_speed = 256
-
-      # PLAYER_1.weapon_1_cooldown = 0
-      # PLAYER_1.weapon_2_cooldown = 0
-      # PLAYER_1.weapon_1_cooldown_default = 250
-      # PLAYER_1.weapon_2_cooldown_default = 1000
-
-
+      player_2_throttle = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_GREY'], (128, 32))
+      max_speed_normalized = PLAYER_2.max_speed - PLAYER_2.min_speed
+      speed_normalized = PLAYER_2.speed - PLAYER_2.min_speed
+      throttle_math = 96 - (((max_speed_normalized - speed_normalized) / max_speed_normalized)) * 96
+      player_2_throttle_value = pygame.transform.scale(GAME_SURFACES['UI_PACK']['RED']['CHECK_SQUARE_COLOR'], (throttle_math, 24))
+      player_2_throttle.blit(player_2_throttle_value, player_2_throttle_value.get_rect(center=(64, 16)))
+      THE_SCREEN.blit(player_2_throttle, player_2_throttle.get_rect(center=(GAME_CONSTANTS['SQUARE_SIZE']*36.5,GAME_CONSTANTS['SCREEN_HEIGHT']-40)))
 
 
     # bottom_hud_test = GAME_FONTS['KENNEY_MINI_SQUARE_32'].render(f"TEST", True, GAME_COLORS['ALMOST_BLACK'])
