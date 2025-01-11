@@ -157,23 +157,23 @@
       state: directory
       mode: '0755'
 
-  - name: Copy ui element from ./tmp/ui-pack/PNG/Grey/Default/button_square_flat.png to ../sprites/ui-pack/grey/Default/
+  - name: Copy ui element from ./tmp/ui-pack/PNG/Grey/Default/button_square_flat.png to ../sprites/ui-pack/grey/default/
     ansible.builtin.copy:
       remote_src: true
       src: "./tmp/ui-pack/PNG/Grey/Default/button_square_flat.png"
-      dest: ../sprites/ui-pack/grey/Default/
+      dest: ../sprites/ui-pack/grey/default/
 
-  - name: Copy ui element from ./tmp/ui-pack/PNG/Red/Default/check_square_color.png to ../sprites/ui-pack/red/Default/
+  - name: Copy ui element from ./tmp/ui-pack/PNG/Red/Default/check_square_color.png to ../sprites/ui-pack/red/default/
     ansible.builtin.copy:
       remote_src: true
       src: "./tmp/ui-pack/PNG/Red/Default/check_square_color.png"
-      dest: ../sprites/ui-pack/red/Default/
+      dest: ../sprites/ui-pack/red/default/
 
-  - name: Copy ui element from ./tmp/ui-pack/PNG/Red/Default/check_square_grey.png to ../sprites/ui-pack/grey/Default/
+  - name: Copy ui element from ./tmp/ui-pack/PNG/Red/Default/check_square_grey.png to ../sprites/ui-pack/grey/default/
     ansible.builtin.copy:
       remote_src: true
       src: "./tmp/ui-pack/PNG/Red/Default/check_square_grey.png"
-      dest: ../sprites/ui-pack/red/Default/
+      dest: ../sprites/ui-pack/red/default/
 
   - name: Create ../sprites/pixel-shmup/
     ansible.builtin.file:
