@@ -528,7 +528,7 @@ GAME_COLORS = {'DEEP_PURPLE': (58, 46, 63),
 # ***LESSON***
 TTL_DEFAULTS = {'TRANSITION_TO_TITLE_SCREEN': 5000, 'TRANSITION_TO_GAME_MODE_SCREEN': 750, 'TRANSITION_TO_INSTRUCTIONS_SCREEN': 750, 'TRANSITION_TO_DOGFIGHT_MODE': 1000, 'TRANSITION_TO_MISSION_MODE': 1000, 'TRANSITION_TO_ARENA_MODE': 1000, 'TRANSITION_TO_GAME_OVER_SCREEN': 5000,
                 'PRESS_START_BLINK': 750, 'ALERT': 1500, 'ALERT_FADEOUT': 1000, 'GAME_OVER': 3500,
-                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 'BASE_CREATION_MIN':20000, 'BASE_CREATION_MAX': 35000,
+                'READY': 1500, 'SET': 1500, 'FIGHT': 750, 'BASE_CREATION_MIN':7500, 'BASE_CREATION_MAX': 10000,
                 'INSTRUCTIONS_SCREEN': 25500}
 
 ######################################################################
@@ -549,6 +549,7 @@ GAME_STATE = {'DEBUG': GAME_CLI_ARGUMENTS.debug, 'DEBUG_GRID': GAME_CLI_ARGUMENT
 GAME_MODE_OPTIONS = {'PLAYERS': True, 'GAME_MODE': False, 'STARTING_LIVES': False, 'START_GAME': False,
                      'ONE_PLAYER': True, 'TWO_PLAYERS': False, 
                      'MISSION': True, 'ARENA': False, 'DOGFIGHT': False,
+                     'DOGFIGHT_BASES': True,
                      'LIVES_COUNT': 3}
 
 GAME_STATE_TRANSITION_TTL = {'TRANSITION_TO_TITLE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_TITLE_SCREEN'], 'TRANSITION_TO_GAME_MODE_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_MODE_SCREEN'], 'TRANSITION_TO_INSTRUCTIONS_SCREEN': TTL_DEFAULTS['TRANSITION_TO_INSTRUCTIONS_SCREEN'], 'TRANSITION_TO_DOGFIGHT_MODE': TTL_DEFAULTS['TRANSITION_TO_DOGFIGHT_MODE'], 'TRANSITION_TO_MISSION_MODE': TTL_DEFAULTS['TRANSITION_TO_MISSION_MODE'], 'TRANSITION_TO_ARENA_MODE': TTL_DEFAULTS['TRANSITION_TO_ARENA_MODE'], 'TRANSITION_TO_GAME_OVER_SCREEN': TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']}
@@ -1581,9 +1582,40 @@ while GAME_STATE['RUNNING']:
 
 
     if dogfighting_pvp_active:
-      ###BASE SHOW TTL
-      dogfighting_base_creation_ttl = dogfighting_base_creation_ttl - ELAPSED_MS
-      #dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
+      ###BASE CREATION
+      if GAME_MODE_OPTIONS['DOGFIGHT_BASES']:
+        dogfighting_base_creation_ttl = dogfighting_base_creation_ttl - ELAPSED_MS
+
+        if dogfighting_base_creation_ttl <= 0:
+          if not PLAYER_1_BASE.activated:
+            base = random.choice(range(3))
+            PLAYER_1_BASE.style = base
+            if base == 0:
+              PLAYER_1_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_GREEN_RED_HOUSE'])
+            elif base == 1:
+              PLAYER_1_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_GREEN_RED_TENT'])
+            elif base == 2:
+              PLAYER_1_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_GREEN_RED_FLAG'])
+            PLAYER_1_BASE.activated = True
+            base_x = random.choice(range(3, 9))
+            base_y = random.choice(range(5, 15))
+            PLAYER_1_BASE.set_location(base_x * GAME_CONSTANTS['SQUARE_SIZE'], base_y * GAME_CONSTANTS['SQUARE_SIZE'])
+
+          if not PLAYER_2_BASE.activated:
+            base = random.choice(range(3))
+            PLAYER_2_BASE.style = base
+            if base == 0:
+              PLAYER_2_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_BROWN_BLUE_HOUSE'])
+            elif base == 1:
+              PLAYER_2_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_BROWN_BLUE_TENT'])
+            elif base == 2:
+              PLAYER_2_BASE.set_image(GAME_SURFACES['PIXEL_SHMUP_TILES']['MAP_BROWN_BLUE_FLAG'])
+            PLAYER_2_BASE.activated = True
+            base_x = random.choice(range(33, 39))
+            base_y = random.choice(range(5, 15))
+            PLAYER_2_BASE.set_location(base_x * GAME_CONSTANTS['SQUARE_SIZE'], base_y * GAME_CONSTANTS['SQUARE_SIZE'])
+
+          dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 
       if PLAYER_1.activated:
         PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown - ELAPSED_MS
@@ -1824,7 +1856,7 @@ while GAME_STATE['RUNNING']:
 
       #Check collisions for "bases" and make life loss accordingly
       if PLAYER_1_BASE.activated:
-        collisions = pygame.sprite.spritecollide(PLAYER_1_BASE, player_2_bullets, False)
+        collisions = pygame.sprite.spritecollide(PLAYER_1_BASE, player_2_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.55))
         for bullet in collisions:
           if bullet.bomb and bullet.size_modifier <= 0.25:
             explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
@@ -1832,19 +1864,21 @@ while GAME_STATE['RUNNING']:
             explosion.effect_2_ttl = 150
             explosion.effect_3_ttl = 150
             explosion.effect_1_active = True
+            explosion.size_modifier = 0.75
             explosions.add(explosion)
             bullet.kill()
             if not PLAYER_1.effect_1_active:
               PLAYER_1_BASE.activated = False
               PLAYER_1.lives = PLAYER_1.lives - 1
-              PLAYER_1.set_location((GAME_CONSTANTS['SCREEN_WIDTH'] / 4) * 3, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
-              PLAYER_1.set_rotation(90)
+              PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
+              PLAYER_1.set_rotation(270)
               PLAYER_1.speed = 64
               PLAYER_1.effect_1_ttl = 3000
               PLAYER_1.effect_1_active = True
+              dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 
       if PLAYER_2_BASE.activated:
-        collisions = pygame.sprite.spritecollide(PLAYER_2_BASE, player_1_bullets, False)
+        collisions = pygame.sprite.spritecollide(PLAYER_2_BASE, player_1_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.55))
         for bullet in collisions:
           if bullet.bomb and bullet.size_modifier <= 0.25:
             explosion = GameSprite(bullet.x, bullet.y, 0, 0, bullet.rotation, 0, GAME_SURFACES['PIXEL_SHMUP_TILES']['STAR_SHOT'])
@@ -1852,6 +1886,7 @@ while GAME_STATE['RUNNING']:
             explosion.effect_2_ttl = 150
             explosion.effect_3_ttl = 150
             explosion.effect_1_active = True
+            explosion.size_modifier = 0.75
             explosions.add(explosion)
             bullet.kill()
             if not PLAYER_2.effect_1_active:
@@ -1862,6 +1897,7 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.speed = 64
               PLAYER_2.effect_1_ttl = 3000
               PLAYER_2.effect_1_active = True
+              dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 
       for explosion in reversed(explosions.sprites()):
         if explosion.effect_1_active and explosion.effect_1_ttl <= 0:
@@ -1886,15 +1922,9 @@ while GAME_STATE['RUNNING']:
       ### DISPLAY THE GRAPHICS
       if GAME_STATE['LAYER_2']:
         if PLAYER_1_BASE.activated:
-          #map_green_red_house
-          #map_green_red_tent
-          #map_green_red_flag
-          a = 1
+          THE_SCREEN.blit(PLAYER_1_BASE.image, PLAYER_1_BASE.image.get_rect(topleft = (PLAYER_1_BASE.x, PLAYER_1_BASE.y)))
         if PLAYER_2_BASE.activated:
-          #map_brown_blue_house
-          #map_brown_blue_tent
-          #map_brown_blue_flag
-          b = 1
+          THE_SCREEN.blit(PLAYER_2_BASE.image, PLAYER_2_BASE.image.get_rect(topleft = (PLAYER_2_BASE.x, PLAYER_2_BASE.y)))
 
       if PLAYER_1.lives <= 0 or PLAYER_2.lives <= 0:
         dogfighting_pvp_active = False
