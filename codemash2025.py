@@ -1,19 +1,6 @@
 ############################################################################################################################################
 # Game Title:
 # Super Sky Squadron II - The Flying Ace Follies
-# 
-# High Scores (missions):
-# Ace Aviators - for the "high scores" screen from missions?
-#
-# For the missions - Aerial Ace Adventures
-# For the pvp - Biplane Battle Royale
-# For the pvp - Sky Saviors: The Biplane Brawl
-# For the pvp - Dogfight Dash
-#
-# https://kenney.itch.io/ship-mixer
-#
-# Transporter-5
-# MDowOjAvMTA6MDowLzM6MDowLzk6MDowLzA6MDowL3wwOjEzLzE6MTMvMjoxMy8zOjAvNDo1LzU6LTEv
 #############################################################################################################################################
 import pygame
 import argparse
