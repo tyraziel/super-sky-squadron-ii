@@ -1,7 +1,8 @@
 sprites/*
 fonts/*
 sounds/*
-sfx/*
+sfx/space-shooter-redux/
+sfx/space-shooter-redux/*
 music/*
 setup/tmp/
 setup/tmp/*
