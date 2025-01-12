@@ -54,6 +54,10 @@ python3 codemash2025.py
 
 For more detailed instructions look at [SETUP.md](SETUP.md)
 
+## Refresh / Update
+
+At anytime either re-download the zip file, or execute a `git pull` from the project root to get any last minute updates.
+
 ## Credits
 
 All visual assets and sound effects have been provided by [kenney.nl](https://www.kenney.nl)
