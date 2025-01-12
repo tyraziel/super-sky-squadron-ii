@@ -82,4 +82,6 @@ Since this has been released to the Public Domain under Creative Commons CC0 1.0
 - Pygame-CE Contributor - nuclear pasta (aatle)[https://github.com/aatle]
 - The Pygame-CE Community - [discord.com/invite/pygame](discord.com/invite/pygame)
 
+- Kenney.nl - For the fantastic assets.
+
 - Those that attend "So you want to make video games?"
