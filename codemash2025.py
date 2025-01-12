@@ -727,6 +727,9 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
 
 ######################################################################
 # LOAD SOUNDS
+# **** LESSON ****
+# 
+# Load individual sound files as needed.
 ######################################################################
 MUSIC_TITLE_SCREEN = None
 MUSIC_PRE_GAME = None
@@ -911,7 +914,12 @@ pygame.display.update()
 print(f"PyGame Driver:  {pygame.display.get_driver()}")
 print(f"PyGame Display Info:\n{pygame.display.Info()}")
 
-# LESSON - Initialize other game elements
+######################################################################
+# ***LESSON***
+# Initialize other game elements
+######################################################################
+
+# Create our "Camera"
 CAMERA = {'X': 0, 'Y': 0}
 
 # Build out a default map 19 high and 40 wide
