@@ -169,7 +169,13 @@ def reset_transitions():
   GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_OVER_SCREEN'] = TTL_DEFAULTS['TRANSITION_TO_GAME_OVER_SCREEN']
 
 def stop_all_sounds():
-  return
+  if MUSIC_TITLE_SCREEN != None:
+    MUSIC_TITLE_SCREEN.fadeout(MUSIC_FADE_OUT)
+  if MUSIC_PRE_GAME != None:
+    MUSIC_PRE_GAME.fadeout(MUSIC_FADE_OUT)
+  if MUSIC_DOG_FIGHTING != None:
+    MUSIC_DOG_FIGHTING.fadeout(MUSIC_FADE_OUT)
+
 
 def destroy_dogfight_objects():
   global player_1_bullets
@@ -217,7 +223,6 @@ def reset_for_game_state_transition():
   destroy_all()
   reset_screens()
   reset_transitions()
-  stop_all_sounds()
   destroy_alert()
 
 def create_alert(color, font, txt_1, txt_2, ttl, fadeout, fadeout_ttl):
@@ -274,6 +279,12 @@ def initialize_title_screen():
 
   reset_for_game_state_transition()
   reset_players()
+
+  stop_all_sounds()
+
+  if MUSIC_TITLE_SCREEN != None:
+    MUSIC_TITLE_SCREEN.set_volume(1.0)
+    MUSIC_TITLE_SCREEN.play(loops=-1, fade_ms=MUSIC_FADE_IN)
   
   GAME_STATE['TITLE_SCREEN'] = True
   GAME_STATE['MULTIPLAYER'] = False
@@ -282,6 +293,11 @@ def initialize_game_mode_screen():
   global GAME_STATE
 
   reset_for_game_state_transition()
+  stop_all_sounds()
+
+  if MUSIC_PRE_GAME != None:
+    MUSIC_PRE_GAME.set_volume(1.0)
+    MUSIC_PRE_GAME.play(loops=-1, fade_ms=MUSIC_FADE_IN)
 
   GAME_STATE['GAME_MODE_SCREEN'] = True
   GAME_STATE['MULTIPLAYER'] = False
@@ -295,6 +311,12 @@ def initialize_instructions_screen():
   global instructions_screen_ttl
 
   reset_for_game_state_transition()
+
+  if MUSIC_PRE_GAME != None:
+    if MUSIC_PRE_GAME.get_num_channels() < 1:
+      stop_all_sounds()
+      MUSIC_PRE_GAME.set_volume(1.0)
+      MUSIC_PRE_GAME.play(loops=-1, fade_ms=MUSIC_FADE_IN)
 
   GAME_STATE['INSTRUCTIONS_SCREEN'] = True
 
@@ -322,6 +344,7 @@ def initialize_dogfight_mode():
   global dogfighting_pvp_ready_ttl
   global dogfighting_pvp_set_ttl
   global dogfighting_pvp_fight_ttl
+  global dogfighting_pvp_fight_shown
   global dogfighting_base_creation_ttl
   global player_1_bullets
   global player_2_bullets
@@ -330,10 +353,17 @@ def initialize_dogfight_mode():
   dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
   dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
   dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
+  dogfighting_pvp_fight_shown = False
   dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
 
   reset_for_game_state_transition()
   reset_players()
+
+  stop_all_sounds()
+
+  if MUSIC_DOG_FIGHTING != None:
+    MUSIC_DOG_FIGHTING.set_volume(1.0)
+    MUSIC_DOG_FIGHTING.play(loops=-1, fade_ms=MUSIC_FADE_IN)
 
   CAMERA = {'X': 0, 'Y': 0}
 
@@ -696,6 +726,165 @@ if GAME_CLI_ARGUMENTS.debug_to_console:
   print(f"[INIT] [TEXTURE] Completed")
 
 ######################################################################
+# LOAD SOUNDS
+######################################################################
+MUSIC_TITLE_SCREEN = None
+MUSIC_PRE_GAME = None
+MUSIC_DOG_FIGHTING = None
+MUSIC_MISSION = None
+
+MUSIC_FADE_IN = 250
+MUSIC_FADE_OUT = 250
+
+SOUND_EFFECT_SELECT = None
+SOUND_EFFECT_UI_MOVE = None
+
+SOUND_EFFECT_SHOT_1 = None
+SOUND_EFFECT_SHOT_2 = None
+SOUND_EFFECT_BOMB = None
+SOUND_EFFECT_PLANE_HIT = None
+SOUND_EFFECT_EXPLOSION_1 = None
+SOUND_EFFECT_EXPLOSION_2 = None
+SOUND_EFFECT_GROUND_HIT = None
+SOUND_EFFECT_ENGINE_1 = None
+SOUND_EFFECT_ENGINE_2 = None
+SOUND_EFFECT_OBJECTIVE_ACHIEVED = None
+SOUND_EFFECT_FIGHT = None
+
+if(not GAME_CLI_ARGUMENTS.mute_audio):
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO] Loading")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-MIXER] Loading")
+
+  pygame.mixer.init()
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-MIXER] Completed")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-MUSIC] Loading Title Music")  
+  try:
+    MUSIC_TITLE_SCREEN = pygame.mixer.Sound("./music/Mission Plausible.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-MUSIC-FAILURE] Title Music Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-MUSIC] Loading Pre-Game Music")  
+  try:
+    MUSIC_PRE_GAME = pygame.mixer.Sound("./music/Retro Beat.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-MUSIC-FAILURE] Pre-Game Music Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-MUSIC] Loading Dogfighting Music")  
+  try:
+    MUSIC_DOG_FIGHTING = pygame.mixer.Sound("./music/Drumming Sticks.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-MUSIC-FAILURE] Dogfighting Music Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Loading Select SFX")  
+  try:
+    SOUND_EFFECT_SELECT = pygame.mixer.Sound("./sfx/confirmation_001.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Select SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Loading UI Move SFX")  
+  try:
+    SOUND_EFFECT_UI_MOVE = pygame.mixer.Sound("./sfx/select_007.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] UI Move SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Loading Shot 1 SFX")  
+  try:
+    SOUND_EFFECT_SHOT_1 = pygame.mixer.Sound("./sfx/laserSmall_001.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Shot 1 SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Loading Shot 2 SFX")  
+  try:
+    SOUND_EFFECT_SHOT_2 = pygame.mixer.Sound("./sfx/laserSmall_003.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Shot 2 SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Loading Bomb SFX")  
+  try:
+    SOUND_EFFECT_BOMB = pygame.mixer.Sound("./sfx/fall1.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Shot 2 SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Plane Hit SFX")  
+  try:
+    SOUND_EFFECT_PLANE_HIT = pygame.mixer.Sound("./sfx/hit1.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Plane Hit SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Explosion 1 (Plane) SFX")  
+  try:
+    SOUND_EFFECT_EXPLOSION_1 = pygame.mixer.Sound("./sfx/explosion1.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Explosion 1 (Plane) SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Explosion 2 (Ground) SFX")  
+  try:
+    SOUND_EFFECT_EXPLOSION_2 = pygame.mixer.Sound("./sfx/explosionCrunch_003.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Explosion 2 (Ground) SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Ground Hit SFX")  
+  try:
+    SOUND_EFFECT_GROUND_HIT = pygame.mixer.Sound("./sfx/rumble3.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Ground Hit SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Engine 1 SFX")  
+  try:
+    SOUND_EFFECT_ENGINE_1 = pygame.mixer.Sound("./sfx/engine3.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Engine 1 SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Engine 2 SFX")  
+  try:
+    SOUND_EFFECT_ENGINE_2 = pygame.mixer.Sound("./sfx/engine4.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Engine 2 SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Objective Achieved SFX")  
+  try:
+    SOUND_EFFECT_OBJECTIVE_ACHIEVED = pygame.mixer.Sound("./sfx/objective achieved.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Objective Achieved SFX Failed to load: {exception}")
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO-SFX] Fight SFX")  
+  try:
+    SOUND_EFFECT_FIGHT = pygame.mixer.Sound("./sfx/fight.ogg")
+  except Exception as exception:
+    print(f"[INIT] [AUDIO-SFX-FAILURE] Fight SFX Failed to load: {exception}")
+
+
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO] Completed")
+
+else:
+  if GAME_CLI_ARGUMENTS.debug_to_console:
+    print(f"[INIT] [AUDIO] Skipping due to mute_audio being True")
+
+
+######################################################################
 # SETUP THE DISPLAY
 ######################################################################
 GAME_CONSTANTS['PYGAME_SCREEN_FLAGS'] = 0 #|pygame.NOFRAME|pygame.RESIZABLE
@@ -771,6 +960,7 @@ dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_
 dogfighting_pvp_ready_ttl = TTL_DEFAULTS['READY']
 dogfighting_pvp_set_ttl = TTL_DEFAULTS['SET']
 dogfighting_pvp_fight_ttl = TTL_DEFAULTS['FIGHT']
+dogfighting_pvp_fight_shown = False
 
 # Set to Title Screen
 reset_game_state()
@@ -1268,6 +1458,10 @@ while GAME_STATE['RUNNING']:
 
     #Evaluate pressing start and then transitioning to the next state of the game after TTL expires
     if not GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN'] and (GAME_CONTROLS['PLAYER_1']['GREEN'] or GAME_CONTROLS['PLAYER_1']['RED'] or GAME_CONTROLS['PLAYER_1']['BLUE'] or GAME_CONTROLS['PLAYER_1']['YELLOW'] or GAME_CONTROLS['PLAYER_2']['GREEN'] or GAME_CONTROLS['PLAYER_2']['RED'] or GAME_CONTROLS['PLAYER_2']['BLUE'] or GAME_CONTROLS['PLAYER_2']['YELLOW']):
+      if SOUND_EFFECT_SELECT != None:
+        SOUND_EFFECT_SELECT.stop()
+        SOUND_EFFECT_SELECT.set_volume(1.00)
+        SOUND_EFFECT_SELECT.play(loops=0)
       GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN'] = True
     if GAME_STATE['TRANSITION_TO_GAME_MODE_SCREEN']:
       GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_GAME_MODE_SCREEN'] - ELAPSED_MS
@@ -1283,6 +1477,10 @@ while GAME_STATE['RUNNING']:
       ## UPDATE THE GAME MODE BASED ON CONTROLS
       if GAME_CONTROLS['PLAYER_1']['DOWN']:
         GAME_CONTROLS['PLAYER_1']['DOWN'] = False
+        if SOUND_EFFECT_UI_MOVE != None:
+          SOUND_EFFECT_UI_MOVE.stop()
+          SOUND_EFFECT_UI_MOVE.set_volume(1.00)
+          SOUND_EFFECT_UI_MOVE.play(loops=0)
         if GAME_MODE_OPTIONS['PLAYERS']:
           GAME_MODE_OPTIONS['PLAYERS'] = False
           GAME_MODE_OPTIONS['GAME_MODE'] = True
@@ -1310,6 +1508,10 @@ while GAME_STATE['RUNNING']:
 
       if GAME_CONTROLS['PLAYER_1']['UP']:
         GAME_CONTROLS['PLAYER_1']['UP'] = False
+        if SOUND_EFFECT_UI_MOVE != None:
+          SOUND_EFFECT_UI_MOVE.stop()
+          SOUND_EFFECT_UI_MOVE.set_volume(1.00)
+          SOUND_EFFECT_UI_MOVE.play(loops=0)
         if GAME_MODE_OPTIONS['PLAYERS']:
           GAME_MODE_OPTIONS['PLAYERS'] = False
           GAME_MODE_OPTIONS['GAME_MODE'] = False
@@ -1337,6 +1539,10 @@ while GAME_STATE['RUNNING']:
 
       if GAME_CONTROLS['PLAYER_1']['RIGHT']:
         GAME_CONTROLS['PLAYER_1']['RIGHT'] = False
+        if SOUND_EFFECT_UI_MOVE != None:
+          SOUND_EFFECT_UI_MOVE.stop()
+          SOUND_EFFECT_UI_MOVE.set_volume(1.00)
+          SOUND_EFFECT_UI_MOVE.play(loops=0)
         if GAME_MODE_OPTIONS['PLAYERS']:
           if GAME_MODE_OPTIONS['ONE_PLAYER']:
             GAME_MODE_OPTIONS['ONE_PLAYER'] = False
@@ -1373,6 +1579,10 @@ while GAME_STATE['RUNNING']:
 
       if GAME_CONTROLS['PLAYER_1']['LEFT']:
         GAME_CONTROLS['PLAYER_1']['LEFT'] = False
+        if SOUND_EFFECT_UI_MOVE != None:
+          SOUND_EFFECT_UI_MOVE.stop()
+          SOUND_EFFECT_UI_MOVE.set_volume(1.00)
+          SOUND_EFFECT_UI_MOVE.play(loops=0)
         if GAME_MODE_OPTIONS['PLAYERS']:
           if GAME_MODE_OPTIONS['ONE_PLAYER']:
             GAME_MODE_OPTIONS['ONE_PLAYER'] = False
@@ -1487,6 +1697,10 @@ while GAME_STATE['RUNNING']:
     THE_SCREEN.blit(start_game, start_game.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SQUARE_SIZE'] * 16.0)))
 
     if GAME_MODE_OPTIONS['START_GAME'] and not GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] and (GAME_CONTROLS['PLAYER_1']['GREEN'] or GAME_CONTROLS['PLAYER_1']['RED'] or GAME_CONTROLS['PLAYER_1']['BLUE'] or GAME_CONTROLS['PLAYER_1']['YELLOW'] or GAME_CONTROLS['PLAYER_2']['GREEN'] or GAME_CONTROLS['PLAYER_2']['RED'] or GAME_CONTROLS['PLAYER_2']['BLUE'] or GAME_CONTROLS['PLAYER_2']['YELLOW']):
+      if SOUND_EFFECT_SELECT != None:
+        SOUND_EFFECT_SELECT.stop()
+        SOUND_EFFECT_SELECT.set_volume(1.0)
+        SOUND_EFFECT_SELECT.play(loops=0)
       GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = True
     if GAME_STATE['TRANSITION_TO_INSTRUCTIONS_SCREEN']:
       GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] = GAME_STATE_TRANSITION_TTL['TRANSITION_TO_INSTRUCTIONS_SCREEN'] - ELAPSED_MS
@@ -1511,6 +1725,10 @@ while GAME_STATE['RUNNING']:
       GAME_CONTROLS['PLAYER_2']['YELLOW'] = False
       instructions_screen_ttl = instructions_screen_ttl - 500
       instructions_screen_ttl = int(instructions_screen_ttl / 1000) * 1000
+      if SOUND_EFFECT_UI_MOVE != None:
+        SOUND_EFFECT_UI_MOVE.stop()
+        SOUND_EFFECT_UI_MOVE.set_volume(1.00)
+        SOUND_EFFECT_UI_MOVE.play(loops=0)
 
     if GAME_MODE_OPTIONS['DOGFIGHT']:
       dogfight_mode = GAME_FONTS['KENNEY_MINI_SQUARE_80'].render(f"DOGFIGHT MODE", True, GAME_COLORS['ALMOST_BLACK'])
@@ -1628,9 +1846,19 @@ while GAME_STATE['RUNNING']:
         if GAME_CONTROLS['PLAYER_1']['BLUE']:
           PLAYER_1.speed = PLAYER_1.speed + PLAYER_1.speed_delta * ELAPSED_S
           PLAYER_1.speed_rotation = PLAYER_1.speed_rotation - PLAYER_1.speed_rotation_delta * ELAPSED_S
+          if SOUND_EFFECT_ENGINE_1 != None:
+            if SOUND_EFFECT_ENGINE_1.get_num_channels() < 1:
+              SOUND_EFFECT_ENGINE_1.play()
+            else:
+              SOUND_EFFECT_ENGINE_1.set_volume(0.30)
         else:
           PLAYER_1.speed = PLAYER_1.speed - PLAYER_1.speed_delta * ELAPSED_S
           PLAYER_1.speed_rotation = PLAYER_1.speed_rotation + PLAYER_1.speed_rotation_delta * ELAPSED_S
+          if SOUND_EFFECT_ENGINE_1 != None:
+            if SOUND_EFFECT_ENGINE_1.get_num_channels() < 1:
+              SOUND_EFFECT_ENGINE_1.play()
+            else:
+              SOUND_EFFECT_ENGINE_1.set_volume(0.15)
 
         if GAME_CONTROLS['PLAYER_1']['GREEN']:
           if PLAYER_1.weapon_1_cooldown <= 0:
@@ -1641,6 +1869,10 @@ while GAME_STATE['RUNNING']:
 
             #GAME_CONTROLS['PLAYER_1']['GREEN'] = False
             PLAYER_1.weapon_1_cooldown = PLAYER_1.weapon_1_cooldown_default
+            if SOUND_EFFECT_SHOT_1 != None:
+              SOUND_EFFECT_SHOT_1.stop()
+              SOUND_EFFECT_SHOT_1.set_volume(1.00)
+              SOUND_EFFECT_SHOT_1.play(loops=0)
 
         if GAME_CONTROLS['PLAYER_1']['RED']:
           if PLAYER_1.weapon_2_cooldown <= 0:
@@ -1653,6 +1885,10 @@ while GAME_STATE['RUNNING']:
 
             #GAME_CONTROLS['PLAYER_1']['RED'] = False
             PLAYER_1.weapon_2_cooldown = PLAYER_1.weapon_2_cooldown_default
+            if SOUND_EFFECT_BOMB != None:
+              SOUND_EFFECT_BOMB.stop()
+              SOUND_EFFECT_BOMB.set_volume(0.25)
+              SOUND_EFFECT_BOMB.play(loops=0)
         
         if PLAYER_1.speed > PLAYER_1.max_speed:
           PLAYER_1.speed = PLAYER_1.max_speed
@@ -1700,9 +1936,19 @@ while GAME_STATE['RUNNING']:
         if GAME_CONTROLS['PLAYER_2']['BLUE']:
           PLAYER_2.speed = PLAYER_2.speed + PLAYER_2.speed_delta * ELAPSED_S
           PLAYER_2.speed_rotation = PLAYER_2.speed_rotation - PLAYER_2.speed_rotation_delta * ELAPSED_S
+          if SOUND_EFFECT_ENGINE_2 != None:
+            if SOUND_EFFECT_ENGINE_2.get_num_channels() < 1:
+              SOUND_EFFECT_ENGINE_2.play()
+            else:
+              SOUND_EFFECT_ENGINE_2.set_volume(0.30)
         else:
           PLAYER_2.speed = PLAYER_2.speed - PLAYER_2.speed_delta * ELAPSED_S
           PLAYER_2.speed_rotation = PLAYER_2.speed_rotation + PLAYER_2.speed_rotation_delta * ELAPSED_S
+          if SOUND_EFFECT_ENGINE_2 != None:
+            if SOUND_EFFECT_ENGINE_2.get_num_channels() < 1:
+              SOUND_EFFECT_ENGINE_2.play()
+            else:
+              SOUND_EFFECT_ENGINE_2.set_volume(0.15)
         
         if GAME_CONTROLS['PLAYER_2']['GREEN']:
           if PLAYER_2.weapon_1_cooldown <= 0:
@@ -1713,6 +1959,10 @@ while GAME_STATE['RUNNING']:
 
             #GAME_CONTROLS['PLAYER_2']['GREEN'] = False
             PLAYER_2.weapon_1_cooldown = PLAYER_2.weapon_1_cooldown_default
+            if SOUND_EFFECT_SHOT_2 != None:
+              SOUND_EFFECT_SHOT_2.stop()
+              SOUND_EFFECT_SHOT_2.set_volume(1.00)
+              SOUND_EFFECT_SHOT_2.play(loops=0)
 
         if GAME_CONTROLS['PLAYER_2']['RED']:
           if PLAYER_2.weapon_2_cooldown <= 0:
@@ -1725,6 +1975,10 @@ while GAME_STATE['RUNNING']:
 
             #GAME_CONTROLS['PLAYER_2']['RED'] = False
             PLAYER_2.weapon_2_cooldown = PLAYER_2.weapon_2_cooldown_default
+            if SOUND_EFFECT_BOMB != None:
+              SOUND_EFFECT_BOMB.stop()
+              SOUND_EFFECT_BOMB.set_volume(0.25)
+              SOUND_EFFECT_BOMB.play(loops=0)
 
         if PLAYER_2.speed > PLAYER_2.max_speed:
           PLAYER_2.speed = PLAYER_2.max_speed
@@ -1783,6 +2037,10 @@ while GAME_STATE['RUNNING']:
             explosion.effect_1_active = True
             explosion.size_modifier = 0.5
             explosions.add(explosion)
+            if SOUND_EFFECT_GROUND_HIT != None:
+              SOUND_EFFECT_GROUND_HIT.stop()
+              SOUND_EFFECT_GROUND_HIT.set_volume(0.65)
+              SOUND_EFFECT_GROUND_HIT.play(loops=0)
         if bullet.x < 0 or bullet.y < 0 or bullet.x > GAME_CONSTANTS['SCREEN_WIDTH'] or bullet.y > GAME_CONSTANTS['SCREEN_HEIGHT']:
           bullet.kill()
         
@@ -1800,6 +2058,10 @@ while GAME_STATE['RUNNING']:
           explosion.effect_3_ttl = 150
           explosion.effect_1_active = True
           explosions.add(explosion)
+          if SOUND_EFFECT_EXPLOSION_1 != None:
+            SOUND_EFFECT_EXPLOSION_1.stop()
+            SOUND_EFFECT_EXPLOSION_1.set_volume(1.00)
+            SOUND_EFFECT_EXPLOSION_1.play(loops=0)
 
           PLAYER_1.lives = PLAYER_1.lives - 1
           PLAYER_1.set_location(GAME_CONSTANTS['SCREEN_WIDTH'] / 4, GAME_CONSTANTS['SCREEN_HEIGHT'] / 2 - GAME_CONSTANTS['SQUARE_SIZE'])
@@ -1831,7 +2093,16 @@ while GAME_STATE['RUNNING']:
               PLAYER_1.set_rotation(270)
               PLAYER_1.speed = 64
               PLAYER_1.effect_1_ttl = 3000
-              PLAYER_1.effect_1_active = True              
+              PLAYER_1.effect_1_active = True
+              if SOUND_EFFECT_EXPLOSION_1 != None:
+                SOUND_EFFECT_EXPLOSION_1.stop()
+                SOUND_EFFECT_EXPLOSION_1.set_volume(1.00)
+                SOUND_EFFECT_EXPLOSION_1.play(loops=0)
+            else:
+              if SOUND_EFFECT_PLANE_HIT != None:
+                SOUND_EFFECT_PLANE_HIT.stop()
+                SOUND_EFFECT_PLANE_HIT.set_volume(1.00)
+                SOUND_EFFECT_PLANE_HIT.play(loops=0)
 
       collisions = pygame.sprite.spritecollide(PLAYER_2, player_1_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.45))
       if len(collisions) > 0:
@@ -1851,6 +2122,15 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.speed = 64
               PLAYER_2.effect_1_ttl = 3000
               PLAYER_2.effect_1_active = True
+              if SOUND_EFFECT_EXPLOSION_1 != None:
+                SOUND_EFFECT_EXPLOSION_1.stop()
+                SOUND_EFFECT_EXPLOSION_1.set_volume(1.00)
+                SOUND_EFFECT_EXPLOSION_1.play(loops=0)
+            else:
+              if SOUND_EFFECT_PLANE_HIT != None:
+                SOUND_EFFECT_PLANE_HIT.stop()
+                SOUND_EFFECT_PLANE_HIT.set_volume(1.00)
+                SOUND_EFFECT_PLANE_HIT.play(loops=0)
 
       #Check collisions for "bases" and make life loss accordingly
       if PLAYER_1_BASE.activated:
@@ -1874,6 +2154,15 @@ while GAME_STATE['RUNNING']:
               PLAYER_1.effect_1_ttl = 3000
               PLAYER_1.effect_1_active = True
               dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
+              if SOUND_EFFECT_EXPLOSION_2 != None:
+                SOUND_EFFECT_EXPLOSION_2.stop()
+                SOUND_EFFECT_EXPLOSION_2.set_volume(1.00)
+                SOUND_EFFECT_EXPLOSION_2.play(loops=0)
+            else:
+              if SOUND_EFFECT_GROUND_HIT != None:
+                SOUND_EFFECT_GROUND_HIT.stop()
+                SOUND_EFFECT_GROUND_HIT.set_volume(0.65)
+                SOUND_EFFECT_GROUND_HIT.play(loops=0)
 
       if PLAYER_2_BASE.activated:
         collisions = pygame.sprite.spritecollide(PLAYER_2_BASE, player_1_bullets, False, collided=pygame.sprite.collide_circle_ratio(0.55))
@@ -1896,6 +2185,15 @@ while GAME_STATE['RUNNING']:
               PLAYER_2.effect_1_ttl = 3000
               PLAYER_2.effect_1_active = True
               dogfighting_base_creation_ttl = random.choice(range(TTL_DEFAULTS['BASE_CREATION_MIN'], TTL_DEFAULTS['BASE_CREATION_MAX']))
+              if SOUND_EFFECT_EXPLOSION_2 != None:
+                SOUND_EFFECT_EXPLOSION_2.stop()
+                SOUND_EFFECT_EXPLOSION_2.set_volume(1.00)
+                SOUND_EFFECT_EXPLOSION_2.play(loops=0)
+            else:
+              if SOUND_EFFECT_GROUND_HIT != None:
+                SOUND_EFFECT_GROUND_HIT.stop()
+                SOUND_EFFECT_GROUND_HIT.set_volume(0.65)
+                SOUND_EFFECT_GROUND_HIT.play(loops=0)
 
       for explosion in reversed(explosions.sprites()):
         if explosion.effect_1_active and explosion.effect_1_ttl <= 0:
@@ -1925,16 +2223,27 @@ while GAME_STATE['RUNNING']:
           THE_SCREEN.blit(PLAYER_2_BASE.image, PLAYER_2_BASE.image.get_rect(topleft = (PLAYER_2_BASE.x, PLAYER_2_BASE.y)))
 
       if PLAYER_1.lives <= 0 or PLAYER_2.lives <= 0:
+        if MUSIC_DOG_FIGHTING != None:
+          MUSIC_DOG_FIGHTING.fadeout(MUSIC_FADE_OUT)
+
         dogfighting_pvp_active = False
         if PLAYER_1.lives > PLAYER_2.lives:
           ace = ""
           if PLAYER_1.lives == GAME_MODE_OPTIONS['LIVES_COUNT']:
             ace = "*****ACE*****"
+            if SOUND_EFFECT_OBJECTIVE_ACHIEVED != None:
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.stop()
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.set_volume(0.65)
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.play(loops=0)
           create_alert(GAME_COLORS['SHMUP_RED'], GAME_FONTS['KENNEY_MINI_SQUARE_80'], "PLAYER 1 WINS!", ace, 4750, False, 0)
         elif PLAYER_1.lives < PLAYER_2.lives:
           ace = ""
           if PLAYER_2.lives == GAME_MODE_OPTIONS['LIVES_COUNT']:
             ace = "*****ACE*****"
+            if SOUND_EFFECT_OBJECTIVE_ACHIEVED != None:
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.stop()
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.set_volume(0.65)
+              SOUND_EFFECT_OBJECTIVE_ACHIEVED.play(loops=0)
           create_alert(GAME_COLORS['SHMUP_BLUE'], GAME_FONTS['KENNEY_MINI_SQUARE_80'], "PLAYER 2 WINS!", ace, 4750, False, 0)
         elif PLAYER_1.lives == PLAYER_2.lives:
           create_alert(GAME_COLORS['SHMUP_ORANGE'], GAME_FONTS['KENNEY_MINI_SQUARE_96'], "DRAW!", "", 4750, False, 0)
@@ -1987,6 +2296,12 @@ while GAME_STATE['RUNNING']:
         THE_SCREEN.blit(set_text, set_text.get_rect(center = (GAME_CONSTANTS['SCREEN_WIDTH'] / 2, GAME_CONSTANTS['SCREEN_HEIGHT'] / 3)))
       elif dogfighting_pvp_fight_ttl > 0:
         dogfighting_pvp_fight_ttl = dogfighting_pvp_fight_ttl - ELAPSED_MS
+        if not dogfighting_pvp_fight_shown:
+          dogfighting_pvp_fight_shown = True
+          # if SOUND_EFFECT_FIGHT != None:
+          #   SOUND_EFFECT_FIGHT.stop()
+          #   SOUND_EFFECT_FIGHT.set_volume(1.00)
+          #   SOUND_EFFECT_FIGHT.play(loops=0)
         size_zoom = 1.0
         if(dogfighting_pvp_fight_ttl > 150):
           size_zoom = 1.0 + 1 / (dogfighting_pvp_fight_ttl / TTL_DEFAULTS['FIGHT'])
