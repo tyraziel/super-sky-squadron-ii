@@ -2025,6 +2025,7 @@ while GAME_STATE['RUNNING']:
             PLAYER_2_BASE.set_alpha(255)
 
       ### Update/Move the bullets and check collisions
+      ### LESSON - Collision Detection
       bullets = player_1_bullets.sprites()
       bullets.extend(player_2_bullets.sprites())
       for bullet in reversed(bullets):
@@ -2354,8 +2355,8 @@ while GAME_STATE['RUNNING']:
   #
   #
   ####################################################################
-  if GAME_STATE['LAYER_1']:
-    a = 1
+  # if GAME_STATE['LAYER_1']:
+  #   a = 1
 
 
   ####################################################################
@@ -2668,7 +2669,7 @@ while GAME_STATE['RUNNING']:
     ######################################################################
     # Show the Player Information
     ######################################################################
-    PLAYER_1.activated
+    # PLAYER_1.activated
 
     ######################################################################
     # Show the Player Controls Debug
