@@ -930,9 +930,11 @@ for i in range(19):
       MAP.append([])
     MAP[i].append("G0")
 
+#Initialize press start
 press_start_color = GAME_COLORS['SHMUP_ROYAL_PURPLE']
 press_start_blink_ttl = TTL_DEFAULTS['PRESS_START_BLINK']
 
+#Initialize Alerts
 alert_ttl = TTL_DEFAULTS['ALERT']
 alert_txt_1 = ""
 alert_txt_2 = ""
