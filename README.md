@@ -3,6 +3,10 @@ Code for CodeMash 2025 Divez Session - So you want to make video games? - Super 
 
 In order to get the most out of the session, it is strongly advisable that the pre-requisites are completed prior to the session starting.  It is even more advisable to complete the pre-requisites before coming to CodeMash as you and every other attendee will be fighting for bandwidth and some setups (chromebook) might take a long time for downloads.
 
+## NOTE
+
+This project is "locked down" for historical purposes (i.e. to keep it as it was for the codemash 25 session.)  The updated project will be located here:  https://github.com/tyraziel/super-sky-squadron-ii.git
+
 ## Pre-Requisites
 
 - A laptop capable of running python3 with pygame-ce and installing various pip packages, and running some type of editor and unzip capabilities.
